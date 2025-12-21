@@ -15,6 +15,12 @@
 `compose.yaml` に以下のサービスを追加しました：
 
 ```yaml
+# MySQL Database Container
+mysql:
+    image: 'mysql:8.4'
+    command: --mysql-native-password=ON  # phpMyAdmin互換性のため追加
+    ...
+
 # phpMyAdmin - MySQL Database Management Tool
 phpmyadmin:
     image: 'phpmyadmin/phpmyadmin:latest'
@@ -31,6 +37,10 @@ phpmyadmin:
     depends_on:
         - mysql
 ```
+
+> **💡 重要な設定**  
+> MySQL 8.4では `mysql_native_password` プラグインがデフォルトで無効化されているため、  
+> `command: --mysql-native-password=ON` を追加してphpMyAdminとの互換性を確保しています。
 
 ### 2. ドキュメントの更新
 
@@ -119,6 +129,37 @@ environment:
 ---
 
 ## 🐛 トラブルシューティング
+
+### ❌ Plugin 'mysql_native_password' is not loaded エラー
+
+**エラー例**：
+```
+mysqli::real_connect(): (HY000/1524): Plugin 'mysql_native_password' is not loaded
+```
+
+**原因**：
+MySQL 8.4では `mysql_native_password` プラグインがデフォルトで無効化されています。
+
+**解決方法**：
+1. `compose.yaml` のMySQLセクションに以下を追加：
+```yaml
+mysql:
+    image: 'mysql:8.4'
+    command: --mysql-native-password=ON  # この行を追加
+```
+
+2. データベースを再作成（**データが消えます！注意**）：
+```bash
+sail down -v
+sail up -d
+sail artisan migrate
+```
+
+> **💡 注意**  
+> `-v` オプションを使うとボリュームが削除され、データベースのデータが全て消えます。  
+> 本番環境では絶対に使用しないでください！
+
+---
 
 ### ポート 8080 が既に使用されている
 

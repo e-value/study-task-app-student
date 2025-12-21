@@ -6,14 +6,14 @@
 
 ## 📋 前提条件
 
-- PHP 8.2以上（または8.4推奨）
-- Composer
-- Node.js & npm
-- SQLite（デフォルト設定）
+-   PHP 8.2 以上（または 8.4 推奨）
+-   Composer
+-   Node.js & npm
+-   SQLite（デフォルト設定）
 
-> **💡 Docker環境の場合**  
+> **💡 Docker 環境の場合**  
 > Docker + Laravel Sail を使用する場合は、[README.md](./README.md) を参照してください。  
-> Sail環境では **phpMyAdmin** も利用できます（http://localhost:8080）。
+> Sail 環境では **phpMyAdmin** も利用できます（http://localhost:8080）。
 
 ---
 
@@ -41,14 +41,16 @@ php artisan db:seed
 
 ### 3. 開発サーバーの起動
 
-ターミナルを **2つ** 開いて、以下をそれぞれ実行：
+ターミナルを **2 つ** 開いて、以下をそれぞれ実行：
 
-**ターミナル1: Laravelサーバー**
+**ターミナル 1: Laravel サーバー**
+
 ```bash
 php artisan serve
 ```
 
-**ターミナル2: Viteビルド（Vue開発サーバー）**
+**ターミナル 2: Vite ビルド（Vue 開発サーバー）**
+
 ```bash
 npm run dev
 ```
@@ -57,63 +59,70 @@ npm run dev
 
 ## 👥 テストユーザー
 
-Seederで以下の3人のユーザーが作成されます：
+Seeder で以下の 3 人のユーザーが作成されます：
 
-| 名前 | メールアドレス | パスワード | 役割 |
-|------|---------------|-----------|------|
-| Owner User | owner@example.com | password | Project Owner |
-| Admin User | admin@example.com | password | Project Admin |
-| Member User | member@example.com | password | Project Member |
+| 名前        | メールアドレス     | パスワード | 役割           |
+| ----------- | ------------------ | ---------- | -------------- |
+| Owner User  | owner@example.com  | password   | Project Owner  |
+| Admin User  | admin@example.com  | password   | Project Admin  |
+| Member User | member@example.com | password   | Project Member |
 
-※ デフォルトのパスワードは全て `password` です（Laravel Factoryのデフォルト）
+※ デフォルトのパスワードは全て `password` です（Laravel Factory のデフォルト）
 
 ---
 
 ## 📂 作成されるプロジェクト
 
 ### Project Alpha
-- **メンバー**: Owner User (owner) / Admin User (admin) / Member User (member)
-- **タスク**: 5件（todo/doing/done混在）
-- **注意**: Member Userが未完了タスクを持っている（削除禁止チェック用）
+
+-   **メンバー**: Owner User (owner) / Admin User (admin) / Member User (member)
+-   **タスク**: 5 件（todo/doing/done 混在）
+-   **注意**: Member User が未完了タスクを持っている（削除禁止チェック用）
 
 ### Project Beta
-- **メンバー**: Owner User (owner) / Member User (member)
-- **タスク**: なし
+
+-   **メンバー**: Owner User (owner) / Member User (member)
+-   **タスク**: なし
 
 ---
 
 ## 🎯 動作確認チェックリスト
 
 ### ✅ 認証
-- [ ] ログインできる（例: owner@example.com / password）
-- [ ] ログアウトできる
+
+-   [ ] ログインできる（例: owner@example.com / password）
+-   [ ] ログアウトできる
 
 ### ✅ プロジェクト一覧（`/projects`）
-- [ ] 自分が所属しているプロジェクトが表示される
-- [ ] プロジェクトをクリックすると詳細画面へ遷移する
+
+-   [ ] 自分が所属しているプロジェクトが表示される
+-   [ ] プロジェクトをクリックすると詳細画面へ遷移する
 
 ### ✅ プロジェクト詳細（`/projects/:id`）
 
 #### タスクタブ
-- [ ] タスク一覧が表示される
-- [ ] タスク作成フォームが表示される
-- [ ] 新しいタスクを作成できる（title/description入力）
-- [ ] `todo` タスクに「Start」ボタンが表示される
-- [ ] 「Start」ボタンで `doing` に変更できる
-- [ ] `doing` タスクに「Complete」ボタンが表示される
-- [ ] 「Complete」ボタンで `done` に変更できる
-- [ ] 不正な状態遷移（例: `done` → `doing`）で **409エラー** が返る
+
+-   [ ] タスク一覧が表示される
+-   [ ] タスク作成フォームが表示される
+-   [ ] 新しいタスクを作成できる（title/description 入力）
+-   [ ] `todo` タスクに「Start」ボタンが表示される
+-   [ ] 「Start」ボタンで `doing` に変更できる
+-   [ ] `doing` タスクに「Complete」ボタンが表示される
+-   [ ] 「Complete」ボタンで `done` に変更できる
+-   [ ] 不正な状態遷移（例: `done` → `doing`）で **409 エラー** が返る
 
 #### メンバータブ
-- [ ] メンバー一覧が表示される（name/email/role）
-- [ ] owner/adminロールで「Delete」ボタンが表示される
-- [ ] **未完了タスクを持つメンバー** の削除で **409エラー** が表示される
-- [ ] **最後のowner** の削除で **409エラー** が表示される
-- [ ] 条件を満たすメンバーは削除できる
+
+-   [ ] メンバー一覧が表示される（name/email/role）
+-   [ ] owner/admin ロールで「Delete」ボタンが表示される
+-   [ ] **未完了タスクを持つメンバー** の削除で **409 エラー** が表示される
+-   [ ] **最後の owner** の削除で **409 エラー** が表示される
+-   [ ] 条件を満たすメンバーは削除できる
 
 ### ✅ 権限チェック
-- [ ] 所属していないプロジェクトへのアクセスで **403エラー** が返る
-- [ ] member権限でメンバー削除を試みると **403エラー** が返る
+
+-   [ ] 所属していないプロジェクトへのアクセスで **403 エラー** が返る
+-   [ ] member 権限でメンバー削除を試みると **403 エラー** が返る
 
 ---
 
@@ -125,12 +134,14 @@ Seederで以下の3人のユーザーが作成されます：
 Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.4.0".
 ```
 
-**解決方法A: PHPをアップグレード**
+**解決方法 A: PHP をアップグレード**
+
 ```bash
 brew upgrade php
 ```
 
-**解決方法B: Composerの設定を緩和（一時的）**
+**解決方法 B: Composer の設定を緩和（一時的）**
+
 ```bash
 composer install --ignore-platform-reqs
 ```
@@ -142,7 +153,7 @@ composer install --ignore-platform-reqs
 php artisan migrate:fresh --seed
 ```
 
-### Viteビルドエラーが出る場合
+### Vite ビルドエラーが出る場合
 
 ```bash
 # node_modulesを削除して再インストール
@@ -192,20 +203,19 @@ npm run dev
 今回は「最小で動く」実装を優先しました。
 以下は、今後の研修で「カオスなサービス」を作る際の参考です：
 
-- [ ] サービス層の導入（UseCase/Service）
-- [ ] Repository層の導入
-- [ ] Policy/Gate による権限管理
-- [ ] FormRequest によるバリデーション分離
-- [ ] API Resource による整形
-- [ ] イベント・リスナーの活用
-- [ ] キューの導入
-- [ ] テストコード（PHPUnit/Pest）
+-   [ ] サービス層の導入（UseCase/Service）
+-   [ ] Repository 層の導入
+-   [ ] Policy/Gate による権限管理
+-   [ ] FormRequest によるバリデーション分離
+-   [ ] API Resource による整形
+-   [ ] イベント・リスナーの活用
+-   [ ] キューの導入
+-   [ ] テストコード（PHPUnit/Pest）
 
 ---
 
 ## 📞 サポート
 
-問題が発生した場合は、ガネーシャ🐘に聞いてや！
+問題が発生した場合は、ガネーシャ 🐘 に聞いてや！
 
 さすガネーシャや！✨
-
