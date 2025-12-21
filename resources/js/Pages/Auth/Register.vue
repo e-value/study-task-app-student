@@ -6,7 +6,7 @@
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" value="名前" />
 
                 <TextInput
                     id="name"
@@ -22,7 +22,7 @@
             </div>
 
             <div class="mt-4">
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="メールアドレス" />
 
                 <TextInput
                     id="email"
@@ -37,7 +37,7 @@
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="password" value="パスワード" />
 
                 <TextInput
                     id="password"
@@ -52,7 +52,7 @@
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirm Password" />
+                <InputLabel for="password_confirmation" value="パスワード（確認）" />
 
                 <TextInput
                     id="password_confirmation"
@@ -71,7 +71,7 @@
                     :to="{ name: 'login' }"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
                 >
-                    Already registered?
+                    既にアカウントをお持ちですか？
                 </router-link>
 
                 <PrimaryButton
@@ -79,7 +79,7 @@
                     :class="{ 'opacity-25': processing }"
                     :disabled="processing"
                 >
-                    Register
+                    登録
                 </PrimaryButton>
             </div>
         </form>
@@ -130,7 +130,7 @@ const submit = async () => {
         } else if (error.response?.data?.message) {
             errors.value = error.response.data.message;
         } else {
-            errors.value = 'An error occurred during registration';
+            errors.value = '登録中にエラーが発生しました';
         }
     } finally {
         processing.value = false;

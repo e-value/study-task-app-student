@@ -23,13 +23,7 @@
                   :to="{ name: 'dashboard' }"
                   :active="$route.name === 'dashboard'"
                 >
-                  Dashboard
-                </NavLink>
-                <NavLink
-                  :to="{ name: 'projects.index' }"
-                  :active="$route.name?.startsWith('projects')"
-                >
-                  Projects
+                  ダッシュボード
                 </NavLink>
               </div>
             </div>
@@ -62,11 +56,8 @@
                   </template>
 
                   <template #content>
-                    <DropdownLink :to="{ name: 'profile.edit' }">
-                      Profile
-                    </DropdownLink>
                     <DropdownLink @click="handleLogout" as="button">
-                      Log Out
+                      ログアウト
                     </DropdownLink>
                   </template>
                 </Dropdown>
@@ -124,13 +115,7 @@
               :to="{ name: 'dashboard' }"
               :active="$route.name === 'dashboard'"
             >
-              Dashboard
-            </ResponsiveNavLink>
-            <ResponsiveNavLink
-              :to="{ name: 'projects.index' }"
-              :active="$route.name?.startsWith('projects')"
-            >
-              Projects
+              ダッシュボード
             </ResponsiveNavLink>
           </div>
 
@@ -148,11 +133,8 @@
             </div>
 
             <div class="mt-3 space-y-1">
-              <ResponsiveNavLink :to="{ name: 'profile.edit' }">
-                Profile
-              </ResponsiveNavLink>
               <ResponsiveNavLink @click="handleLogout" as="button">
-                Log Out
+                ログアウト
               </ResponsiveNavLink>
             </div>
           </div>

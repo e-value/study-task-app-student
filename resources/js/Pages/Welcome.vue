@@ -5,7 +5,7 @@
                 <header class="grid grid-cols-2 items-center gap-2 py-10 lg:grid-cols-3">
                     <div class="flex lg:col-start-2 lg:justify-center">
                         <h1 class="text-4xl font-bold text-gray-900 dark:text-white">
-                            Welcome to Laravel + Vue 3
+                            Laravel + Vue 3 へようこそ
                         </h1>
                     </div>
                     <nav v-if="!authStore.isAuthenticated" class="-mx-3 flex flex-1 justify-end">
@@ -13,13 +13,13 @@
                             :to="{ name: 'login' }"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                         >
-                            Log in
+                            ログイン
                         </router-link>
                         <router-link
                             :to="{ name: 'register' }"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                         >
-                            Register
+                            新規登録
                         </router-link>
                     </nav>
                     <nav v-else class="-mx-3 flex flex-1 justify-end">
@@ -27,7 +27,7 @@
                             :to="{ name: 'dashboard' }"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                         >
-                            Dashboard
+                            ダッシュボード
                         </router-link>
                     </nav>
                 </header>
@@ -39,8 +39,8 @@
                                 Laravel + Vue 3 SPA
                             </h2>
                             <p class="mt-4 text-sm/relaxed">
-                                This is a Single Page Application built with Laravel (API) and Vue 3 (Frontend).
-                                Authentication is powered by Laravel Sanctum.
+                                Laravel（API）とVue 3（フロントエンド）で構築されたシングルページアプリケーションです。
+                                認証機能はLaravel Sanctumを使用しています。
                             </p>
                         </div>
 
@@ -55,9 +55,9 @@
                                 </svg>
                             </div>
                             <div class="pt-3 sm:pt-5">
-                                <h2 class="text-xl font-semibold text-black dark:text-white">Documentation</h2>
+                                <h2 class="text-xl font-semibold text-black dark:text-white">ドキュメント</h2>
                                 <p class="mt-4 text-sm/relaxed">
-                                    Laravel has wonderful documentation covering every aspect of the framework.
+                                    Laravelには、フレームワークのあらゆる側面をカバーする素晴らしいドキュメントがあります。
                                 </p>
                             </div>
                         </a>
@@ -76,7 +76,7 @@
                             <div class="pt-3 sm:pt-5">
                                 <h2 class="text-xl font-semibold text-black dark:text-white">Vue 3</h2>
                                 <p class="mt-4 text-sm/relaxed">
-                                    The Progressive JavaScript Framework for building user interfaces.
+                                    ユーザーインターフェースを構築するためのプログレッシブなJavaScriptフレームワークです。
                                 </p>
                             </div>
                         </a>

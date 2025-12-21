@@ -10,7 +10,7 @@
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="メールアドレス" />
 
                 <TextInput
                     id="email"
@@ -26,7 +26,7 @@
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="password" value="パスワード" />
 
                 <TextInput
                     id="password"
@@ -43,7 +43,7 @@
             <div class="mt-4 block">
                 <label class="flex items-center">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
+                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">ログイン状態を保持する</span>
                 </label>
             </div>
 
@@ -52,7 +52,7 @@
                     :to="{ name: 'password.request' }"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
                 >
-                    Forgot your password?
+                    パスワードをお忘れですか？
                 </router-link>
 
                 <PrimaryButton
@@ -60,7 +60,7 @@
                     :class="{ 'opacity-25': processing }"
                     :disabled="processing"
                 >
-                    Log in
+                    ログイン
                 </PrimaryButton>
             </div>
         </form>
@@ -111,7 +111,7 @@ const submit = async () => {
         } else if (error.response?.data?.message) {
             errors.value = error.response.data.message;
         } else {
-            errors.value = 'An error occurred during login';
+            errors.value = 'ログイン中にエラーが発生しました';
         }
     } finally {
         processing.value = false;
