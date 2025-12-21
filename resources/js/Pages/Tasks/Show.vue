@@ -25,7 +25,7 @@ const fetchTask = async () => {
   try {
     loading.value = true;
     const response = await axios.get(`/api/tasks/${taskId}`);
-    task.value = response.data.task;
+    task.value = response.data.data;
   } catch (err) {
     console.error('Failed to fetch task:', err);
     error.value = err.response?.data?.message || 'タスクの読み込みに失敗しました';
@@ -52,7 +52,7 @@ const saveChanges = async () => {
     error.value = null;
 
     const response = await axios.put(`/api/tasks/${taskId}`, form.value);
-    task.value = response.data.task;
+    task.value = response.data.data;
     editing.value = false;
   } catch (err) {
     console.error('Failed to update task:', err);
@@ -65,7 +65,7 @@ const saveChanges = async () => {
 const startTask = async () => {
   try {
     const response = await axios.post(`/api/tasks/${taskId}/start`);
-    task.value = response.data.task;
+    task.value = response.data.data;
   } catch (err) {
     console.error('Failed to start task:', err);
     error.value = err.response?.data?.message || 'タスクの開始に失敗しました';
@@ -75,7 +75,7 @@ const startTask = async () => {
 const completeTask = async () => {
   try {
     const response = await axios.post(`/api/tasks/${taskId}/complete`);
-    task.value = response.data.task;
+    task.value = response.data.data;
   } catch (err) {
     console.error('Failed to complete task:', err);
     error.value = err.response?.data?.message || 'タスクの完了に失敗しました';
@@ -214,9 +214,9 @@ onMounted(() => {
                 <!-- 作成者 -->
                 <div class="flex items-center gap-2 text-slate-600">
                   <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm font-bold">
-                    {{ task.created_by?.name?.charAt(0) || '?' }}
+                    {{ task.created_by_user?.name?.charAt(0) || '?' }}
                   </div>
-                  <span class="text-sm font-medium">{{ task.created_by?.name || '不明' }}</span>
+                  <span class="text-sm font-medium">{{ task.created_by_user?.name || '不明' }}</span>
                 </div>
 
                 <!-- 作成日時 -->

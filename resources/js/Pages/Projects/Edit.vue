@@ -24,7 +24,7 @@ const fetchProject = async () => {
   try {
     loading.value = true;
     const response = await axios.get(`/api/projects/${projectId}`);
-    project.value = response.data.project;
+    project.value = response.data.data;
 
     // フォームに現在の値を設定
     form.value.name = project.value.name;

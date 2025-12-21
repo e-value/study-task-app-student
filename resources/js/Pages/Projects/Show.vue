@@ -92,9 +92,9 @@ const fetchProject = async () => {
     loading.value = true;
     error.value = null;
     const response = await axios.get(`/api/projects/${projectId}`);
-    project.value = response.data.project;
-    tasks.value = response.data.project.tasks || [];
-    members.value = response.data.project.memberships || [];
+    project.value = response.data.data;
+    tasks.value = response.data.data.tasks || [];
+    members.value = response.data.data.memberships || [];
   } catch (err) {
     console.error('Failed to fetch project:', err);
     error.value = err.response?.data?.message || 'プロジェクトの読み込みに失敗しました';
@@ -107,7 +107,7 @@ const createTask = async () => {
   try {
     creatingTask.value = true;
     const response = await axios.post(`/api/projects/${projectId}/tasks`, newTask.value);
-    tasks.value.unshift(response.data.task);
+    tasks.value.unshift(response.data.data);
     newTask.value = { title: '', description: '' };
   } catch (err) {
     console.error('Failed to create task:', err);
@@ -122,7 +122,7 @@ const startTask = async (taskId) => {
     const response = await axios.post(`/api/tasks/${taskId}/start`);
     const index = tasks.value.findIndex(t => t.id === taskId);
     if (index !== -1) {
-      tasks.value[index] = response.data.task;
+      tasks.value[index] = response.data.data;
     }
   } catch (err) {
     console.error('Failed to start task:', err);
@@ -135,7 +135,7 @@ const completeTask = async (taskId) => {
     const response = await axios.post(`/api/tasks/${taskId}/complete`);
     const index = tasks.value.findIndex(t => t.id === taskId);
     if (index !== -1) {
-      tasks.value[index] = response.data.task;
+      tasks.value[index] = response.data.data;
     }
   } catch (err) {
     console.error('Failed to complete task:', err);
@@ -408,9 +408,9 @@ onMounted(() => {
                         <!-- 作成者 -->
                         <div class="flex items-center gap-2 text-sm text-slate-600">
                           <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold">
-                            {{ task.created_by?.name?.charAt(0) || '?' }}
+                            {{ task.created_by_user?.name?.charAt(0) || '?' }}
                           </div>
-                          <span>{{ task.created_by?.name || '不明' }}</span>
+                          <span>{{ task.created_by_user?.name || '不明' }}</span>
                         </div>
 
                         <!-- ステータスバッジ -->

@@ -17,7 +17,7 @@ const fetchProjects = async () => {
     loading.value = true;
     error.value = null;
     const response = await axios.get('/api/projects');
-    projects.value = response.data.projects;
+    projects.value = response.data.data;
   } catch (err) {
     console.error('Failed to fetch projects:', err);
     error.value = err.response?.data?.message || 'プロジェクトの読み込みに失敗しました';

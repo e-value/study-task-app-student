@@ -26,7 +26,7 @@ const createProject = async () => {
     // 作成成功後、プロジェクト詳細へ遷移
     router.push({
       name: "project.detail",
-      params: { id: response.data.project.id },
+      params: { id: response.data.data.id },
     });
   } catch (err) {
     console.error("Failed to create project:", err);
