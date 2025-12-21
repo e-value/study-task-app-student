@@ -119,6 +119,7 @@ sail npm run dev
 ブラウザで以下の URL を開いてください：
 
 -   **アプリケーション**: http://localhost
+-   **phpMyAdmin**: http://localhost:8080
 
 ### 🎉 初回アクセス時
 
@@ -173,6 +174,7 @@ sail npm run build
 | **認証**           | Laravel Sanctum             |
 | **スタイリング**   | Tailwind CSS                |
 | **データベース**   | MySQL 8.4                   |
+| **DB管理ツール**   | phpMyAdmin                  |
 | **キャッシュ**     | Redis                       |
 | **開発環境**       | Docker (Laravel Sail)       |
 | **ビルドツール**   | Vite 6                      |

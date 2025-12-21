@@ -11,6 +11,10 @@
 - Node.js & npm
 - SQLite（デフォルト設定）
 
+> **💡 Docker環境の場合**  
+> Docker + Laravel Sail を使用する場合は、[README.md](./README.md) を参照してください。  
+> Sail環境では **phpMyAdmin** も利用できます（http://localhost:8080）。
+
 ---
 
 ## 🔧 セットアップ手順
