@@ -14,6 +14,11 @@ import ForgotPassword from "../Pages/Auth/ForgotPassword.vue";
 import ResetPassword from "../Pages/Auth/ResetPassword.vue";
 import VerifyEmail from "../Pages/Auth/VerifyEmail.vue";
 import ConfirmPassword from "../Pages/Auth/ConfirmPassword.vue";
+import ProjectList from "../Pages/Projects/Index.vue";
+import ProjectCreate from "../Pages/Projects/Create.vue";
+import ProjectDetail from "../Pages/Projects/Show.vue";
+import ProjectEdit from "../Pages/Projects/Edit.vue";
+import TaskDetail from "../Pages/Tasks/Show.vue";
 
 const routes = [
     {
@@ -64,6 +69,36 @@ const routes = [
         component: Dashboard,
         meta: { requiresAuth: true, layout: "authenticated" },
     },
+    {
+        path: "/projects",
+        name: "projects",
+        component: ProjectList,
+        meta: { requiresAuth: true, layout: "authenticated" },
+    },
+    {
+        path: "/projects/create",
+        name: "project.create",
+        component: ProjectCreate,
+        meta: { requiresAuth: true, layout: "authenticated" },
+    },
+    {
+        path: "/projects/:id",
+        name: "project.detail",
+        component: ProjectDetail,
+        meta: { requiresAuth: true, layout: "authenticated" },
+    },
+    {
+        path: "/projects/:id/edit",
+        name: "project.edit",
+        component: ProjectEdit,
+        meta: { requiresAuth: true, layout: "authenticated" },
+    },
+    {
+        path: "/tasks/:id",
+        name: "task.detail",
+        component: TaskDetail,
+        meta: { requiresAuth: true, layout: "authenticated" },
+    },
 ];
 
 const router = createRouter({
@@ -89,7 +124,7 @@ router.beforeEach(async (to, from, next) => {
         next({ name: "login" });
     } else if (isGuest && isAuthenticated && to.name !== "welcome") {
         // ゲスト専用ページで認証済みの場合
-        next({ name: "dashboard" });
+        next({ name: "projects" });
     } else {
         next();
     }
