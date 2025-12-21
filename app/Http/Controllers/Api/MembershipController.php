@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Membership;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class MembershipController extends Controller
+class MembershipController extends ApiController
 {
     /**
      * プロジェクトのメンバー一覧を取得

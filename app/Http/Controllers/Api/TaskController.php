@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Project;
 use App\Models\Task;
@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class TaskController extends Controller
+class TaskController extends ApiController
 {
     /**
      * プロジェクトのタスク一覧を取得

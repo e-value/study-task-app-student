@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Membership;
 use App\Models\Project;
@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class ProjectController extends Controller
+class ProjectController extends ApiController
 {
     /**
      * 自分が所属しているプロジェクト一覧を返す
