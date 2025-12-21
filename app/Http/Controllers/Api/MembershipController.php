@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\MembershipResource;
 use App\Models\Membership;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class MembershipController extends ApiController
 {
     /**
      * プロジェクトのメンバー一覧を取得
      */
-    public function index(Request $request, Project $project): JsonResponse
+    public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
         // メンバーチェック
         if (!$this->isMember($request, $project)) {
@@ -23,9 +25,7 @@ class MembershipController extends ApiController
             ->with('user')
             ->get();
 
-        return response()->json([
-            'memberships' => $memberships,
-        ]);
+        return MembershipResource::collection($memberships);
     }
 
     /**

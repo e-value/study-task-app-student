@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\ProjectResource;
 use App\Models\Membership;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends ApiController
@@ -13,7 +15,7 @@ class ProjectController extends ApiController
     /**
      * 自分が所属しているプロジェクト一覧を返す
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $projects = $request->user()
             ->projects()
@@ -21,9 +23,7 @@ class ProjectController extends ApiController
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json([
-            'projects' => $projects,
-        ]);
+        return ProjectResource::collection($projects);
     }
 
     /**
@@ -58,16 +58,16 @@ class ProjectController extends ApiController
 
         $project->load(['memberships.user']);
 
-        return response()->json([
-            'project' => $project,
-            'message' => 'プロジェクトを作成しました',
-        ], 201);
+        return (new ProjectResource($project))
+            ->additional(['message' => 'プロジェクトを作成しました'])
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
      * プロジェクト詳細を返す
      */
-    public function show(Request $request, Project $project): JsonResponse
+    public function show(Request $request, Project $project): ProjectResource|JsonResponse
     {
         // 自分が所属しているかチェック
         $isMember = $project->memberships()
@@ -82,15 +82,13 @@ class ProjectController extends ApiController
 
         $project->load(['memberships.user', 'tasks.createdBy']);
 
-        return response()->json([
-            'project' => $project,
-        ]);
+        return new ProjectResource($project);
     }
 
     /**
      * プロジェクト更新
      */
-    public function update(Request $request, Project $project): JsonResponse
+    public function update(Request $request, Project $project): ProjectResource|JsonResponse
     {
         // 自分がオーナーまたは管理者かチェック
         $myMembership = $project->memberships()
@@ -118,10 +116,8 @@ class ProjectController extends ApiController
         $project->update($request->only(['name', 'is_archived']));
         $project->load(['memberships.user', 'tasks.createdBy']);
 
-        return response()->json([
-            'project' => $project,
-            'message' => 'プロジェクトを更新しました',
-        ]);
+        return (new ProjectResource($project))
+            ->additional(['message' => 'プロジェクトを更新しました']);
     }
 
     /**

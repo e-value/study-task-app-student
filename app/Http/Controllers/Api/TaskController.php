@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends ApiController
@@ -13,7 +15,7 @@ class TaskController extends ApiController
     /**
      * プロジェクトのタスク一覧を取得
      */
-    public function index(Request $request, Project $project): JsonResponse
+    public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
         // メンバーチェック
         if (!$this->isMember($request, $project)) {
@@ -25,9 +27,7 @@ class TaskController extends ApiController
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json([
-            'tasks' => $tasks,
-        ]);
+        return TaskResource::collection($tasks);
     }
 
     /**
@@ -62,16 +62,16 @@ class TaskController extends ApiController
 
         $task->load('createdBy');
 
-        return response()->json([
-            'task' => $task,
-            'message' => 'タスクを作成しました',
-        ], 201);
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを作成しました'])
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
      * タスク詳細を取得
      */
-    public function show(Request $request, Task $task): JsonResponse
+    public function show(Request $request, Task $task): TaskResource|JsonResponse
     {
         // メンバーチェック
         if (!$this->isMember($request, $task->project)) {
@@ -80,15 +80,13 @@ class TaskController extends ApiController
 
         $task->load(['createdBy', 'project']);
 
-        return response()->json([
-            'task' => $task,
-        ]);
+        return new TaskResource($task);
     }
 
     /**
      * タスク更新
      */
-    public function update(Request $request, Task $task): JsonResponse
+    public function update(Request $request, Task $task): TaskResource|JsonResponse
     {
         // メンバーチェック
         if (!$this->isMember($request, $task->project)) {
@@ -111,10 +109,8 @@ class TaskController extends ApiController
         $task->update($request->only(['title', 'description', 'status']));
         $task->load('createdBy');
 
-        return response()->json([
-            'task' => $task,
-            'message' => 'タスクを更新しました',
-        ]);
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを更新しました']);
     }
 
     /**
@@ -137,7 +133,7 @@ class TaskController extends ApiController
     /**
      * タスクを開始（todo → doing）
      */
-    public function start(Request $request, Task $task): JsonResponse
+    public function start(Request $request, Task $task): TaskResource|JsonResponse
     {
         // メンバーチェック
         if (!$this->isMember($request, $task->project)) {
@@ -154,15 +150,13 @@ class TaskController extends ApiController
         $task->update(['status' => 'doing']);
         $task->load('createdBy');
 
-        return response()->json([
-            'task' => $task,
-        ]);
+        return new TaskResource($task);
     }
 
     /**
      * タスクを完了（doing → done）
      */
-    public function complete(Request $request, Task $task): JsonResponse
+    public function complete(Request $request, Task $task): TaskResource|JsonResponse
     {
         // メンバーチェック
         if (!$this->isMember($request, $task->project)) {
@@ -179,9 +173,7 @@ class TaskController extends ApiController
         $task->update(['status' => 'done']);
         $task->load('createdBy');
 
-        return response()->json([
-            'task' => $task,
-        ]);
+        return new TaskResource($task);
     }
 
     /**
