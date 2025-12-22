@@ -5,46 +5,47 @@ services:
     # Laravel Application Container
     laravel.test:
         build:
-            context: './vendor/laravel/sail/runtimes/8.5'
+            context: "./vendor/laravel/sail/runtimes/8.5"
             dockerfile: Dockerfile
             args:
-                WWWGROUP: '${WWWGROUP}'
-        image: 'sail-8.5/app'
+                WWWGROUP: "${WWWGROUP}"
+        image: "sail-8.5/app"
         extra_hosts:
-            - 'host.docker.internal:host-gateway'
+            - "host.docker.internal:host-gateway"
         ports:
-            - '${APP_PORT:-80}:80'           # Laravel Application
-            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'  # Vite HMR
+            - "${APP_PORT:-80}:80" # Laravel Application
+            - "${VITE_PORT:-5173}:${VITE_PORT:-5173}" # Vite HMR
         environment:
-            WWWUSER: '${WWWUSER}'
+            WWWUSER: "${WWWUSER}"
             LARAVEL_SAIL: 1
-            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
-            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
-            IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            XDEBUG_MODE: "${SAIL_XDEBUG_MODE:-off}"
+            XDEBUG_CONFIG: "${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}"
+            IGNITION_LOCAL_SITES_PATH: "${PWD}"
         volumes:
-            - '.:/var/www/html'
+            - ".:/var/www/html"
         networks:
             - sail
         depends_on:
             - mysql
             - redis
-    
+
     # MySQL Database Container
     mysql:
-        image: 'mysql:8.4'
+        image: "mysql:8.4"
+        command: --mysql-native-password=ON
         ports:
-            - '${FORWARD_DB_PORT:-3306}:3306'
+            - "${FORWARD_DB_PORT:-3306}:3306"
         environment:
-            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
-            MYSQL_ROOT_HOST: '%'
-            MYSQL_DATABASE: '${DB_DATABASE}'
-            MYSQL_USER: '${DB_USERNAME}'
-            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+            MYSQL_ROOT_HOST: "%"
+            MYSQL_DATABASE: "${DB_DATABASE}"
+            MYSQL_USER: "${DB_USERNAME}"
+            MYSQL_PASSWORD: "${DB_PASSWORD}"
             MYSQL_ALLOW_EMPTY_PASSWORD: 1
-            MYSQL_EXTRA_OPTIONS: '${MYSQL_EXTRA_OPTIONS:-}'
+            MYSQL_EXTRA_OPTIONS: "${MYSQL_EXTRA_OPTIONS:-}"
         volumes:
-            - 'sail-mysql:/var/lib/mysql'
-            - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+            - "sail-mysql:/var/lib/mysql"
+            - "./vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh"
         networks:
             - sail
         healthcheck:
@@ -52,17 +53,17 @@ services:
                 - CMD
                 - mysqladmin
                 - ping
-                - '-p${DB_PASSWORD}'
+                - "-p${DB_PASSWORD}"
             retries: 3
             timeout: 5s
-    
+
     # Redis Cache Container
     redis:
-        image: 'redis:alpine'
+        image: "redis:alpine"
         ports:
-            - '${FORWARD_REDIS_PORT:-6379}:6379'
+            - "${FORWARD_REDIS_PORT:-6379}:6379"
         volumes:
-            - 'sail-redis:/data'
+            - "sail-redis:/data"
         networks:
             - sail
         healthcheck:
@@ -72,17 +73,18 @@ services:
                 - ping
             retries: 3
             timeout: 5s
-    
+
     # phpMyAdmin - MySQL Database Management Tool
     phpmyadmin:
-        image: 'phpmyadmin/phpmyadmin:latest'
+        image: "phpmyadmin/phpmyadmin:latest"
         ports:
-            - '${FORWARD_PHPMYADMIN_PORT:-8080}:80'
+            - "${FORWARD_PHPMYADMIN_PORT:-8080}:80"
         environment:
             PMA_HOST: mysql
             PMA_PORT: 3306
-            PMA_USER: '${DB_USERNAME}'
-            PMA_PASSWORD: '${DB_PASSWORD}'
+            PMA_USER: root
+            PMA_PASSWORD: ""
+            PMA_ARBITRARY: 1
             UPLOAD_LIMIT: 300M
         networks:
             - sail
