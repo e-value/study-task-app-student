@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,9 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 // 認証が必要なAPI
 Route::middleware(['auth:sanctum'])->group(function () {
+    // Users
+    Route::get('/users', [UserController::class, 'index']);
+
     // Projects
     Route::get('/projects', [ProjectController::class, 'index']);
     Route::post('/projects', [ProjectController::class, 'store']);
@@ -31,5 +35,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Members
     Route::get('/projects/{project}/members', [MembershipController::class, 'index']);
+    Route::post('/projects/{project}/members', [MembershipController::class, 'store']);
     Route::delete('/memberships/{membership}', [MembershipController::class, 'destroy']);
 });

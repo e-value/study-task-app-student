@@ -29,6 +29,65 @@ class MembershipController extends ApiController
     }
 
     /**
+     * プロジェクトにメンバーを追加
+     */
+    public function store(Request $request, Project $project): JsonResponse
+    {
+        // 自分がowner/adminかチェック
+        $myMembership = $project->memberships()
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (!$myMembership || !in_array($myMembership->role, ['project_owner', 'project_admin'])) {
+            return response()->json([
+                'message' => 'Forbidden: Only owners and admins can add members.',
+            ], 403);
+        }
+
+        // バリデーション
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'nullable|in:project_owner,project_admin,project_member',
+        ]);
+
+        // デフォルトロール設定
+        $role = $validated['role'] ?? 'project_member';
+
+        // 既にメンバーかチェック
+        $existingMembership = $project->memberships()
+            ->where('user_id', $validated['user_id'])
+            ->first();
+
+        if ($existingMembership) {
+            return response()->json([
+                'message' => 'User is already a member of this project.',
+            ], 409);
+        }
+
+        // 自分自身を追加しようとしていないかチェック
+        if ($validated['user_id'] == $request->user()->id) {
+            return response()->json([
+                'message' => 'You are already a member of this project.',
+            ], 409);
+        }
+
+        // メンバーシップ作成
+        $membership = Membership::create([
+            'project_id' => $project->id,
+            'user_id' => $validated['user_id'],
+            'role' => $role,
+        ]);
+
+        // ユーザー情報を含めて返す
+        $membership->load('user');
+
+        return response()->json([
+            'message' => 'Member added successfully.',
+            'membership' => new MembershipResource($membership),
+        ], 201);
+    }
+
+    /**
      * メンバーシップ削除
      */
     public function destroy(Request $request, Membership $membership): JsonResponse

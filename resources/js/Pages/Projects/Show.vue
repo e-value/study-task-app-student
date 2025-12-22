@@ -17,6 +17,15 @@ const memberError = ref(null);
 const activeTab = ref("tasks");
 const creatingTask = ref(false);
 
+// メンバー追加用の状態
+const addingMember = ref(false);
+const showAddMemberForm = ref(false);
+const allUsers = ref([]);
+const newMember = ref({
+  user_id: "",
+  role: "project_member",
+});
+
 const taskSearchQuery = ref("");
 const taskStatusFilter = ref("all");
 const taskSortBy = ref("newest");
@@ -28,6 +37,12 @@ const newTask = ref({
 
 const canDeleteMember = computed(() => {
   return true;
+});
+
+// メンバー追加可能なユーザー（既存メンバーを除外）
+const availableUsers = computed(() => {
+  const memberUserIds = members.value.map((m) => m.user_id);
+  return allUsers.value.filter((user) => !memberUserIds.includes(user.id));
 });
 
 const filteredTasks = computed(() => {
@@ -105,6 +120,15 @@ const fetchProject = async () => {
   }
 };
 
+const fetchUsers = async () => {
+  try {
+    const response = await axios.get("/api/users");
+    allUsers.value = response.data.data || [];
+  } catch (err) {
+    console.error("Failed to fetch users:", err);
+  }
+};
+
 const createTask = async () => {
   try {
     creatingTask.value = true;
@@ -164,6 +188,31 @@ const deleteMember = async (membershipId) => {
   }
 };
 
+const addMember = async () => {
+  if (!newMember.value.user_id) {
+    alert("ユーザーを選択してください");
+    return;
+  }
+
+  try {
+    addingMember.value = true;
+    memberError.value = null;
+    const response = await axios.post(
+      `/api/projects/${projectId}/members`,
+      newMember.value
+    );
+    members.value.push(response.data.membership);
+    newMember.value = { user_id: "", role: "project_member" };
+    showAddMemberForm.value = false;
+  } catch (err) {
+    console.error("Failed to add member:", err);
+    memberError.value =
+      err.response?.data?.message || "メンバーの追加に失敗しました";
+  } finally {
+    addingMember.value = false;
+  }
+};
+
 const goToTask = (taskId, event) => {
   // ボタンのクリックイベントの場合は遷移しない
   if (event.target.closest("button")) {
@@ -174,6 +223,7 @@ const goToTask = (taskId, event) => {
 
 onMounted(() => {
   fetchProject();
+  fetchUsers();
 });
 </script>
 
@@ -739,6 +789,136 @@ onMounted(() => {
                   />
                 </svg>
                 <p class="text-red-800 font-medium">{{ memberError }}</p>
+              </div>
+            </div>
+
+            <!-- メンバー追加フォーム -->
+            <div class="mb-6">
+              <button
+                v-if="!showAddMemberForm"
+                @click="showAddMemberForm = true"
+                class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                  />
+                </svg>
+                メンバーを追加
+              </button>
+
+              <!-- フォーム -->
+              <div
+                v-else
+                class="backdrop-blur-lg bg-white/70 rounded-2xl shadow-xl border border-white/50 p-8"
+              >
+                <div class="flex items-center gap-3 mb-6">
+                  <div
+                    class="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500"
+                  >
+                    <svg
+                      class="w-6 h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                      />
+                    </svg>
+                  </div>
+                  <h2 class="text-2xl font-bold text-slate-800">
+                    新しいメンバーを追加
+                  </h2>
+                </div>
+
+                <form @submit.prevent="addMember" class="space-y-5">
+                  <div>
+                    <label
+                      class="block text-sm font-semibold text-slate-700 mb-2"
+                      >ユーザーを選択</label
+                    >
+                    <select
+                      v-model="newMember.user_id"
+                      required
+                      class="w-full px-4 py-3 rounded-xl backdrop-blur-lg bg-white/80 border border-slate-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all outline-none"
+                    >
+                      <option value="">ユーザーを選択してください</option>
+                      <option
+                        v-for="user in availableUsers"
+                        :key="user.id"
+                        :value="user.id"
+                      >
+                        {{ user.name }} ({{ user.email }})
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      class="block text-sm font-semibold text-slate-700 mb-2"
+                      >役割</label
+                    >
+                    <select
+                      v-model="newMember.role"
+                      class="w-full px-4 py-3 rounded-xl backdrop-blur-lg bg-white/80 border border-slate-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all outline-none"
+                    >
+                      <option value="project_member">メンバー</option>
+                      <option value="project_admin">管理者</option>
+                      <option value="project_owner">オーナー</option>
+                    </select>
+                  </div>
+
+                  <div class="flex gap-3">
+                    <button
+                      type="submit"
+                      :disabled="addingMember"
+                      class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2"
+                    >
+                      <svg
+                        v-if="!addingMember"
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      <div
+                        v-else
+                        class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+                      ></div>
+                      {{ addingMember ? "追加中..." : "メンバーを追加" }}
+                    </button>
+                    <button
+                      type="button"
+                      @click="
+                        showAddMemberForm = false;
+                        newMember = { user_id: '', role: 'project_member' };
+                        memberError = null;
+                      "
+                      class="px-6 py-3 backdrop-blur-lg bg-white/80 hover:bg-white text-slate-700 font-semibold rounded-xl transition-all duration-300 border border-slate-200 hover:border-slate-300"
+                    >
+                      キャンセル
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
 
