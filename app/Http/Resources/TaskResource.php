@@ -10,21 +10,20 @@ class TaskResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
+     * TODO: Lesson1 で実装してください
+     * 
+     * 考えるべきポイント：
+     * - どのような情報をフロントエンドに返すべきか？
+     * - DBのカラムをそのまま返すべきか？加工すべきか？
+     * - 関連データ（作成者、プロジェクトなど）をどう扱うべきか？
+     * - ステータス（todo/doing/done）をどう表現すべきか？
+     * - 一覧表示用と詳細表示用で返す情報を分けるべきか？
+     * 
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'project_id' => $this->project_id,
-            'title' => $this->title,
-            'description' => $this->description,
-            'status' => $this->status,
-            'created_by' => $this->created_by,
-            'created_by_user' => new UserResource($this->whenLoaded('createdBy')),
-            'project' => new ProjectResource($this->whenLoaded('project')),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ];
+        // TODO: タスク情報のJSON構造を設計してください
+        return [];
     }
 }

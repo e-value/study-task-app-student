@@ -10,18 +10,19 @@ class ProjectResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
+     * TODO: Lesson1 で実装してください
+     * 
+     * 考えるべきポイント：
+     * - どのような情報をフロントエンドに返すべきか？
+     * - DBのカラムをそのまま返すべきか？加工すべきか？
+     * - 関連データ（メンバー、タスクなど）をどう扱うべきか？
+     * - 一覧表示用と詳細表示用で返す情報を分けるべきか？
+     * 
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'is_archived' => $this->is_archived,
-            'memberships' => MembershipResource::collection($this->whenLoaded('memberships')),
-            'tasks' => TaskResource::collection($this->whenLoaded('tasks')),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ];
+        // TODO: プロジェクト情報のJSON構造を設計してください
+        return [];
     }
 }
