@@ -27,11 +27,13 @@ const createProject = async () => {
 
     toast.success(response.data.message || "プロジェクトを作成しました");
 
-    // 作成成功後、プロジェクト詳細へ遷移
-    router.push({
-      name: "project.detail",
-      params: { id: response.data.data.id },
-    });
+    // トーストを表示させてからページ遷移
+    setTimeout(() => {
+      router.push({
+        name: "project.detail",
+        params: { id: response.data.data.id },
+      });
+    }, 500);
   } catch (err) {
     console.error("Failed to create project:", err);
 

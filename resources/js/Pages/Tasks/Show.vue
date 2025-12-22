@@ -108,11 +108,13 @@ const deleteTask = async () => {
 
     toast.success(response.data.message || "タスクを削除しました");
 
-    // 削除成功後、プロジェクト詳細へ戻る
-    router.push({
-      name: "project.detail",
-      params: { id: task.value.project.id },
-    });
+    // トーストを表示させてからページ遷移
+    setTimeout(() => {
+      router.push({
+        name: "project.detail",
+        params: { id: task.value.project.id },
+      });
+    }, 500);
   } catch (err) {
     console.error("Failed to delete task:", err);
     error.value = err.response?.data?.message || "タスクの削除に失敗しました";
