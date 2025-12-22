@@ -122,7 +122,7 @@ const fetchProject = async () => {
 
 const fetchUsers = async () => {
   try {
-    const response = await axios.get("/api/users");
+    const response = await axios.get("/api/users/dropdown");
     allUsers.value = response.data.data || [];
   } catch (err) {
     console.error("Failed to fetch users:", err);

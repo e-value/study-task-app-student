@@ -16,6 +16,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum'])->group(function () {
     // Users
     Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/dropdown', [UserController::class, 'dropdown']);
 
     // Projects
     Route::get('/projects', [ProjectController::class, 'index']);

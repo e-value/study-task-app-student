@@ -19,6 +19,7 @@ import ProjectCreate from "../Pages/Projects/Create.vue";
 import ProjectDetail from "../Pages/Projects/Show.vue";
 import ProjectEdit from "../Pages/Projects/Edit.vue";
 import TaskDetail from "../Pages/Tasks/Show.vue";
+import UserList from "../Pages/Users/Index.vue";
 
 const routes = [
     {
@@ -97,6 +98,12 @@ const routes = [
         path: "/tasks/:id",
         name: "task.detail",
         component: TaskDetail,
+        meta: { requiresAuth: true, layout: "authenticated" },
+    },
+    {
+        path: "/users",
+        name: "users",
+        component: UserList,
         meta: { requiresAuth: true, layout: "authenticated" },
     },
 ];
