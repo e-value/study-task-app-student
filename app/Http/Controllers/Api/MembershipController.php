@@ -18,7 +18,7 @@ class MembershipController extends ApiController
     {
         // メンバーチェック
         if (!$this->isMember($request, $project)) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return response()->json(['message' => 'このプロジェクトにアクセスする権限がありません'], 403);
         }
 
         $memberships = $project->memberships()
@@ -40,7 +40,7 @@ class MembershipController extends ApiController
 
         if (!$myMembership || !in_array($myMembership->role, ['project_owner', 'project_admin'])) {
             return response()->json([
-                'message' => 'Forbidden: Only owners and admins can add members.',
+                'message' => 'メンバーを追加する権限がありません（オーナーまたは管理者のみ）',
             ], 403);
         }
 
@@ -60,14 +60,14 @@ class MembershipController extends ApiController
 
         if ($existingMembership) {
             return response()->json([
-                'message' => 'User is already a member of this project.',
+                'message' => 'このユーザーは既にプロジェクトのメンバーです',
             ], 409);
         }
 
         // 自分自身を追加しようとしていないかチェック
         if ($validated['user_id'] == $request->user()->id) {
             return response()->json([
-                'message' => 'You are already a member of this project.',
+                'message' => 'あなたは既にこのプロジェクトのメンバーです',
             ], 409);
         }
 
@@ -82,7 +82,7 @@ class MembershipController extends ApiController
         $membership->load('user');
 
         return response()->json([
-            'message' => 'Member added successfully.',
+            'message' => 'メンバーを追加しました',
             'membership' => new MembershipResource($membership),
         ], 201);
     }
@@ -101,7 +101,7 @@ class MembershipController extends ApiController
 
         if (!$myMembership || !in_array($myMembership->role, ['project_owner', 'project_admin'])) {
             return response()->json([
-                'message' => 'Forbidden: Only owners and admins can delete members.',
+                'message' => 'メンバーを削除する権限がありません（オーナーまたは管理者のみ）',
             ], 403);
         }
 
@@ -113,7 +113,7 @@ class MembershipController extends ApiController
 
             if ($ownerCount <= 1) {
                 return response()->json([
-                    'message' => 'Cannot delete the last owner of the project.',
+                    'message' => 'プロジェクトの最後のオーナーは削除できません',
                 ], 409);
             }
         }
@@ -126,7 +126,7 @@ class MembershipController extends ApiController
 
         if ($hasIncompleteTasks) {
             return response()->json([
-                'message' => 'Cannot delete member with incomplete tasks (todo or doing).',
+                'message' => '未完了のタスクがあるメンバーは削除できません',
             ], 409);
         }
 
@@ -134,7 +134,7 @@ class MembershipController extends ApiController
         $membership->delete();
 
         return response()->json([
-            'message' => 'Membership deleted successfully.',
+            'message' => 'メンバーを削除しました',
         ]);
     }
 

@@ -29,12 +29,14 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 import { useAuthStore } from '../../stores/auth';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import axios from 'axios';
 
 const router = useRouter();
+const toast = useToast();
 const authStore = useAuthStore();
 
 const processing = ref(false);
@@ -47,8 +49,10 @@ const submit = async () => {
     try {
         await axios.post('/email/verification-notification');
         verificationLinkSent.value = true;
+        toast.success('確認メールを送信しました');
     } catch (error) {
         console.error('Error sending verification email:', error);
+        toast.error('確認メールの送信に失敗しました');
     } finally {
         processing.value = false;
     }

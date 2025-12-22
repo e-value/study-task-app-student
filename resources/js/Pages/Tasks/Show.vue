@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
 const taskId = route.params.id;
 
 const task = ref(null);
@@ -55,9 +57,11 @@ const saveChanges = async () => {
     const response = await axios.put(`/api/tasks/${taskId}`, form.value);
     task.value = response.data.data;
     editing.value = false;
+    toast.success(response.data.message || "タスクを更新しました");
   } catch (err) {
     console.error("Failed to update task:", err);
     error.value = err.response?.data?.message || "タスクの更新に失敗しました";
+    toast.error(error.value);
   } finally {
     saving.value = false;
   }
@@ -67,9 +71,11 @@ const startTask = async () => {
   try {
     const response = await axios.post(`/api/tasks/${taskId}/start`);
     task.value = response.data.data;
+    toast.success("タスクを開始しました");
   } catch (err) {
     console.error("Failed to start task:", err);
     error.value = err.response?.data?.message || "タスクの開始に失敗しました";
+    toast.error(error.value);
   }
 };
 
@@ -77,9 +83,11 @@ const completeTask = async () => {
   try {
     const response = await axios.post(`/api/tasks/${taskId}/complete`);
     task.value = response.data.data;
+    toast.success("タスクを完了しました");
   } catch (err) {
     console.error("Failed to complete task:", err);
     error.value = err.response?.data?.message || "タスクの完了に失敗しました";
+    toast.error(error.value);
   }
 };
 
@@ -96,7 +104,9 @@ const confirmDelete = () => {
 const deleteTask = async () => {
   try {
     deleting.value = true;
-    await axios.delete(`/api/tasks/${taskId}`);
+    const response = await axios.delete(`/api/tasks/${taskId}`);
+
+    toast.success(response.data.message || "タスクを削除しました");
 
     // 削除成功後、プロジェクト詳細へ戻る
     router.push({
@@ -106,6 +116,7 @@ const deleteTask = async () => {
   } catch (err) {
     console.error("Failed to delete task:", err);
     error.value = err.response?.data?.message || "タスクの削除に失敗しました";
+    toast.error(error.value);
     deleting.value = false;
   }
 };

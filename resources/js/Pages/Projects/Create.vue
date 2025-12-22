@@ -1,10 +1,12 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 const router = useRouter();
+const toast = useToast();
 
 const form = ref({
   name: "",
@@ -23,6 +25,8 @@ const createProject = async () => {
 
     const response = await axios.post("/api/projects", form.value);
 
+    toast.success(response.data.message || "プロジェクトを作成しました");
+
     // 作成成功後、プロジェクト詳細へ遷移
     router.push({
       name: "project.detail",
@@ -37,6 +41,7 @@ const createProject = async () => {
 
     error.value =
       err.response?.data?.message || "プロジェクトの作成に失敗しました";
+    toast.error(error.value);
   } finally {
     creating.value = false;
   }

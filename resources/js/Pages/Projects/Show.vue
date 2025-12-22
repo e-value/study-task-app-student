@@ -1,8 +1,11 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+
+const toast = useToast();
 
 const route = useRoute();
 const router = useRouter();
@@ -138,9 +141,10 @@ const createTask = async () => {
     );
     tasks.value.unshift(response.data.data);
     newTask.value = { title: "", description: "" };
+    toast.success(response.data.message || "タスクを作成しました");
   } catch (err) {
     console.error("Failed to create task:", err);
-    alert(err.response?.data?.message || "タスクの作成に失敗しました");
+    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
   } finally {
     creatingTask.value = false;
   }
@@ -153,9 +157,10 @@ const startTask = async (taskId) => {
     if (index !== -1) {
       tasks.value[index] = response.data.data;
     }
+    toast.success("タスクを開始しました");
   } catch (err) {
     console.error("Failed to start task:", err);
-    alert(err.response?.data?.message || "タスクの開始に失敗しました");
+    toast.error(err.response?.data?.message || "タスクの開始に失敗しました");
   }
 };
 
@@ -166,9 +171,10 @@ const completeTask = async (taskId) => {
     if (index !== -1) {
       tasks.value[index] = response.data.data;
     }
+    toast.success("タスクを完了しました");
   } catch (err) {
     console.error("Failed to complete task:", err);
-    alert(err.response?.data?.message || "タスクの完了に失敗しました");
+    toast.error(err.response?.data?.message || "タスクの完了に失敗しました");
   }
 };
 
@@ -179,18 +185,20 @@ const deleteMember = async (membershipId) => {
 
   try {
     memberError.value = null;
-    await axios.delete(`/api/memberships/${membershipId}`);
+    const response = await axios.delete(`/api/memberships/${membershipId}`);
     members.value = members.value.filter((m) => m.id !== membershipId);
+    toast.success(response.data.message || "メンバーを削除しました");
   } catch (err) {
     console.error("Failed to delete member:", err);
     memberError.value =
       err.response?.data?.message || "メンバーの削除に失敗しました";
+    toast.error(memberError.value);
   }
 };
 
 const addMember = async () => {
   if (!newMember.value.user_id) {
-    alert("ユーザーを選択してください");
+    toast.warning("ユーザーを選択してください");
     return;
   }
 
@@ -204,10 +212,12 @@ const addMember = async () => {
     members.value.push(response.data.membership);
     newMember.value = { user_id: "", role: "project_member" };
     showAddMemberForm.value = false;
+    toast.success(response.data.message || "メンバーを追加しました");
   } catch (err) {
     console.error("Failed to add member:", err);
     memberError.value =
       err.response?.data?.message || "メンバーの追加に失敗しました";
+    toast.error(memberError.value);
   } finally {
     addingMember.value = false;
   }

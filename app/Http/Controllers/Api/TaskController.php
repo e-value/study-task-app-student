@@ -19,7 +19,7 @@ class TaskController extends ApiController
     {
         // メンバーチェック
         if (!$this->isMember($request, $project)) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return response()->json(['message' => 'このプロジェクトにアクセスする権限がありません'], 403);
         }
 
         $tasks = $project->tasks()
