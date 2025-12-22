@@ -98,11 +98,24 @@ sail npm install
 sail artisan key:generate
 ```
 
-### 7️⃣ データベースのマイグレーション
+### 7️⃣ データベースのセットアップ
 
 ```bash
-sail artisan migrate
+# データベースを作成
+sail exec mysql mysql -uroot -e "CREATE DATABASE IF NOT EXISTS study_task_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# マイグレーションとシーダーを実行
+sail artisan migrate:fresh --seed
 ```
+
+> **📝 シーダーについて**  
+> `--seed` オプションを付けることで、以下のダミーデータが自動的に作成されます：
+> - 3人のユーザー（owner@example.com, admin@example.com, member@example.com）
+> - 複数のプロジェクト
+> - サンプルタスク
+> - メンバーシップ（ロール設定）
+> 
+> パスワードは全て `password` です。
 
 ### 8️⃣ フロントエンドのビルド（開発モード）
 
@@ -128,6 +141,17 @@ sail npm run dev
 1. **「Register」** をクリックして新規ユーザーを作成
 2. 必要な情報を入力して登録
 3. 自動的にログインされ、ダッシュボードが表示されます
+
+### 🗄️ データベース管理（phpMyAdmin）
+
+phpMyAdmin にはログイン不要で直接アクセスできます：
+
+-   **URL**: http://localhost:8080
+-   **データベース名**: `study_task_app`
+-   **ユーザー名**: `root`
+-   **パスワード**: なし（空）
+
+左側のサイドバーから `study_task_app` を選択すると、テーブル一覧が表示されます。
 
 ---
 
