@@ -49,8 +49,7 @@ app/Http/
 ├── Controllers/Api/
 │   └── ApiController.php           （ベースコントローラーのみ）
 └── Resources/
-    ├── ProjectResource.php         （空）
-    └── TaskResource.php            （空）
+    （空 - 受講者が自分で作成）
 
 routes/
 └── api.php                         （認証エンドポイントのみ）
@@ -59,7 +58,8 @@ routes/
 **あなたがやること：**
 1. Controller を作成する
 2. `routes/api.php` にエンドポイントを定義する
-3. ApiResource の構造を設計する
+3. ApiResource を作成する
+4. ApiResource の構造を設計する
 
 ---
 
@@ -100,9 +100,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 ```
 
-### Step 5: ApiResource 設計
+### Step 5: ApiResource 作成と設計
 
-`ProjectResource.php` と `TaskResource.php` に、返すべき JSON 構造を考えてください。
+必要な ApiResource を作成して、返すべき JSON 構造を考えてください。
+
+```bash
+php artisan make:resource ProjectResource
+php artisan make:resource TaskResource
+```
 
 ### Step 6: 動作確認
 
@@ -123,8 +128,10 @@ curl http://localhost:8000/api/projects
 - [ ] エンドポイント設計を紙に書き出した
 - [ ] Controller を作成した
 - [ ] `routes/api.php` にルーティングを定義した
-- [ ] `ProjectResource.php` の構造を考えた
-- [ ] `TaskResource.php` の構造を考えた
+- [ ] `ProjectResource` を作成した
+- [ ] `ProjectResource` の構造を考えた
+- [ ] `TaskResource` を作成した
+- [ ] `TaskResource` の構造を考えた
 - [ ] `php artisan route:list --path=api` で確認した
 - [ ] API を叩いて 501 エラーが返ることを確認した
 

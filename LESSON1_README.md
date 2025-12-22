@@ -236,12 +236,17 @@ MeTasksController
 
 フロントエンドに返す JSON 構造を考えてください：
 
+```bash
+# まず ApiResource を作成
+php artisan make:resource ProjectResource
+```
+
 ```php
-// app/Http/Resources/ProjectResource.php
+// 作成後、app/Http/Resources/ProjectResource.php を編集
 public function toArray(Request $request): array
 {
     return [
-        // 何を返すべき？
+        // TODO: 何を返すべき？
 
         // id は必要？
         // name だけでいい？
@@ -257,12 +262,17 @@ public function toArray(Request $request): array
 
 ### TaskResource の設計
 
+```bash
+# まず ApiResource を作成
+php artisan make:resource TaskResource
+```
+
 ```php
-// app/Http/Resources/TaskResource.php
+// 作成後、app/Http/Resources/TaskResource.php を編集
 public function toArray(Request $request): array
 {
     return [
-        // 何を返すべき？
+        // TODO: 何を返すべき？
 
         // id, title, description は必要？
         // status を "todo" | "doing" | "done" で返す？
@@ -353,10 +363,15 @@ public function toArray(Request $request): array
 1. `routes/api.php` にエンドポイントを定義
 2. 各エンドポイントを適切な Controller に紐づける
 
-### 演習 4: ApiResource 設計
+### 演習 4: ApiResource 作成と設計
 
-1. `ProjectResource.php` の `toArray()` に返すべき構造をコメントで書く
-2. `TaskResource.php` の `toArray()` に返すべき構造をコメントで書く
+1. 必要な ApiResource を作成する
+   ```bash
+   php artisan make:resource ProjectResource
+   php artisan make:resource TaskResource
+   ```
+2. `ProjectResource.php` の `toArray()` に返すべき構造をコメントで書く
+3. `TaskResource.php` の `toArray()` に返すべき構造をコメントで書く
 
 ---
 

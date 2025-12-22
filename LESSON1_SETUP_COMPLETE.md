@@ -44,20 +44,17 @@
 
 ---
 
-### 3. ✅ ApiResource を空にする
-
-**修正したファイル：**
-
--   ✅ `ProjectResource.php` - `toArray()` を空配列に変更
--   ✅ `TaskResource.php` - `toArray()` を空配列に変更
+### 3. ✅ ApiResource を削除
 
 **削除したファイル：**
 
+-   ❌ `ProjectResource.php`
+-   ❌ `TaskResource.php`
 -   ❌ `MembershipResource.php`
 -   ❌ `UserResource.php`
 
 **理由：**
-受講者に「どのような JSON 構造を返すべきか」を自分で考えさせるため。
+受講者に「どのような ApiResource を作成すべきか」「どのような JSON 構造を返すべきか」を自分で考えさせるため。
 
 ---
 
@@ -89,8 +86,7 @@ app/Http/
 ├── Controllers/Api/
 │   └── ApiController.php           （ベースコントローラーのみ）
 └── Resources/
-    ├── ProjectResource.php         （toArray() が空配列）
-    └── TaskResource.php            （toArray() が空配列）
+    （空 - 受講者が自分で作成）
 
 routes/
 └── api.php                         （認証エンドポイントのみ）
@@ -168,11 +164,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 ```
 
-### Step 6: ApiResource 設計
+### Step 6: ApiResource 作成と設計
 
-`ProjectResource.php` と `TaskResource.php` に返すべき構造を考える：
+必要な ApiResource を作成して、返すべき構造を考える：
+
+```bash
+# ApiResource を作成
+php artisan make:resource ProjectResource
+php artisan make:resource TaskResource
+```
 
 ```php
+// toArray() を実装
 public function toArray(Request $request): array
 {
     return [
@@ -255,11 +258,13 @@ Lesson1 完了時に、以下が揃っているか確認：
     -   [ ] 全エンドポイントが定義されている
     -   [ ] Controller に正しく紐づいている
 
--   [ ] `ProjectResource.php` の設計
+-   [ ] `ProjectResource` の作成と設計
 
+    -   [ ] `php artisan make:resource ProjectResource` で作成
     -   [ ] 返すべき JSON 構造が決まっている（コメントで OK）
 
--   [ ] `TaskResource.php` の設計
+-   [ ] `TaskResource` の作成と設計
+    -   [ ] `php artisan make:resource TaskResource` で作成
     -   [ ] 返すべき JSON 構造が決まっている（コメントで OK）
 
 ### 動作確認
