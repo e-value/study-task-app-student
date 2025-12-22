@@ -2,7 +2,7 @@
 
 ## 👋 ようこそ！
 
-このLesson1では、**あなた自身で**以下を設計します：
+この Lesson1 では、**あなた自身で**以下を設計します：
 
 1. ✅ **API エンドポイント設計** - RESTful な URL と HTTP メソッドを決める
 2. ✅ **Controller 責務分離** - どの Controller に何を実装すべきか決める
@@ -21,24 +21,27 @@
 
 ## 🎯 あなたのミッション
 
-以下の機能を実現するAPIを設計してください：
+以下の機能を実現する API を設計してください：
 
 ### プロジェクト管理機能
-- プロジェクト一覧取得
-- プロジェクト作成
-- プロジェクト詳細取得
-- プロジェクト更新
-- プロジェクト削除
+
+-   プロジェクト一覧取得
+-   プロジェクト作成
+-   プロジェクト詳細取得
+-   プロジェクト更新
+-   プロジェクト削除
 
 ### タスク管理機能
-- プロジェクト内のタスク一覧取得
-- プロジェクト内にタスク作成
-- タスク詳細取得
-- タスク更新
-- タスク削除
+
+-   プロジェクト内のタスク一覧取得
+-   プロジェクト内にタスク作成
+-   タスク詳細取得
+-   タスク更新
+-   タスク削除
 
 ### ユーザー機能
-- 自分のタスク一覧取得
+
+-   自分のタスク一覧取得
 
 ---
 
@@ -56,6 +59,7 @@ routes/
 ```
 
 **あなたがやること：**
+
 1. Controller を作成する
 2. `routes/api.php` にエンドポイントを定義する
 3. ApiResource を作成する
@@ -73,10 +77,10 @@ routes/
 
 紙やドキュメントに、以下を書き出してください：
 
-| HTTP メソッド | URL | 説明 | Controller |
-|--------------|-----|------|-----------|
-| GET | `/api/projects` | プロジェクト一覧 | ？ |
-| ... | ... | ... | ... |
+| HTTP メソッド | URL             | 説明             | Controller |
+| ------------- | --------------- | ---------------- | ---------- |
+| GET           | `/api/projects` | プロジェクト一覧 | ？         |
+| ...           | ...             | ...              | ...        |
 
 ### Step 3: Controller 作成
 
@@ -87,7 +91,7 @@ routes/
 php artisan make:controller Api/ProjectsController
 ```
 
-各メソッドは `abort(501, 'Not Implemented');` でOK。
+各メソッドは `abort(501, 'Not Implemented');` で OK。
 
 ### Step 4: ルーティング定義
 
@@ -124,16 +128,16 @@ curl http://localhost:8000/api/projects
 
 ## ✅ 完了チェックリスト
 
-- [ ] `LESSON1_README.md` を読んだ
-- [ ] エンドポイント設計を紙に書き出した
-- [ ] Controller を作成した
-- [ ] `routes/api.php` にルーティングを定義した
-- [ ] `ProjectResource` を作成した
-- [ ] `ProjectResource` の構造を考えた
-- [ ] `TaskResource` を作成した
-- [ ] `TaskResource` の構造を考えた
-- [ ] `php artisan route:list --path=api` で確認した
-- [ ] API を叩いて 501 エラーが返ることを確認した
+-   [ ] `LESSON1_README.md` を読んだ
+-   [ ] エンドポイント設計を紙に書き出した
+-   [ ] Controller を作成した
+-   [ ] `routes/api.php` にルーティングを定義した
+-   [ ] `ProjectResource` を作成した
+-   [ ] `ProjectResource` の構造を考えた
+-   [ ] `TaskResource` を作成した
+-   [ ] `TaskResource` の構造を考えた
+-   [ ] `php artisan route:list --path=api` で確認した
+-   [ ] API を叩いて 501 エラーが返ることを確認した
 
 ---
 
@@ -142,6 +146,7 @@ curl http://localhost:8000/api/projects
 ### RESTful 設計の基本
 
 **良い例：**
+
 ```
 GET    /api/projects           プロジェクト一覧
 POST   /api/projects           プロジェクト作成
@@ -151,6 +156,7 @@ DELETE /api/projects/{id}      プロジェクト削除
 ```
 
 **悪い例：**
+
 ```
 GET    /api/getProjects        ← 動詞が入っている
 POST   /api/createProject      ← 動詞が入っている
@@ -159,13 +165,15 @@ GET    /api/projects/list      ← 不要な単語
 
 ### Controller 責務分離
 
-**Option A: シンプル（2つ）**
+**Option A: シンプル（2 つ）**
+
 ```
 ProjectsController  → プロジェクト操作
 TasksController     → タスク操作
 ```
 
-**Option B: 明確（3つ）**
+**Option B: 明確（3 つ）**
+
 ```
 ProjectsController  → プロジェクト操作
 TasksController     → タスク操作
@@ -178,9 +186,9 @@ MeTasksController   → 自分のタスク一覧
 
 ## ❓ 質問があれば
 
-- RESTful 設計がわからない → `LESSON1_README.md` の「RESTful 設計の基本原則」を読む
-- Controller の責務分離がわからない → `LESSON1_README.md` の「Controller 責務分離を考える」を読む
-- エンドポイントの階層がわからない → `LESSON1_README.md` の「よくある質問」を読む
+-   RESTful 設計がわからない → `LESSON1_README.md` の「RESTful 設計の基本原則」を読む
+-   Controller の責務分離がわからない → `LESSON1_README.md` の「Controller 責務分離を考える」を読む
+-   エンドポイントの階層がわからない → `LESSON1_README.md` の「よくある質問」を読む
 
 ---
 
@@ -194,4 +202,3 @@ Lesson1 が完了したら、Lesson2 で以下を実装します：
 4. 業務ルール
 
 **まずは設計をしっかり考えてください！頑張ってください！** 💪
-

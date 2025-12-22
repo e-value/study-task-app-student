@@ -366,10 +366,10 @@ public function toArray(Request $request): array
 ### 演習 4: ApiResource 作成と設計
 
 1. 必要な ApiResource を作成する
-   ```bash
-   php artisan make:resource ProjectResource
-   php artisan make:resource TaskResource
-   ```
+    ```bash
+    php artisan make:resource ProjectResource
+    php artisan make:resource TaskResource
+    ```
 2. `ProjectResource.php` の `toArray()` に返すべき構造をコメントで書く
 3. `TaskResource.php` の `toArray()` に返すべき構造をコメントで書く
 
