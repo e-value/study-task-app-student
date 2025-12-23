@@ -121,6 +121,45 @@ sail artisan make:controller Api/YourController
 -   各 Controller にメソッドを定義してください
 -   各メソッドの中身は `abort(501, 'Not Implemented');` としてください
 
+**記載例：**
+
+```php
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class ProjectController extends Controller
+{
+    public function index()
+    {
+        abort(501, 'Not Implemented');
+    }
+
+    public function store(Request $request)
+    {
+        abort(501, 'Not Implemented');
+    }
+
+    public function show($id)
+    {
+        abort(501, 'Not Implemented');
+    }
+
+    public function update(Request $request, $id)
+    {
+        abort(501, 'Not Implemented');
+    }
+
+    public function destroy($id)
+    {
+        abort(501, 'Not Implemented');
+    }
+}
+```
+
 ---
 
 ## 🎨 Step 3: ApiResource 作成
