@@ -1,210 +1,436 @@
-# study-task-app 🚀
+# 📚 Laravel API 設計 実践講座
 
-**Laravel × Sail × Vue3 (SPA)** で構築されたプロジェクトです。  
-**ログイン機能付きの初期画面が実装済み**で、この README に従えば、誰でも環境構築なしでプロジェクトを立ち上げることができます。
-
----
-
-## ✨ このプロジェクトの特徴
-
--   ✅ **認証機能実装済み**（ログイン・ログアウト・ユーザー登録）
--   ✅ **Docker 完全対応**（PHP・Node.js・Composer のインストール不要）
--   ✅ **モダンなフロントエンド**（Vue 3 SPA + Vue Router + Pinia）
--   ✅ **Laravel API**（Sanctum による認証）
--   ✅ **開発環境即座に起動**（コマンド数回で動作する）
+> **Laravel × Vue3 SPA で学ぶ REST API 設計とレビュープロセス**
 
 ---
 
-## 📋 必要な環境
+## 🎯 この講座について
 
--   **Docker Desktop** がインストールされていること
--   **Git** がインストールされていること
+この講座では、**実際の開発現場で使われる PR レビュープロセス**を通じて、  
+**REST API の設計力**を実践的に身につけることができます。
 
-※ PHP、Composer、Node.js のインストールは不要です！
+### ✨ 学べること
+
+-   ✅ **REST API の設計思想**（リソース思考、ステータスコード、命名規則）
+-   ✅ **Laravel の API 実装**（Controller、Resource、Request Validation）
+-   ✅ **PR レビューの受け方**（指摘の受け止め方、修正の進め方）
+-   ✅ **実務レベルのコード品質**（保守性、拡張性、可読性）
 
 ---
 
-## ⚙️ Sail コマンドのエイリアス設定（推奨）
+## 📖 学習の流れ
 
-このプロジェクトでは `./vendor/bin/sail` の代わりに短く `sail` と入力できるように設定することを推奨します。
-
-### macOS / Linux の場合
-
-お使いのシェル設定ファイル（`~/.zshrc` または `~/.bashrc`）に以下を追加：
-
-```bash
-alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'
+```
+1️⃣ このリポジトリを Fork
+     ↓
+2️⃣ ローカルに Clone
+     ↓
+3️⃣ 課題を実装（API エンドポイントの追加）
+     ↓
+4️⃣ Pull Request を作成
+     ↓
+5️⃣ レビューを受ける（エンドポイント設計、責務分離など）
+     ↓
+6️⃣ 指摘を修正 → 再レビュー
+     ↓
+7️⃣ 承認 → マージ → 次のレッスンへ 🎉
 ```
 
-設定を反映：
-
-```bash
-source ~/.zshrc  # zsh の場合
-# または
-source ~/.bashrc  # bash の場合
-```
-
-> **💡 ヒント**  
-> 以降のドキュメントでは `sail` と記載します。エイリアス未設定の場合は `./vendor/bin/sail` に読み替えてください。
-
 ---
 
-## 🚀 プロジェクト立ち上げ手順
+## 🚀 はじめ方
 
-### 1️⃣ プロジェクトをクローン
+### 1️⃣ このリポジトリを Fork
+
+右上の **「Fork」** ボタンをクリックして、あなたのアカウントにコピーしてください。
+
+### 2️⃣ ローカルに Clone
 
 ```bash
 cd ~/Desktop
-git clone <リポジトリURL> study-task-app
-cd study-task-app
+git clone https://github.com/e-value/study-task-app-student.git
+cd study-task-app-student
 ```
 
-### 2️⃣ 環境変数ファイルを準備
+### 3️⃣ 環境構築
+
+> **💡 最短 3 ステップでセットアップしたい方へ**  
+> **[QUICKSTART.md](./QUICKSTART.md)** をご覧ください！
+
+#### 手順 1: 環境変数ファイルの準備
 
 ```bash
 cp .env.example .env
 ```
 
-### 3️⃣ 依存関係のインストール（初回のみ）
+#### 手順 2: Composer パッケージのインストール
+
+**ローカルに Composer がインストールされている場合（推奨）**:
+
+```bash
+composer install --ignore-platform-reqs
+```
+
+**ローカルに Composer がない場合（Docker 経由）**:
 
 ```bash
 docker run --rm \
     -u "$(id -u):$(id -g)" \
     -v "$(pwd):/var/www/html" \
     -w /var/www/html \
-    laravelsail/php85-composer:latest \
+    laravelsail/php84-composer:latest \
     composer install --ignore-platform-reqs
 ```
 
-### 4️⃣ コンテナを起動
+#### 手順 3: Docker コンテナの起動
 
 ```bash
-sail up -d
+./vendor/bin/sail up -d
 ```
 
-### 5️⃣ パッケージのインストール
+> **📝 Note**: コンテナの起動には少し時間がかかります（初回は特に）
+
+#### 手順 4: Node.js パッケージのインストール
 
 ```bash
-# Composer (既にインストール済みの場合はスキップ)
-sail composer install
-
-# NPM
-sail npm install
+./vendor/bin/sail npm install
 ```
 
-### 6️⃣ アプリケーションキーの生成
+#### 手順 5: アプリケーションキーの生成
 
 ```bash
-sail artisan key:generate
+./vendor/bin/sail artisan key:generate
 ```
 
-### 7️⃣ データベースのセットアップ
+#### 手順 6: データベースのセットアップ
 
 ```bash
-# データベースを作成
-sail exec mysql mysql -uroot -e "CREATE DATABASE IF NOT EXISTS study_task_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-# マイグレーションとシーダーを実行
-sail artisan migrate:fresh --seed
+# MySQL の起動を待ってから実行（15秒待機）
+sleep 15 && ./vendor/bin/sail artisan migrate:fresh --seed
 ```
 
-> **📝 シーダーについて**  
-> `--seed` オプションを付けることで、以下のダミーデータが自動的に作成されます：
-> - 3人のユーザー（owner@example.com, admin@example.com, member@example.com）
-> - 複数のプロジェクト
-> - サンプルタスク
-> - メンバーシップ（ロール設定）
-> 
-> パスワードは全て `password` です。
+> **💡 Tip**: シーダーにより以下のテストユーザーが作成されます
+>
+> -   owner@example.com (password: `password`)
+> -   admin@example.com (password: `password`)
+> -   member@example.com (password: `password`)
 
-### 8️⃣ フロントエンドのビルド（開発モード）
+#### 手順 7: フロントエンドの起動
 
 **別のターミナルを開いて**以下を実行：
 
 ```bash
-sail npm run dev
+cd study-task-app-student
+./vendor/bin/sail npm run dev
 ```
 
----
+### 4️⃣ ブラウザでアクセス
 
-## 🌐 アプリケーションにアクセス
-
-ブラウザで以下の URL を開いてください：
+セットアップが完了したら、以下の URL にアクセスしてください：
 
 -   **アプリケーション**: http://localhost
 -   **phpMyAdmin**: http://localhost:8080
 
-### 🎉 初回アクセス時
+#### 🔑 テストユーザーでログイン
 
-ウェルカム画面が表示されます！
+以下のアカウントでログインできます：
 
-1. **「Register」** をクリックして新規ユーザーを作成
-2. 必要な情報を入力して登録
-3. 自動的にログインされ、ダッシュボードが表示されます
-
-### 🗄️ データベース管理（phpMyAdmin）
-
-phpMyAdmin にはログイン不要で直接アクセスできます：
-
--   **URL**: http://localhost:8080
--   **データベース名**: `study_task_app`
--   **ユーザー名**: `root`
--   **パスワード**: なし（空）
-
-左側のサイドバーから `study_task_app` を選択すると、テーブル一覧が表示されます。
+| メールアドレス     | パスワード | 役割     |
+| :----------------- | :--------- | :------- |
+| owner@example.com  | password   | オーナー |
+| admin@example.com  | password   | 管理者   |
+| member@example.com | password   | メンバー |
 
 ---
 
-## 🛠 よく使うコマンド
+## 📝 課題について
 
-### コンテナの起動・停止
+### Lesson 1: タスク API の実装
 
-```bash
-# バックグラウンドで起動
-sail up -d
+**目標**: プロジェクトに紐づくタスク（Task）の CRUD API を実装する
 
-# コンテナを停止
-sail down
+#### 実装するエンドポイント
+
+| メソッド | URL                             | 説明           |
+| :------- | :------------------------------ | :------------- |
+| `GET`    | `/api/projects/{project}/tasks` | タスク一覧取得 |
+| `POST`   | `/api/projects/{project}/tasks` | タスク作成     |
+| `GET`    | `/api/tasks/{task}`             | タスク詳細取得 |
+| `PUT`    | `/api/tasks/{task}`             | タスク更新     |
+| `DELETE` | `/api/tasks/{task}`             | タスク削除     |
+
+#### 実装の流れ
+
+1. **ブランチを切る**
+
+    ```bash
+    git checkout -b feature/task-api
+    ```
+
+2. **Controller を作成**
+
+    ```bash
+    ./vendor/bin/sail artisan make:controller Api/TaskController
+    ```
+
+3. **実装する**
+
+    - `routes/api.php` にルーティングを追加
+    - `TaskController` に各メソッドを実装
+    - `TaskResource` を作成してレスポンス形式を定義
+    - `TaskRequest` を作成してバリデーションを実装
+
+4. **動作確認**
+
+    - Postman や curl でエンドポイントをテスト
+    - フロントエンドから実際に動作するか確認
+
+5. **コミット & プッシュ**
+
+    ```bash
+    git add .
+    git commit -m "feat: タスクAPIの実装"
+    git push origin feature/task-api
+    ```
+
+6. **Pull Request を作成**
+    - GitHub で PR を作成
+    - レビュー依頼を送る
+
+---
+
+## 🔍 レビューで見られるポイント
+
+PR レビューでは、以下の観点でコードがチェックされます。
+
+### 1. **エンドポイント設計** 🎯
+
+-   ✅ RESTful な URL 設計になっているか？
+-   ✅ 適切な HTTP メソッドを使っているか？
+-   ✅ ステータスコードは正しいか？
+
+**よくある指摘例**
+
+```php
+// ❌ 悪い例：動詞を使っている
+POST /api/tasks/create
+
+// ✅ 良い例：リソース思考
+POST /api/tasks
 ```
 
-### Artisan コマンド
+### 2. **Resource の責務** 📦
 
-```bash
-# マイグレーション
-sail artisan migrate
+-   ✅ API レスポンスの形式が統一されているか？
+-   ✅ Resource クラスでレスポンスを整形しているか？
+-   ✅ 不要な情報を返していないか？
 
-# キャッシュクリア
-sail artisan cache:clear
+**よくある指摘例**
+
+```php
+// ❌ 悪い例：Controller で直接配列を返す
+return response()->json($task);
+
+// ✅ 良い例：Resource を使う
+return new TaskResource($task);
 ```
 
-### NPM コマンド
+### 3. **バリデーション** ✅
+
+-   ✅ FormRequest でバリデーションしているか？
+-   ✅ エラーメッセージは分かりやすいか？
+-   ✅ 必須/任意が適切か？
+
+### 4. **ステータスコード** 🔢
+
+-   ✅ 作成時に `201 Created` を返しているか？
+-   ✅ 更新時に `200 OK` を返しているか？
+-   ✅ 削除時に `204 No Content` を返しているか？
+-   ✅ エラー時に適切なコードを返しているか？
+
+### 5. **コードの品質** 🎨
+
+-   ✅ 責務が明確に分離されているか？
+-   ✅ 変数名・メソッド名が分かりやすいか？
+-   ✅ 冗長なコードがないか？
+
+---
+
+## 💡 参考資料
+
+### 📚 Laravel 公式ドキュメント
+
+-   [API Resources](https://laravel.com/docs/12.x/eloquent-resources)
+-   [Form Requests](https://laravel.com/docs/12.x/validation#form-request-validation)
+-   [Routing](https://laravel.com/docs/12.x/routing)
+
+### 🎓 REST API 設計
+
+-   [RESTful API 設計のベストプラクティス](https://restfulapi.net/)
+-   [HTTP ステータスコード一覧](https://developer.mozilla.org/ja/docs/Web/HTTP/Status)
+
+---
+
+## ❓ よくある質問
+
+### Q1. コンテナが起動しない
+
+**A.** 以下を確認してください：
+
+1. **Docker Desktop が起動しているか確認**
 
 ```bash
-# 開発サーバーの起動
-sail npm run dev
-
-# 本番用ビルド
-sail npm run build
+docker info
 ```
+
+2. **ポートが使用されていないか確認**
+
+```bash
+# ポート 80 の使用状況
+lsof -i :80
+
+# ポート 3306 の使用状況
+lsof -i :3306
+```
+
+3. **コンテナの状態を確認**
+
+```bash
+# コンテナの状態を確認
+./vendor/bin/sail ps
+
+# ログを確認
+./vendor/bin/sail logs
+
+# 特定のコンテナのログを確認
+./vendor/bin/sail logs mysql
+```
+
+4. **コンテナを再起動**
+
+```bash
+./vendor/bin/sail down
+./vendor/bin/sail up -d
+```
+
+### Q2. マイグレーションでエラーが出る
+
+**A.** MySQL コンテナの起動を待ってから実行してください。
+
+```bash
+# MySQL の起動を待つ（15秒）
+sleep 15
+
+# マイグレーションを実行
+./vendor/bin/sail artisan migrate:fresh --seed
+```
+
+**それでもエラーが出る場合**:
+
+```bash
+# コンテナの状態を確認
+./vendor/bin/sail ps
+
+# MySQL のログを確認
+./vendor/bin/sail logs mysql
+
+# コンテナを再起動
+./vendor/bin/sail down
+./vendor/bin/sail up -d
+```
+
+### Q3. npm install でエラーが出る
+
+**A.** 依存関係の競合エラーが出た場合は、以下を試してください。
+
+**エラー例**:
+```
+npm error ERESOLVE could not resolve
+npm error Conflicting peer dependency: vite@7.3.0
+```
+
+**解決方法**:
+
+1. **package.json の確認**（推奨）
+   - `vite` と `laravel-vite-plugin` のバージョンが互換性があるか確認
+   - `laravel-vite-plugin@2.x` を使う場合は `vite@^7.0.0` が必要
+   - `@vitejs/plugin-vue` も Vite のバージョンに合わせる
+
+2. **強制インストール**（一時的な回避策）
+   ```bash
+   ./vendor/bin/sail npm install --legacy-peer-deps
+   ```
+
+### Q4. フロントエンドが表示されない
+
+**A.** Vite の開発サーバーが起動しているか確認してください。
+
+```bash
+# 別ターミナルで実行
+./vendor/bin/sail npm run dev
+```
+
+### Q5. PR レビューで何を書けばいい？
+
+**A.** 以下のテンプレートを参考にしてください。
+
+```markdown
+## 実装内容
+
+-   タスクの CRUD API を実装しました
+
+## 動作確認
+
+-   ✅ 一覧取得: GET /api/projects/1/tasks
+-   ✅ 詳細取得: GET /api/tasks/1
+-   ✅ 作成: POST /api/projects/1/tasks
+-   ✅ 更新: PUT /api/tasks/1
+-   ✅ 削除: DELETE /api/tasks/1
+
+## 質問・相談
+
+-   ステータスの更新 API は別エンドポイントにすべきでしょうか？
+```
+
+---
+
+## 📞 サポート
+
+質問や問題があれば、以下の方法でサポートを受けられます：
+
+1. **Issue を作成**（バグ報告・質問）
+2. **PR コメント**（実装に関する相談）
+3. **Discord / Slack**（講師と直接やり取り）
+
+---
+
+## 🎉 Let's Code!
+
+**実装 → レビュー → 修正** のサイクルを回すことで、  
+確実に API 設計力が身につきます！
+
+頑張ってください！💪✨
 
 ---
 
 ## 📦 技術スタック
 
-| 分類               | 技術                        |
-| ------------------ | --------------------------- |
-| **バックエンド**   | Laravel 12.x                |
+| 分類               | 技術                           |
+| :----------------- | :----------------------------- |
+| **バックエンド**   | Laravel 12.x                   |
 | **フロントエンド** | Vue 3 SPA + Vue Router + Pinia |
-| **認証**           | Laravel Sanctum             |
-| **スタイリング**   | Tailwind CSS                |
-| **データベース**   | MySQL 8.4                   |
-| **DB管理ツール**   | phpMyAdmin                  |
-| **キャッシュ**     | Redis                       |
-| **開発環境**       | Docker (Laravel Sail)       |
-| **ビルドツール**   | Vite 6                      |
+| **認証**           | Laravel Sanctum                |
+| **スタイリング**   | Tailwind CSS                   |
+| **データベース**   | MySQL 8.4                      |
+| **DB 管理ツール**  | phpMyAdmin                     |
+| **キャッシュ**     | Redis                          |
+| **開発環境**       | Docker (Laravel Sail)          |
+| **ビルドツール**   | Vite 7                         |
 
 ---
 
-## 🎉 これで準備完了です！
+## 📚 関連ドキュメント
 
-Happy Coding! 🚀✨
+-   **[QUICKSTART.md](./QUICKSTART.md)** - 最短 3 ステップのセットアップガイド
+-   **[SETUP.md](./SETUP.md)** - 詳細なセットアップ手順
+-   **[docs/PROJECT_OVERVIEW.md](./docs/PROJECT_OVERVIEW.md)** - アーキテクチャ設計
