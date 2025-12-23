@@ -87,272 +87,110 @@ updated_at      timestamp
 
 ---
 
-## 🤔 Step 1: エンドポイント設計を考える
+## 📝 Step 1: エンドポイント設計
 
-### 考えるべき質問
+RESTful な API エンドポイントを設計してください。
 
-#### Q1: プロジェクト操作のエンドポイントは？
+**設計すべきエンドポイント：**
 
-**プロジェクト一覧取得** はどうする？
-
--   `GET /api/projects` ？
--   `GET /api/project/list` ？
--   どちらが RESTful？
-
-**プロジェクト作成** はどうする？
-
--   `POST /api/projects` ？
--   `POST /api/project/create` ？
--   どちらが RESTful？
-
-**プロジェクト詳細取得** はどうする？
-
--   `GET /api/projects/{project}` ？
--   `GET /api/project/{id}` ？
--   `GET /api/projects/{id}/show` ？
--   どれが RESTful？
-
-**プロジェクト更新** はどうする？
-
--   `PUT /api/projects/{project}` ？
--   `PATCH /api/projects/{project}` ？
--   `POST /api/projects/{project}/update` ？
--   PUT と PATCH の違いは？
-
-**プロジェクト削除** はどうする？
-
--   `DELETE /api/projects/{project}` ？
--   `POST /api/projects/{project}/delete` ？
--   どちらが RESTful？
-
-#### Q2: タスク操作のエンドポイントは？
-
-**プロジェクト内のタスク一覧取得** はどうする？
-
--   `GET /api/projects/{project}/tasks` ？
--   `GET /api/tasks?project_id={project}` ？
--   どちらが階層構造を表現している？
-
-**プロジェクト内にタスク作成** はどうする？
-
--   `POST /api/projects/{project}/tasks` ？
--   `POST /api/tasks` （body に project_id を入れる）？
--   どちらがわかりやすい？
-
-**タスク詳細取得** はどうする？
-
--   `GET /api/tasks/{task}` ？
--   `GET /api/projects/{project}/tasks/{task}` ？
--   どちらがシンプル？
-
-**タスク更新** はどうする？
-
--   `PATCH /api/tasks/{task}` ？
--   `PATCH /api/projects/{project}/tasks/{task}` ？
-
-**タスク削除** はどうする？
-
--   `DELETE /api/tasks/{task}` ？
--   `DELETE /api/projects/{project}/tasks/{task}` ？
-
-#### Q3: 自分のタスク一覧取得は？
-
-**自分のタスク一覧** はどうする？
-
--   `GET /api/me/tasks` ？
--   `GET /api/tasks/my` ？
--   `GET /api/tasks?user=me` ？
--   どれが「自分のタスク」を明確に表現している？
+-   プロジェクト一覧取得
+-   プロジェクト作成
+-   プロジェクト詳細取得
+-   プロジェクト更新
+-   プロジェクト削除
+-   プロジェクト内のタスク一覧取得
+-   プロジェクト内にタスク作成
+-   タスク詳細取得
+-   タスク更新
+-   タスク削除
+-   自分のタスク一覧取得
 
 ---
 
-## 🧠 Step 2: Controller 責務分離を考える
+## 🎯 Step 2: Controller 作成
 
-### 考えるべき質問
+必要な Controller を `app/Http/Controllers/Api/` に作成してください。
 
-#### Q1: Controller をいくつ作るべき？
-
-**Option A: 1 つの Controller にまとめる**
-
-```
-ProjectController
-  - プロジェクト操作
-  - タスク操作
-  - 全部入り
+```bash
+# 例：Controllerの作成
+./vendor/bin/sail artisan make:controller Api/YourController
 ```
 
-**メリット・デメリットは？**
+**要件：**
 
-**Option B: リソースごとに分ける**
-
-```
-ProjectsController
-  - プロジェクト操作のみ
-
-TasksController
-  - タスク操作のみ
-```
-
-**メリット・デメリットは？**
-
-**Option C: さらに細かく分ける**
-
-```
-ProjectsController
-  - プロジェクト操作のみ
-
-TasksController
-  - タスク操作のみ
-
-MeTasksController
-  - 自分のタスク一覧取得のみ
-```
-
-**メリット・デメリットは？**
-
-#### Q2: どの Controller にどのメソッドを実装する？
-
-あなたが設計した Controller に対して：
-
--   プロジェクト一覧取得 → どの Controller の何というメソッド？
--   プロジェクト作成 → どの Controller の何というメソッド？
--   プロジェクト詳細取得 → どの Controller の何というメソッド？
--   プロジェクト更新 → どの Controller の何というメソッド？
--   プロジェクト削除 → どの Controller の何というメソッド？
-
--   プロジェクト内のタスク一覧取得 → どの Controller の何というメソッド？
--   プロジェクト内にタスク作成 → どの Controller の何というメソッド？
--   タスク詳細取得 → どの Controller の何というメソッド？
--   タスク更新 → どの Controller の何というメソッド？
--   タスク削除 → どの Controller の何というメソッド？
-
--   自分のタスク一覧取得 → どの Controller の何というメソッド？
+-   各 Controller にメソッドを定義してください
+-   各メソッドの中身は `abort(501, 'Not Implemented');` としてください
 
 ---
 
-## 🎨 Step 3: ApiResource 設計を考える
+## 🎨 Step 3: ApiResource 作成
 
-### ProjectResource の設計
-
-フロントエンドに返す JSON 構造を考えてください：
+フロントエンドに返す JSON の構造を定義する ApiResource を作成してください。
 
 ```bash
-# まず ApiResource を作成
-php artisan make:resource ProjectResource
+# ApiResourceの作成
+./vendor/bin/sail artisan make:resource ProjectResource
+./vendor/bin/sail artisan make:resource TaskResource
 ```
 
-```php
-// 作成後、app/Http/Resources/ProjectResource.php を編集
-public function toArray(Request $request): array
-{
-    return [
-        // TODO: 何を返すべき？
+**要件：**
 
-        // id は必要？
-        // name だけでいい？
-        // is_archived を boolean で返す？ それとも status: "active" | "archived" にする？
-        // メンバー情報を含める？
-        // タスク数を含める？
-        // 作成日時・更新日時は？
-        //
-        // 一覧表示用と詳細表示用で分けるべき？
-    ];
-}
-```
-
-### TaskResource の設計
-
-```bash
-# まず ApiResource を作成
-php artisan make:resource TaskResource
-```
-
-```php
-// 作成後、app/Http/Resources/TaskResource.php を編集
-public function toArray(Request $request): array
-{
-    return [
-        // TODO: 何を返すべき？
-
-        // id, title, description は必要？
-        // status を "todo" | "doing" | "done" で返す？
-        // 作成者の情報をどこまで含める？（id だけ？名前も？）
-        // プロジェクト情報を含める？
-        // 作成日時・更新日時は？
-        //
-        // 一覧表示用と詳細表示用で分けるべき？
-    ];
-}
-```
+-   `app/Http/Resources/` に作成された各 Resource ファイルの `toArray()` メソッドを定義してください
 
 ---
 
 ## ✍️ 演習：あなたのターン！
 
 > **📚 事前学習：** エンドポイント設計を始める前に、RESTful API の基本原則について調べてください。
-> 
+>
 > 以下のキーワードで検索することをおすすめします：
-> - RESTful API とは
-> - HTTP メソッド（GET, POST, PUT, PATCH, DELETE）の使い分け
-> - リソース指向の URL 設計
-> - RESTful API 階層構造
+>
+> -   RESTful API とは
+> -   HTTP メソッド（GET, POST, PUT, PATCH, DELETE）の使い分け
+> -   リソース指向の URL 設計
+> -   RESTful API 階層構造
 
-### 演習 1: エンドポイント設計
+### 演習 1: エンドポイント設計を文書化
 
-1. 紙やドキュメントに、全てのエンドポイントを書き出してください
-2. 各エンドポイントについて、以下を記載：
-    - HTTP メソッド
-    - URL
-    - 説明
-    - どの Controller に実装するか
+全てのエンドポイントを紙やドキュメントに書き出してください。
 
-### 演習 2: Controller 作成
+**記載内容：**
+
+-   HTTP メソッド
+-   URL
+-   説明
+
+### 演習 2: Controller 作成とメソッド定義
 
 1. 必要な Controller を `app/Http/Controllers/Api/` に作成
-2. 各メソッドは `abort(501, 'Not Implemented');` で OK
-3. クラス名とメソッド名だけ決めてください
+2. 各メソッドの中身は `abort(501, 'Not Implemented');` で OK
 
 ### 演習 3: ルーティング定義
 
-1. `routes/api.php` にエンドポイントを定義
-2. 各エンドポイントを適切な Controller に紐づける
+`routes/api.php` に全てのエンドポイントを定義してください。
 
-### 演習 4: ApiResource 作成と設計
+### 演習 4: ApiResource 作成と定義
 
-1. 必要な ApiResource を作成する
-    ```bash
-    php artisan make:resource ProjectResource
-    php artisan make:resource TaskResource
-    ```
-2. `ProjectResource.php` の `toArray()` に返すべき構造をコメントで書く
-3. `TaskResource.php` の `toArray()` に返すべき構造をコメントで書く
+1. 必要な ApiResource を作成
+2. 各 Resource の `toArray()` メソッドを定義
 
 ---
 
 ## 🧪 動作確認
 
-設計が完了したら、以下で確認：
+設計が完了したら、以下で確認してください：
 
 ```bash
 # ルート一覧を表示
-php artisan route:list --path=api
-
-# 期待される出力：
-# あなたが設計した全エンドポイントが表示されるはず
+./vendor/bin/sail artisan route:list --path=api
 ```
 
 ```bash
-# アプリを起動
-php artisan serve
+# 動作確認（501エラーが返ればOK）
+./vendor/bin/sail artisan serve
 
-# 別ターミナルで API を叩いてみる
-curl -X GET http://localhost:8000/api/projects \
-  -H "Authorization: Bearer YOUR_TOKEN"
-
-# レスポンス（501エラーが返ればOK）
-{
-  "message": "Not Implemented"
-}
+# 別ターミナルで
+curl -X GET http://localhost:8000/api/projects
 ```
 
 ---
