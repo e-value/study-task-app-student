@@ -113,7 +113,7 @@ RESTful な API エンドポイントを設計してください。
 
 ```bash
 # 例：Controllerの作成
-./vendor/bin/sail artisan make:controller Api/YourController
+sail artisan make:controller Api/YourController
 ```
 
 **要件：**
@@ -129,8 +129,8 @@ RESTful な API エンドポイントを設計してください。
 
 ```bash
 # ApiResourceの作成
-./vendor/bin/sail artisan make:resource ProjectResource
-./vendor/bin/sail artisan make:resource TaskResource
+sail artisan make:resource ProjectResource
+sail artisan make:resource TaskResource
 ```
 
 **要件：**
@@ -182,12 +182,12 @@ RESTful な API エンドポイントを設計してください。
 
 ```bash
 # ルート一覧を表示
-./vendor/bin/sail artisan route:list --path=api
+sail artisan route:list --path=api
 ```
 
 ```bash
 # 動作確認（501エラーが返ればOK）
-./vendor/bin/sail artisan serve
+sail artisan serve
 
 # 別ターミナルで
 curl -X GET http://localhost:8000/api/projects
