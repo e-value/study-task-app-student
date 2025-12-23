@@ -287,61 +287,15 @@ public function toArray(Request $request): array
 
 ---
 
-## 📖 RESTful 設計の基本原則
-
-設計の参考にしてください：
-
-### 1. リソース指向の URL
-
-**良い例：**
-
--   `GET /api/projects` - プロジェクト一覧
--   `POST /api/projects` - プロジェクト作成
--   `GET /api/projects/{id}` - プロジェクト詳細
-
-**悪い例：**
-
--   `GET /api/getProjects` - 動詞が URL に入っている
--   `POST /api/createProject` - 動詞が URL に入っている
--   `GET /api/projects/list` - 不要な単語が入っている
-
-### 2. HTTP メソッドの使い分け
-
-| メソッド   | 用途         | 例                          |
-| ---------- | ------------ | --------------------------- |
-| **GET**    | 取得         | `GET /api/projects`         |
-| **POST**   | 作成         | `POST /api/projects`        |
-| **PUT**    | 全体置き換え | `PUT /api/projects/{id}`    |
-| **PATCH**  | 部分更新     | `PATCH /api/projects/{id}`  |
-| **DELETE** | 削除         | `DELETE /api/projects/{id}` |
-
-### 3. リソースの階層構造
-
-**プロジェクト配下のタスク：**
-
--   `GET /api/projects/{project}/tasks` ✅
--   `GET /api/tasks?project_id={id}` ❌（クエリパラメータより URL で表現）
-
-**タスク単体：**
-
--   `GET /api/tasks/{task}` ✅
--   `GET /api/projects/{project}/tasks/{task}` ❌（階層が深すぎる）
-
-### 4. コレクションと単体リソース
-
-| URL                  | 意味                             |
-| -------------------- | -------------------------------- |
-| `/api/projects`      | プロジェクトコレクション（一覧） |
-| `/api/projects/{id}` | 特定のプロジェクト（単体）       |
-
-**ルール：**
-
--   コレクション = 複数形
--   単体リソース = 複数形 + ID
-
----
-
 ## ✍️ 演習：あなたのターン！
+
+> **📚 事前学習：** エンドポイント設計を始める前に、RESTful API の基本原則について調べてください。
+> 
+> 以下のキーワードで検索することをおすすめします：
+> - RESTful API とは
+> - HTTP メソッド（GET, POST, PUT, PATCH, DELETE）の使い分け
+> - リソース指向の URL 設計
+> - RESTful API 階層構造
 
 ### 演習 1: エンドポイント設計
 
@@ -403,21 +357,6 @@ curl -X GET http://localhost:8000/api/projects \
 
 ---
 
-## 💡 ヒント：正解例はありません
-
-RESTful 設計には「絶対的な正解」はありません。
-
-**大事なのは：**
-
-1. **一貫性** - 命名規則や URL 構造が統一されているか
-2. **予測可能性** - URL を見ただけで何をする API かわかるか
-3. **シンプルさ** - 複雑すぎないか
-4. **拡張性** - 将来的に機能追加しやすいか
-
-ペアで議論して、チームとして納得できる設計を見つけてください。
-
----
-
 ## 🚀 次の Lesson2 では...
 
 -   あなたが設計したエンドポイントと ApiResource を**実装**します
@@ -432,64 +371,6 @@ RESTful 設計には「絶対的な正解」はありません。
 -   [RESTful API 設計ガイド](https://restfulapi.net/)
 -   [Laravel Resource Controllers](https://laravel.com/docs/controllers#resource-controllers)
 -   [Laravel API Resources](https://laravel.com/docs/eloquent-resources)
-
----
-
-## ❓ よくある質問
-
-### Q1: PUT と PATCH の違いは？
-
-**PUT** = リソース全体を置き換える
-
-```json
-// 全フィールドを送る必要がある
-PUT /api/projects/1
-{
-  "name": "新しいプロジェクト名",
-  "is_archived": false
-}
-```
-
-**PATCH** = リソースの一部を更新する
-
-```json
-// 更新したいフィールドだけ送る
-PATCH /api/projects/1
-{
-  "name": "新しいプロジェクト名"
-}
-```
-
-**推奨：** 今回は PATCH を使うことをお勧めします。
-
-### Q2: エンドポイントに動詞を入れるのは NG？
-
-**基本的に NG：**
-
--   ❌ `POST /api/projects/create`
--   ❌ `GET /api/projects/list`
--   ✅ `POST /api/projects`
--   ✅ `GET /api/projects`
-
-**例外：** 動詞的な操作（アクション）の場合は OK
-
--   ✅ `POST /api/tasks/{task}/start` （タスクを開始）
--   ✅ `POST /api/tasks/{task}/complete` （タスクを完了）
-
-ただし、今回の Lesson1 では動詞的なエンドポイントは不要です。
-
-### Q3: 階層はどこまで深くすべき？
-
-**推奨：2 階層まで**
-
-```
-✅ /api/projects/{project}/tasks
-❌ /api/projects/{project}/tasks/{task}/comments
-```
-
-3 階層以上になる場合は：
-
--   `GET /api/tasks/{task}/comments` （タスク単体からアクセス）
 
 ---
 
