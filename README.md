@@ -344,22 +344,39 @@ sleep 15
 **A.** 依存関係の競合エラーが出た場合は、以下を試してください。
 
 **エラー例**:
+
 ```
 npm error ERESOLVE could not resolve
 npm error Conflicting peer dependency: vite@7.3.0
 ```
 
+**原因**:
+
+-   `laravel-vite-plugin@2.x` は Vite 7.x を要求しますが、このプロジェクトは Vite 6.x を使用しています
+
 **解決方法**:
 
-1. **package.json の確認**（推奨）
-   - `vite` と `laravel-vite-plugin` のバージョンが互換性があるか確認
-   - `laravel-vite-plugin@2.x` を使う場合は `vite@^7.0.0` が必要
-   - `@vitejs/plugin-vue` も Vite のバージョンに合わせる
+このプロジェクトは Vite 6.x ベースで設計されているため、以下の手順で解決してください：
 
-2. **強制インストール**（一時的な回避策）
-   ```bash
-   ./vendor/bin/sail npm install --legacy-peer-deps
-   ```
+1. **package.json の確認**
+
+    `laravel-vite-plugin` が `^1.0.0` になっているか確認してください。  
+    もし `^2.0.0` になっている場合は、以下のように修正してください：
+
+    ```json
+    "laravel-vite-plugin": "^1.0.0"
+    ```
+
+2. **キャッシュをクリア**
+
+    ```bash
+    ./vendor/bin/sail exec laravel.test rm -rf node_modules package-lock.json
+    ```
+
+3. **再インストール**
+    ```bash
+    ./vendor/bin/sail npm install
+    ```
 
 ### Q4. フロントエンドが表示されない
 
@@ -425,7 +442,7 @@ npm error Conflicting peer dependency: vite@7.3.0
 | **DB 管理ツール**  | phpMyAdmin                     |
 | **キャッシュ**     | Redis                          |
 | **開発環境**       | Docker (Laravel Sail)          |
-| **ビルドツール**   | Vite 7                         |
+| **ビルドツール**   | Vite 6                         |
 
 ---
 
