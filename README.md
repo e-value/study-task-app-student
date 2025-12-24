@@ -338,6 +338,19 @@ SQLSTATE[HY000] [1049] Unknown database 'study_task_app'
     cp .env.example .env
     ```
 
+    **重要**: `.env` ファイルに以下の設定が正しく記述されているか確認してください：
+
+    ```env
+    DB_CONNECTION=mysql
+    DB_HOST=mysql
+    DB_PORT=3306
+    DB_DATABASE=study_task_app
+    DB_USERNAME=sail
+    DB_PASSWORD=password
+    ```
+
+    > **💡 注意**: `DB_USERNAME` と `DB_PASSWORD` が設定されていないと、データベース接続エラーが発生します。
+
 2. **Docker ボリュームを含めて再起動**
 
     ```bash
