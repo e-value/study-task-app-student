@@ -315,7 +315,7 @@ lsof -i :3306
 
 ### Q2. マイグレーションでエラーが出る
 
-#### 💡 エラー1: `Unknown database 'study_task_app'`
+#### 💡 エラー 1: `Unknown database 'study_task_app'`
 
 ```
 SQLSTATE[HY000] [1049] Unknown database 'study_task_app'
@@ -343,13 +343,13 @@ SQLSTATE[HY000] [1049] Unknown database 'study_task_app'
     ```bash
     # コンテナとボリュームを完全削除
     ./vendor/bin/sail down -v
-    
+
     # 再起動
     ./vendor/bin/sail up -d
-    
+
     # MySQL の起動を待つ（重要！）
     sleep 15
-    
+
     # マイグレーション実行
     ./vendor/bin/sail artisan migrate:fresh --seed
     ```
@@ -359,20 +359,20 @@ SQLSTATE[HY000] [1049] Unknown database 'study_task_app'
     ```bash
     # MySQL コンテナに接続
     ./vendor/bin/sail mysql
-    
+
     # データベースを作成
     CREATE DATABASE IF NOT EXISTS study_task_app;
-    
+
     # 確認
     SHOW DATABASES;
-    
+
     # 終了
     exit
     ```
 
     または、phpMyAdmin (http://localhost:8080) からデータベース `study_task_app` を作成してください。
 
-#### 💡 エラー2: その他のマイグレーションエラー
+#### 💡 エラー 2: その他のマイグレーションエラー
 
 **A.** MySQL コンテナの起動を待ってから実行してください。
 
