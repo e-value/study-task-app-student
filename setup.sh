@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# sample-project セットアップスクリプト
+# Study Task App セットアップスクリプト
 # このスクリプトを実行すれば、プロジェクトを自動でセットアップできます
 
 set -e
 
-echo "🚀 sample-project のセットアップを開始します..."
+echo "🚀 Study Task App のセットアップを開始します..."
 echo ""
 
 # カラー定義
@@ -42,7 +42,7 @@ if [ ! -d "vendor" ]; then
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/var/www/html" \
         -w /var/www/html \
-        laravelsail/php85-composer:latest \
+        laravelsail/php84-composer:latest \
         composer install --ignore-platform-reqs
     echo -e "${GREEN}✅ Composer パッケージをインストールしました${NC}"
 else
@@ -64,20 +64,24 @@ echo ""
 
 # 6. Node.js パッケージのインストール
 echo -e "${BLUE}[6/9]${NC} Node.js パッケージをインストール中..."
-./vendor/bin/sail npm install --legacy-peer-deps
+./vendor/bin/sail npm install
 echo -e "${GREEN}✅ Node.js パッケージをインストールしました${NC}"
 echo ""
 
 # 7. アプリケーションキーの生成
 echo -e "${BLUE}[7/9]${NC} アプリケーションキーを生成中..."
-./vendor/bin/sail artisan key:generate
-echo -e "${GREEN}✅ アプリケーションキーを生成しました${NC}"
+if grep -q "APP_KEY=$" .env || grep -q "APP_KEY=\"\"" .env || grep -q "APP_KEY=''" .env; then
+    ./vendor/bin/sail artisan key:generate
+    echo -e "${GREEN}✅ アプリケーションキーを生成しました${NC}"
+else
+    echo -e "${YELLOW}⚠️  APP_KEY は既に設定されています（スキップ）${NC}"
+fi
 echo ""
 
-# 8. データベースマイグレーション
-echo -e "${BLUE}[8/9]${NC} データベースをマイグレーション中..."
-./vendor/bin/sail artisan migrate --force
-echo -e "${GREEN}✅ データベースをマイグレーションしました${NC}"
+# 8. データベースマイグレーション＆シーダー実行
+echo -e "${BLUE}[8/9]${NC} データベースをセットアップ中..."
+./vendor/bin/sail artisan migrate:fresh --seed --force
+echo -e "${GREEN}✅ データベースをセットアップしました${NC}"
 echo ""
 
 # 9. 完了メッセージ
@@ -96,7 +100,10 @@ echo ""
 echo -e "2. ブラウザで以下のURLを開いてください:"
 echo -e "   ${YELLOW}http://localhost${NC}"
 echo ""
-echo -e "3. 「Register」からユーザー登録してログインしてください！"
+echo -e "3. 以下のテストユーザーでログインできます:"
+echo -e "   ${YELLOW}owner@example.com${NC} (password: ${YELLOW}password${NC})"
+echo -e "   ${YELLOW}admin@example.com${NC} (password: ${YELLOW}password${NC})"
+echo -e "   ${YELLOW}member@example.com${NC} (password: ${YELLOW}password${NC})"
 echo ""
 echo -e "${GREEN}Happy Coding! 🚀✨${NC}"
 
