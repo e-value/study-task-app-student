@@ -163,26 +163,22 @@ sail artisan make:resource TaskResource
 > -   リソース指向の URL 設計
 > -   RESTful API 階層構造
 
-### 演習 1: エンドポイント設計を文書化
+### 演習 1: エンドポイント設計とルーティング定義
 
-全てのエンドポイントを紙やドキュメントに書き出してください。
+設計したエンドポイントを `routes/api.php` に記載してください。
 
 **記載内容：**
 
 -   HTTP メソッド
 -   URL
--   説明
+-   対応する Controller とメソッド
 
 ### 演習 2: Controller 作成とメソッド定義
 
 1. 必要な Controller を `app/Http/Controllers/Api/` に作成
 2. 各メソッドの中身は `abort(501, 'Not Implemented');` で OK
 
-### 演習 3: ルーティング定義
-
-`routes/api.php` に全てのエンドポイントを定義してください。
-
-### 演習 4: ApiResource 作成と定義
+### 演習 3: ApiResource 作成と定義
 
 1. 必要な ApiResource を作成
 2. 各 Resource の `toArray()` メソッドを定義
