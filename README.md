@@ -63,9 +63,6 @@ cd study-task-app-student
 cp .env.example .env
 ```
 
-> **📝 Note**: この時点では `.env` ファイルの `APP_KEY` は空です。  
-> 手順 5 で `php artisan key:generate` を実行して生成します。
-
 #### 手順 2: Composer パッケージのインストール
 
 **ローカルに Composer がインストールされている場合（推奨）**:
@@ -104,10 +101,6 @@ docker run --rm \
 ```bash
 ./vendor/bin/sail artisan key:generate
 ```
-
-> **🔑 重要**: この手順は**必須**です！  
-> Laravel はこのキーを暗号化やセッション管理に使用します。  
-> この手順を飛ばすと、データベース接続エラーなどが発生する可能性があります。
 
 #### 手順 6: データベースのセットアップ
 
@@ -321,6 +314,65 @@ lsof -i :3306
 ```
 
 ### Q2. マイグレーションでエラーが出る
+
+#### 💡 エラー1: `Unknown database 'study_task_app'`
+
+```
+SQLSTATE[HY000] [1049] Unknown database 'study_task_app'
+```
+
+**原因**: データベースが作成されていない、または古いボリュームが残っている
+
+**解決方法**:
+
+1. **`.env` ファイルの確認**
+
+    ```bash
+    # .env ファイルが存在するか確認
+    ls -la .env
+    ```
+
+    存在しない場合は作成：
+
+    ```bash
+    cp .env.example .env
+    ```
+
+2. **Docker ボリュームを含めて再起動**
+
+    ```bash
+    # コンテナとボリュームを完全削除
+    ./vendor/bin/sail down -v
+    
+    # 再起動
+    ./vendor/bin/sail up -d
+    
+    # MySQL の起動を待つ（重要！）
+    sleep 15
+    
+    # マイグレーション実行
+    ./vendor/bin/sail artisan migrate:fresh --seed
+    ```
+
+3. **それでもダメな場合：手動でデータベースを作成**
+
+    ```bash
+    # MySQL コンテナに接続
+    ./vendor/bin/sail mysql
+    
+    # データベースを作成
+    CREATE DATABASE IF NOT EXISTS study_task_app;
+    
+    # 確認
+    SHOW DATABASES;
+    
+    # 終了
+    exit
+    ```
+
+    または、phpMyAdmin (http://localhost:8080) からデータベース `study_task_app` を作成してください。
+
+#### 💡 エラー2: その他のマイグレーションエラー
 
 **A.** MySQL コンテナの起動を待ってから実行してください。
 
