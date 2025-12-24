@@ -131,29 +131,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class ProjectController extends Controller
+class HogeController extends Controller
 {
-    public function index()
-    {
-        abort(501, 'Not Implemented');
-    }
-
-    public function store(Request $request)
-    {
-        abort(501, 'Not Implemented');
-    }
-
-    public function show($id)
-    {
-        abort(501, 'Not Implemented');
-    }
-
-    public function update(Request $request, $id)
-    {
-        abort(501, 'Not Implemented');
-    }
-
-    public function destroy($id)
+    public function hoge()
     {
         abort(501, 'Not Implemented');
     }
