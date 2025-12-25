@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\TaskController;
 
 /**
  * Lesson1: API エンドポイント設計
@@ -40,5 +42,34 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum'])->group(function () {
 
     // TODO: ここにエンドポイントを定義してください
+    Route::group(['prefix'=>'projects', 'as'=>'projects.'],function(){
+        // プロジェクト一覧取得
+        Route::get('/',[ProjectController::class,'index'])->name('index');
+        // プロジェクト作成
+        Route::post('/',[ProjectController::class,'store'])->name('store');
+        // プロジェクト詳細取得
+        Route::get('{project}',[ProjectController::class,'show'])->name('show');
+        // プロジェクト更新
+        Route::put('{project}',[ProjectController::class,'update'])->name('update');
+        // プロジェクト削除
+        Route::delete('{project}',[ProjectController::class,'destroy'])->name('destroy');
+
+        Route::group(['prefix'=>'{project}/tasks', 'as'=>'tasks.'],function(){
+            // プロジェクト内のタスク一覧取得
+            Route::get('/',[TaskController::class,'index'])->name('index');
+            // プロジェクト内にタスク作成
+            Route::post('/',[TaskController::class,'store'])->name('store');
+            // タスク詳細取得
+            Route::get('{task}',[TaskController::class,'show'])->name('show');
+            // タスク更新
+            Route::put('{task}',[TaskController::class,'update'])->name('update');
+            // タスク削除
+            Route::delete('{task}',[TaskController::class,'destroy'])->name('destroy');
+            // 自分のタスク一覧取得
+            Route::get('own',[TaskController::class,'index'])->name('own'); # ルートの名前で条件分岐
+        });
+    });
+    
+
 
 });
