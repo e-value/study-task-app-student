@@ -18,7 +18,9 @@ const fetchProjects = async () => {
     error.value = null;
     const response = await axios.get("/api/projects");
     // ProjectResource::collection()は {"data": [...]} の形式で返す
+    console.log("API Response:", response.data);
     projects.value = response.data.data || [];
+    console.log("Projects value:", projects.value);
   } catch (err) {
     console.error("Failed to fetch projects:", err);
     error.value =
@@ -31,9 +33,11 @@ const fetchProjects = async () => {
 const filteredProjects = computed(() => {
   // projects.valueが配列でない場合の安全な処理
   if (!Array.isArray(projects.value)) {
+    console.warn("projects.value is not an array:", projects.value);
     return [];
   }
   let result = [...projects.value];
+  console.log("Filtered projects (before filters):", result.length);
 
   // 検索フィルター
   if (searchQuery.value) {
