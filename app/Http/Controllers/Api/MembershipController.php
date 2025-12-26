@@ -49,12 +49,12 @@ class MembershipController extends ApiController
      */
     public function store(Request $request, Project $project): JsonResponse
     {
-        // 自分がowner/adminかチェック
-        $myMembership = $project->memberships()
-            ->where('user_id', $request->user()->id)
+        // 自分がowner/adminかチェック（users()リレーションを使用）
+        $myUser = $project->users()
+            ->where('users.id', $request->user()->id)
             ->first();
 
-        if (!$myMembership || !in_array($myMembership->role, ['project_owner', 'project_admin'])) {
+        if (!$myUser || !in_array($myUser->pivot->role, ['project_owner', 'project_admin'])) {
             return response()->json([
                 'message' => 'メンバーを追加する権限がありません（オーナーまたは管理者のみ）',
             ], 403);
@@ -94,39 +94,31 @@ class MembershipController extends ApiController
 
         // ユーザー情報を含めて返す
         $user = $project->users()->find($validated['user_id']);
+        $membershipId = \App\Models\Membership::where('project_id', $project->id)
+            ->where('user_id', $validated['user_id'])
+            ->value('id');
+        
+        $membership = new \App\Models\Membership();
+        $membership->id = $membershipId;
+        $membership->project_id = $project->id;
+        $membership->user_id = $user->id;
+        $membership->role = $user->pivot->role;
+        $membership->created_at = $user->pivot->created_at;
+        $membership->updated_at = $user->pivot->updated_at;
+        $membership->setRelation('user', $user);
 
         return response()->json([
             'message' => 'メンバーを追加しました',
-            'membership' => [
-                'id' => null,
-                'project_id' => $project->id,
-                'user_id' => $user->id,
-                'role' => $user->pivot->role,
-                'user' => $user,
-            ],
+            'membership' => new MembershipResource($membership),
         ], 201);
     }
 
     /**
-     * プロジェクトからメンバーを削除（users()リレーションを使用）
+     * メンバーシップ削除
      */
-    public function destroy(Request $request, Project $project, $userId): JsonResponse
+    public function destroy(Request $request, Membership $membership): JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $project)) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
-
-        // 削除対象のユーザーを取得
-        $targetUser = $project->users()
-            ->where('users.id', $userId)
-            ->first();
-
-        if (!$targetUser) {
-            return response()->json([
-                'message' => 'User is not a member of this project.',
-            ], 404);
-        }
+        $project = $membership->project;
 
         // 自分がowner/adminかチェック（users()リレーションを使用）
         $myUser = $project->users()
@@ -140,9 +132,9 @@ class MembershipController extends ApiController
         }
 
         // Owner維持チェック（Owner削除後に0人になる場合は不可）
-        if ($targetUser->pivot->role === 'project_owner') {
-            $ownerCount = $project->users()
-                ->wherePivot('role', 'project_owner')
+        if ($membership->role === 'project_owner') {
+            $ownerCount = $project->memberships()
+                ->where('role', 'project_owner')
                 ->count();
 
             if ($ownerCount <= 1) {
@@ -154,7 +146,7 @@ class MembershipController extends ApiController
 
         // 未完了タスクチェック
         $hasIncompleteTasks = $project->tasks()
-            ->where('created_by', $userId)
+            ->where('created_by', $membership->user_id)
             ->whereIn('status', ['todo', 'doing'])
             ->exists();
 
@@ -164,8 +156,8 @@ class MembershipController extends ApiController
             ], 409);
         }
 
-        // 削除実行（users()リレーションのdetach()を使用）
-        $project->users()->detach($userId);
+        // 削除実行
+        $membership->delete();
 
         return response()->json([
             'message' => 'メンバーを削除しました',

@@ -37,6 +37,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Members
     Route::get('/projects/{project}/members', [MembershipController::class, 'index']);
     Route::post('/projects/{project}/members', [MembershipController::class, 'store']);
-    // リレーション統一により、destroyメソッドのシグネチャが変更されたため、ルートも更新
     Route::delete('/projects/{project}/members/{user}', [MembershipController::class, 'destroy']);
 });
