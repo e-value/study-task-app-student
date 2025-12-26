@@ -21,28 +21,6 @@ class Project extends Model
     ];
 
     /**
-     * プロジェクトのメンバーシップ（中間テーブルのレコード）
-     * 
-     * ⚠️ 非推奨: 通常は users() リレーションを使用してください
-     * 
-     * 返り値: Membership モデルのコレクション
-     * 使用例: $project->memberships()->where('role', 'project_owner')->get()
-     * 
-     * 特徴:
-     * - 中間テーブル（memberships）のレコード自体を取得
-     * - Membership モデルのプロパティ（id, project_id, user_id, role）に直接アクセス可能
-     * - ユーザー情報にアクセスするには: $membership->user
-     * 
-     * 使用するべき場面:
-     * - メンバーシップIDが必要な特殊なケース（現在は使用していない）
-     * - 通常は users() リレーションと detach() を使用してメンバー管理を行う
-     */
-    public function memberships(): HasMany
-    {
-        return $this->hasMany(Membership::class);
-    }
-
-    /**
      * プロジェクトのユーザー（中間テーブル経由でユーザーを取得）
      * 
      * 返り値: User モデルのコレクション（pivot情報付き）
