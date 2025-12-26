@@ -93,9 +93,10 @@ const fetchProject = async () => {
     loading.value = true;
     error.value = null;
     const response = await axios.get(`/api/projects/${projectId}`);
-    project.value = response.data.project;
-    tasks.value = response.data.project.tasks || [];
-    members.value = response.data.project.users || [];
+    // ProjectResourceは {"data": {...}} の形式で返す
+    project.value = response.data.data;
+    tasks.value = response.data.data?.tasks || [];
+    members.value = response.data.data?.users || [];
   } catch (err) {
     console.error("Failed to fetch project:", err);
     error.value =
@@ -112,7 +113,8 @@ const createTask = async () => {
       `/api/projects/${projectId}/tasks`,
       newTask.value
     );
-    tasks.value.unshift(response.data.task);
+    // TaskResourceは {"data": {...}, "message": "..."} の形式で返す
+    tasks.value.unshift(response.data.data);
     newTask.value = { title: "", description: "" };
   } catch (err) {
     console.error("Failed to create task:", err);
@@ -127,7 +129,8 @@ const startTask = async (taskId) => {
     const response = await axios.post(`/api/tasks/${taskId}/start`);
     const index = tasks.value.findIndex((t) => t.id === taskId);
     if (index !== -1) {
-      tasks.value[index] = response.data.task;
+      // TaskResourceは {"data": {...}} の形式で返す
+      tasks.value[index] = response.data.data;
     }
   } catch (err) {
     console.error("Failed to start task:", err);
@@ -140,7 +143,8 @@ const completeTask = async (taskId) => {
     const response = await axios.post(`/api/tasks/${taskId}/complete`);
     const index = tasks.value.findIndex((t) => t.id === taskId);
     if (index !== -1) {
-      tasks.value[index] = response.data.task;
+      // TaskResourceは {"data": {...}} の形式で返す
+      tasks.value[index] = response.data.data;
     }
   } catch (err) {
     console.error("Failed to complete task:", err);
