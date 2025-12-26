@@ -106,19 +106,23 @@ updated_at      timestamp
 
 設計の参考に、`app/Models/` ディレクトリ内のモデルファイルを確認して、モデル間のリレーションを把握してください。
 
+**注意：** ProjectとUserは多対多の関係ですが、`memberships()` と `users()` の両方のリレーションがあります。
+- `users()` - メンバー一覧を取得する場合に使用（推奨）
+- `memberships()` - 中間テーブル（Membership）のレコードを操作する場合に使用（削除など）
+
 以下の表は、各モデル間のリレーションをまとめたものです：
 
 | モデル         | リレーションメソッド | 関係の種類 | 関連モデル | 備考                                                   |
 | -------------- | -------------------- | ---------- | ---------- | ------------------------------------------------------ |
-| **Project**    | `memberships()`      | 1 対多     | Membership | プロジェクトのメンバーシップ一覧                       |
-| **Project**    | `users()`            | 多対多     | User       | 中間テーブル: `memberships`, pivot: `role`             |
+| **Project**    | `memberships()`      | 1 対多     | Membership | 中間テーブル（Membership）のレコードを取得（削除などで使用） |
+| **Project**    | `users()`            | 多対多     | User       | プロジェクトのメンバー（User）を直接取得（推奨）       |
 | **Project**    | `tasks()`            | 1 対多     | Task       | プロジェクトのタスク一覧                               |
 | **Task**       | `project()`          | 多対 1     | Project    | タスクが属するプロジェクト                             |
 | **Task**       | `createdBy()`        | 多対 1     | User       | タスクを作成したユーザー（外部キー: `created_by`）     |
 | **Membership** | `project()`          | 多対 1     | Project    | メンバーシップが属するプロジェクト                     |
 | **Membership** | `user()`             | 多対 1     | User       | メンバーシップが属するユーザー                         |
-| **User**       | `memberships()`      | 1 対多     | Membership | ユーザーのメンバーシップ一覧                           |
-| **User**       | `projects()`         | 多対多     | Project    | 中間テーブル: `memberships`, pivot: `role`             |
+| **User**       | `memberships()`      | 1 対多     | Membership | ユーザーの中間テーブル（Membership）レコードを取得     |
+| **User**       | `projects()`         | 多対多     | Project    | ユーザーが所属するプロジェクト（推奨）                 |
 | **User**       | `createdTasks()`     | 1 対多     | Task       | ユーザーが作成したタスク一覧（外部キー: `created_by`） |
 
 ---
