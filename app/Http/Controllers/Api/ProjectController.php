@@ -80,7 +80,7 @@ class ProjectController extends ApiController
             ], 403);
         }
 
-        $project->load(['users', 'tasks.createdBy']);
+        $project->load(['users', 'memberships', 'tasks.createdBy']);
 
         return response()->json([
             'project' => $project,
@@ -116,7 +116,7 @@ class ProjectController extends ApiController
         }
 
         $project->update($request->only(['name', 'is_archived']));
-        $project->load(['users', 'tasks.createdBy']);
+        $project->load(['users', 'memberships', 'tasks.createdBy']);
 
         return response()->json([
             'project' => $project,
