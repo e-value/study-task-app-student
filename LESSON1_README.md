@@ -80,6 +80,68 @@ updated_at      timestamp
 
 ---
 
+## 🔗 リレーション（Eloquent 関係）
+
+設計の参考に、現在のモデル間のリレーションを確認してください：
+
+### Project モデル
+
+```php
+// プロジェクトのメンバーシップ（1対多）
+public function memberships(): HasMany
+    → Project hasMany Membership
+
+// プロジェクトのユーザー（多対多、中間テーブル: memberships）
+public function users(): BelongsToMany
+    → Project belongsToMany User (中間テーブル: memberships, pivot: role)
+
+// プロジェクトのタスク（1対多）
+public function tasks(): HasMany
+    → Project hasMany Task
+```
+
+### Task モデル
+
+```php
+// タスクが属するプロジェクト（多対1）
+public function project(): BelongsTo
+    → Task belongsTo Project
+
+// タスクを作成したユーザー（多対1）
+public function createdBy(): BelongsTo
+    → Task belongsTo User (外部キー: created_by)
+```
+
+### Membership モデル
+
+```php
+// メンバーシップが属するプロジェクト（多対1）
+public function project(): BelongsTo
+    → Membership belongsTo Project
+
+// メンバーシップが属するユーザー（多対1）
+public function user(): BelongsTo
+    → Membership belongsTo User
+```
+
+### User モデル
+
+```php
+// ユーザーのメンバーシップ（1対多）
+public function memberships(): HasMany
+    → User hasMany Membership
+
+// ユーザーが所属するプロジェクト（多対多、中間テーブル: memberships）
+public function projects(): BelongsToMany
+    → User belongsToMany Project (中間テーブル: memberships, pivot: role)
+
+// ユーザーが作成したタスク（1対多）
+public function createdTasks(): HasMany
+    → User hasMany Task (外部キー: created_by)
+```
+
+---
+
 ## 📝 Step 1: エンドポイント設計
 
 RESTful な API エンドポイントを設計してください。
