@@ -110,14 +110,11 @@ updated_at      timestamp
 
 | モデル         | リレーションメソッド | 関係の種類   | 関連モデル | 備考                                                                                     |
 | -------------- | -------------------- | ------------ | ---------- | ---------------------------------------------------------------------------------------- |
-| **Project**    | `memberships()`      | 1 対多       | Membership | 中間テーブル（Membership モデル）のレコード一覧。通常は`users()`を使用                   |
 | **Project**    | `users()`            | 多対多       | User       | プロジェクトのメンバー（ユーザー）一覧を取得。中間テーブル: `memberships`, pivot: `role` |
 | **Project**    | `tasks()`            | 1 対多       | Task       | プロジェクトのタスク一覧                                                                 |
 | **Task**       | `project()`          | 多対 1       | Project    | タスクが属するプロジェクト                                                               |
 | **Task**       | `createdBy()`        | 多対 1       | User       | タスクを作成したユーザー（外部キー: `created_by`）                                       |
-| **Membership** | `project()`          | 中間テーブル | Project    | メンバーシップが属するプロジェクト（中間テーブル）                                       |
-| **Membership** | `user()`             | 中間テーブル | User       | メンバーシップが属するユーザー（中間テーブル）                                           |
-| **User**       | `memberships()`      | 1 対多       | Membership | 中間テーブル（Membership モデル）のレコード一覧。通常は`projects()`を使用                |
+| **Membership** | （リレーションなし） | 中間テーブル | -          | Pivotモデル。`$project->users()`や`$user->projects()`経由でアクセス                       |
 | **User**       | `projects()`         | 多対多       | Project    | ユーザーが所属するプロジェクト一覧を取得。中間テーブル: `memberships`, pivot: `role`     |
 | **User**       | `createdTasks()`     | 1 対多       | Task       | ユーザーが作成したタスク一覧（外部キー: `created_by`）                                   |
 
