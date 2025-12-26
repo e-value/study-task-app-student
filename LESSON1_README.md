@@ -110,16 +110,16 @@ updated_at      timestamp
 
 | モデル         | リレーションメソッド | 関係の種類 | 関連モデル | 備考                                                   |
 | -------------- | -------------------- | ---------- | ---------- | ------------------------------------------------------ |
-| **Project**    | `memberships()`      | 1対多      | Membership | プロジェクトのメンバーシップ一覧                       |
+| **Project**    | `memberships()`      | 1 対多     | Membership | プロジェクトのメンバーシップ一覧                       |
 | **Project**    | `users()`            | 多対多     | User       | 中間テーブル: `memberships`, pivot: `role`             |
-| **Project**    | `tasks()`            | 1対多      | Task       | プロジェクトのタスク一覧                               |
-| **Task**       | `project()`          | 多対1      | Project    | タスクが属するプロジェクト                             |
-| **Task**       | `createdBy()`        | 多対1      | User       | タスクを作成したユーザー（外部キー: `created_by`）     |
-| **Membership** | `project()`          | 多対1      | Project    | メンバーシップが属するプロジェクト                     |
-| **Membership** | `user()`             | 多対1      | User       | メンバーシップが属するユーザー                         |
-| **User**       | `memberships()`      | 1対多      | Membership | ユーザーのメンバーシップ一覧                           |
+| **Project**    | `tasks()`            | 1 対多     | Task       | プロジェクトのタスク一覧                               |
+| **Task**       | `project()`          | 多対 1     | Project    | タスクが属するプロジェクト                             |
+| **Task**       | `createdBy()`        | 多対 1     | User       | タスクを作成したユーザー（外部キー: `created_by`）     |
+| **Membership** | `project()`          | 多対 1     | Project    | メンバーシップが属するプロジェクト                     |
+| **Membership** | `user()`             | 多対 1     | User       | メンバーシップが属するユーザー                         |
+| **User**       | `memberships()`      | 1 対多     | Membership | ユーザーのメンバーシップ一覧                           |
 | **User**       | `projects()`         | 多対多     | Project    | 中間テーブル: `memberships`, pivot: `role`             |
-| **User**       | `createdTasks()`     | 1対多      | Task       | ユーザーが作成したタスク一覧（外部キー: `created_by`） |
+| **User**       | `createdTasks()`     | 1 対多     | Task       | ユーザーが作成したタスク一覧（外部キー: `created_by`） |
 
 ---
 
