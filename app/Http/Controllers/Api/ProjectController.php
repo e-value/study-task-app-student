@@ -69,9 +69,9 @@ class ProjectController extends ApiController
      */
     public function show(Request $request, Project $project): JsonResponse
     {
-        // 自分が所属しているかチェック
-        $isMember = $project->memberships()
-            ->where('user_id', $request->user()->id)
+        // 自分が所属しているかチェック（users()リレーションを使用）
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
             ->exists();
 
         if (!$isMember) {
@@ -92,12 +92,12 @@ class ProjectController extends ApiController
      */
     public function update(Request $request, Project $project): JsonResponse
     {
-        // 自分がオーナーまたは管理者かチェック
-        $myMembership = $project->memberships()
-            ->where('user_id', $request->user()->id)
+        // 自分がオーナーまたは管理者かチェック（users()リレーションを使用）
+        $myUser = $project->users()
+            ->where('users.id', $request->user()->id)
             ->first();
 
-        if (!$myMembership || !in_array($myMembership->role, ['project_owner', 'project_admin'])) {
+        if (!$myUser || !in_array($myUser->pivot->role, ['project_owner', 'project_admin'])) {
             return response()->json([
                 'message' => 'プロジェクトを編集する権限がありません',
             ], 403);
@@ -129,12 +129,12 @@ class ProjectController extends ApiController
      */
     public function destroy(Request $request, Project $project): JsonResponse
     {
-        // 自分がオーナーかチェック
-        $myMembership = $project->memberships()
-            ->where('user_id', $request->user()->id)
+        // 自分がオーナーかチェック（users()リレーションを使用）
+        $myUser = $project->users()
+            ->where('users.id', $request->user()->id)
             ->first();
 
-        if (!$myMembership || $myMembership->role !== 'project_owner') {
+        if (!$myUser || $myUser->pivot->role !== 'project_owner') {
             return response()->json([
                 'message' => 'プロジェクトを削除する権限がありません（オーナーのみ）',
             ], 403);

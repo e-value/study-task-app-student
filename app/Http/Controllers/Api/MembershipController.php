@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Membership;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -28,27 +28,41 @@ class MembershipController extends ApiController
     }
 
     /**
-     * メンバーシップ削除
+     * プロジェクトからメンバーを削除（users()リレーションを使用）
      */
-    public function destroy(Request $request, Membership $membership): JsonResponse
+    public function destroy(Request $request, Project $project, $userId): JsonResponse
     {
-        $project = $membership->project;
+        // メンバーチェック
+        if (!$this->isMember($request, $project)) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
 
-        // 自分がowner/adminかチェック
-        $myMembership = $project->memberships()
-            ->where('user_id', $request->user()->id)
+        // 削除対象のユーザーを取得
+        $targetUser = $project->users()
+            ->where('users.id', $userId)
             ->first();
 
-        if (!$myMembership || !in_array($myMembership->role, ['project_owner', 'project_admin'])) {
+        if (!$targetUser) {
+            return response()->json([
+                'message' => 'User is not a member of this project.',
+            ], 404);
+        }
+
+        // 自分がowner/adminかチェック（users()リレーションを使用）
+        $myUser = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->first();
+
+        if (!$myUser || !in_array($myUser->pivot->role, ['project_owner', 'project_admin'])) {
             return response()->json([
                 'message' => 'Forbidden: Only owners and admins can delete members.',
             ], 403);
         }
 
         // Owner維持チェック（Owner削除後に0人になる場合は不可）
-        if ($membership->role === 'project_owner') {
-            $ownerCount = $project->memberships()
-                ->where('role', 'project_owner')
+        if ($targetUser->pivot->role === 'project_owner') {
+            $ownerCount = $project->users()
+                ->wherePivot('role', 'project_owner')
                 ->count();
 
             if ($ownerCount <= 1) {
@@ -60,7 +74,7 @@ class MembershipController extends ApiController
 
         // 未完了タスクチェック
         $hasIncompleteTasks = $project->tasks()
-            ->where('created_by', $membership->user_id)
+            ->where('created_by', $userId)
             ->whereIn('status', ['todo', 'doing'])
             ->exists();
 
@@ -70,21 +84,21 @@ class MembershipController extends ApiController
             ], 409);
         }
 
-        // 削除実行
-        $membership->delete();
+        // 削除実行（users()リレーションのdetach()を使用）
+        $project->users()->detach($userId);
 
         return response()->json([
-            'message' => 'Membership deleted successfully.',
+            'message' => 'Member deleted successfully.',
         ]);
     }
 
     /**
-     * ユーザーがプロジェクトのメンバーかチェック
+     * ユーザーがプロジェクトのメンバーかチェック（users()リレーションを使用）
      */
     private function isMember(Request $request, Project $project): bool
     {
-        return $project->memberships()
-            ->where('user_id', $request->user()->id)
+        return $project->users()
+            ->where('users.id', $request->user()->id)
             ->exists();
     }
 }
