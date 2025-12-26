@@ -13,6 +13,27 @@
 
 ---
 
+## 🌿 ブランチ作成
+
+課題に取り組む前に、Lesson 用のブランチを作成してください：
+
+```bash
+# 現在のブランチを確認
+git branch
+
+# メインブランチから作業ブランチを作成（例：lesson1）
+git checkout -b lesson1
+
+# または、他のブランチから作成する場合
+git checkout main  # または master、ver1 など
+git pull origin main  # 最新の状態に更新
+git checkout -b lesson1
+```
+
+**推奨：** 各 Lesson ごとに専用のブランチを作成することで、作業を整理しやすくなります。
+
+---
+
 ## 📋 要件：実現すべき機能
 
 ### プロジェクト管理機能
