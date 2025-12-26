@@ -30,20 +30,4 @@ class Membership extends Pivot
         'user_id',
         'role',
     ];
-
-    /**
-     * Get the project that owns the membership.
-     */
-    public function project()
-    {
-        return $this->belongsTo(Project::class);
-    }
-
-    /**
-     * Get the user that owns the membership.
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }
