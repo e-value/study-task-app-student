@@ -140,12 +140,6 @@ class HogeController extends Controller
 
 フロントエンドに返す JSON の構造を定義する ApiResource を作成してください。
 
-```bash
-# ApiResourceの作成
-sail artisan make:resource ProjectResource
-sail artisan make:resource TaskResource
-```
-
 **要件：**
 
 -   `app/Http/Resources/` に作成された各 Resource ファイルの `toArray()` メソッドを定義してください
