@@ -50,7 +50,21 @@ class User extends Authenticatable
     }
 
     /**
-     * ユーザーのメンバーシップ
+     * ユーザーのメンバーシップ（中間テーブルのレコード）
+     * 
+     * ⚠️ 非推奨: 通常は projects() リレーションを使用してください
+     * 
+     * 返り値: Membership モデルのコレクション
+     * 使用例: $user->memberships()->where('role', 'project_owner')->get()
+     * 
+     * 特徴:
+     * - 中間テーブル（memberships）のレコード自体を取得
+     * - Membership モデルのプロパティ（id, project_id, user_id, role）に直接アクセス可能
+     * - プロジェクト情報にアクセスするには: $membership->project
+     * 
+     * 使用するべき場面:
+     * - メンバーシップIDが必要な特殊なケース（現在は使用していない）
+     * - 通常は projects() リレーションと detach() を使用してメンバー管理を行う
      */
     public function memberships(): HasMany
     {
@@ -58,7 +72,16 @@ class User extends Authenticatable
     }
 
     /**
-     * ユーザーが所属するプロジェクト
+     * ユーザーが所属するプロジェクト（中間テーブル経由でプロジェクトを取得）
+     * 
+     * 返り値: Project モデルのコレクション（pivot情報付き）
+     * 使用例: $user->projects()->get() // 各プロジェクトの $project->pivot->role で役割を取得
+     * 
+     * 特徴:
+     * - 中間テーブルを経由してプロジェクト情報を取得
+     * - Project モデルのプロパティ（id, name, is_archived）に直接アクセス可能
+     * - 中間テーブルの情報（role）にアクセスするには: $project->pivot->role
+     * - プロジェクト一覧表示など、プロジェクト情報が必要な場合に使用（推奨）
      */
     public function projects(): BelongsToMany
     {

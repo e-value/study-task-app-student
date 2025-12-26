@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Membership;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -49,10 +48,8 @@ class ProjectController extends ApiController
             'is_archived' => $request->is_archived ?? false,
         ]);
 
-        // 作成者を自動的にオーナーとして追加
-        Membership::create([
-            'project_id' => $project->id,
-            'user_id' => $request->user()->id,
+        // 作成者を自動的にオーナーとして追加（users()リレーションのattach()を使用）
+        $project->users()->attach($request->user()->id, [
             'role' => 'project_owner',
         ]);
 

@@ -155,7 +155,9 @@ const deleteMember = async (userId) => {
 
   try {
     memberError.value = null;
-    const response = await axios.delete(`/api/projects/${projectId}/members/${userId}`);
+    const response = await axios.delete(
+      `/api/projects/${projectId}/members/${userId}`
+    );
     // プロジェクト情報を再取得してメンバー一覧を更新
     await fetchProject();
   } catch (err) {
