@@ -106,29 +106,20 @@ updated_at      timestamp
 
 設計の参考に、`app/Models/` ディレクトリ内のモデルファイルを確認して、モデル間のリレーションを把握してください。
 
-**確認方法：**
-```bash
-# モデルファイルを確認
-cat app/Models/Project.php
-cat app/Models/Task.php
-cat app/Models/Membership.php
-cat app/Models/User.php
-```
-
 以下の表は、各モデル間のリレーションをまとめたものです：
 
-| モデル | リレーションメソッド | 関係の種類 | 関連モデル | 備考 |
-|--------|---------------------|-----------|-----------|------|
-| **Project** | `memberships()` | HasMany | Membership | プロジェクトのメンバーシップ一覧 |
-| **Project** | `users()` | BelongsToMany | User | 中間テーブル: `memberships`, pivot: `role` |
-| **Project** | `tasks()` | HasMany | Task | プロジェクトのタスク一覧 |
-| **Task** | `project()` | BelongsTo | Project | タスクが属するプロジェクト |
-| **Task** | `createdBy()` | BelongsTo | User | タスクを作成したユーザー（外部キー: `created_by`） |
-| **Membership** | `project()` | BelongsTo | Project | メンバーシップが属するプロジェクト |
-| **Membership** | `user()` | BelongsTo | User | メンバーシップが属するユーザー |
-| **User** | `memberships()` | HasMany | Membership | ユーザーのメンバーシップ一覧 |
-| **User** | `projects()` | BelongsToMany | Project | 中間テーブル: `memberships`, pivot: `role` |
-| **User** | `createdTasks()` | HasMany | Task | ユーザーが作成したタスク一覧（外部キー: `created_by`） |
+| モデル         | リレーションメソッド | 関係の種類 | 関連モデル | 備考                                                   |
+| -------------- | -------------------- | ---------- | ---------- | ------------------------------------------------------ |
+| **Project**    | `memberships()`      | 1対多      | Membership | プロジェクトのメンバーシップ一覧                       |
+| **Project**    | `users()`            | 多対多     | User       | 中間テーブル: `memberships`, pivot: `role`             |
+| **Project**    | `tasks()`            | 1対多      | Task       | プロジェクトのタスク一覧                               |
+| **Task**       | `project()`          | 多対1      | Project    | タスクが属するプロジェクト                             |
+| **Task**       | `createdBy()`        | 多対1      | User       | タスクを作成したユーザー（外部キー: `created_by`）     |
+| **Membership** | `project()`          | 多対1      | Project    | メンバーシップが属するプロジェクト                     |
+| **Membership** | `user()`             | 多対1      | User       | メンバーシップが属するユーザー                         |
+| **User**       | `memberships()`      | 1対多      | Membership | ユーザーのメンバーシップ一覧                           |
+| **User**       | `projects()`         | 多対多     | Project    | 中間テーブル: `memberships`, pivot: `role`             |
+| **User**       | `createdTasks()`     | 1対多      | Task       | ユーザーが作成したタスク一覧（外部キー: `created_by`） |
 
 ---
 
