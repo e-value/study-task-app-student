@@ -37,7 +37,7 @@ class MembershipController extends ApiController
             $membership->created_at = $user->pivot->created_at;
             $membership->updated_at = $user->pivot->updated_at;
             $membership->setRelation('user', $user);
-            
+
             return $membership;
         });
 
