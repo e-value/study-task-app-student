@@ -35,8 +35,9 @@ const fetchUsers = async (page = 1) => {
     }
     
     const response = await axios.get("/api/users", { params });
-    users.value = response.data.data;
-    pagination.value = response.data.meta;
+    // UserResource::collection()はページネーション情報を含む {"data": [...], "meta": {...}} の形式で返す
+    users.value = response.data.data || [];
+    pagination.value = response.data.meta || {};
     currentPage.value = page;
   } catch (err) {
     console.error("Failed to fetch users:", err);
@@ -216,7 +217,7 @@ onMounted(() => {
 
         <!-- ユーザー一覧テーブル -->
         <div
-          v-else-if="users.length > 0"
+          v-else-if="users && users.length > 0"
           class="backdrop-blur-lg bg-white/70 rounded-2xl shadow-xl border border-white/50 overflow-hidden"
         >
           <div class="overflow-x-auto">
@@ -249,7 +250,7 @@ onMounted(() => {
               </thead>
               <tbody class="divide-y divide-slate-200/50">
                 <tr
-                  v-for="user in users"
+                  v-for="user in users || []"
                   :key="user.id"
                   class="hover:bg-blue-50/30 transition-colors"
                 >
