@@ -1,41 +1,44 @@
 <?php
 
-use App\Http\Controllers\Api\MembershipController;
-use App\Http\Controllers\Api\ProjectController;
-use App\Http\Controllers\Api\TaskController;
-use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+/**
+ * Lesson1: API エンドポイント設計
+ * 
+ * TODO: 以下の機能を実現するエンドポイントを設計してください
+ * 
+ * 【必要な機能】
+ * - プロジェクト一覧取得
+ * - プロジェクト作成
+ * - プロジェクト詳細取得
+ * - プロジェクト更新
+ * - プロジェクト削除
+ * 
+ * - プロジェクト内のタスク一覧取得
+ * - プロジェクト内にタスク作成
+ * 
+ * - タスク詳細取得
+ * - タスク更新
+ * - タスク削除
+ * 
+ * - 自分のタスク一覧取得
+ * 
+ * 【考えるべきポイント】
+ * 1. RESTful な URL 設計になっているか？
+ * 2. HTTP メソッド（GET/POST/PATCH/DELETE）を適切に使い分けているか？
+ * 3. リソースの階層構造を正しく表現できているか？
+ * 4. どの Controller に実装すべきか？（責務分離）
+ */
 
 // 認証済みユーザー情報を取得
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// 認証が必要なAPI
+// 認証が必要な API
 Route::middleware(['auth:sanctum'])->group(function () {
-    // Users
-    Route::get('/users', [UserController::class, 'index']);
-    Route::get('/users/dropdown', [UserController::class, 'dropdown']);
 
-    // Projects
-    Route::get('/projects', [ProjectController::class, 'index']);
-    Route::post('/projects', [ProjectController::class, 'store']);
-    Route::get('/projects/{project}', [ProjectController::class, 'show']);
-    Route::put('/projects/{project}', [ProjectController::class, 'update']);
-    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+    // TODO: ここにエンドポイントを定義してください
 
-    // Tasks
-    Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);
-    Route::post('/projects/{project}/tasks', [TaskController::class, 'store']);
-    Route::get('/tasks/{task}', [TaskController::class, 'show']);
-    Route::put('/tasks/{task}', [TaskController::class, 'update']);
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
-    Route::post('/tasks/{task}/start', [TaskController::class, 'start']);
-    Route::post('/tasks/{task}/complete', [TaskController::class, 'complete']);
-
-    // Members
-    Route::get('/projects/{project}/members', [MembershipController::class, 'index']);
-    Route::post('/projects/{project}/members', [MembershipController::class, 'store']);
-    Route::delete('/memberships/{membership}', [MembershipController::class, 'destroy']);
 });

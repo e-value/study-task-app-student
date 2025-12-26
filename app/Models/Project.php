@@ -21,15 +21,16 @@ class Project extends Model
     ];
 
     /**
-     * プロジェクトのメンバーシップ
-     */
-    public function memberships(): HasMany
-    {
-        return $this->hasMany(Membership::class);
-    }
-
-    /**
-     * プロジェクトのユーザー（中間テーブル経由）
+     * プロジェクトのユーザー（中間テーブル経由でユーザーを取得）
+     * 
+     * 返り値: User モデルのコレクション（pivot情報付き）
+     * 使用例: $project->users()->get() // 各ユーザーの $user->pivot->role で役割を取得
+     * 
+     * 特徴:
+     * - 中間テーブルを経由してユーザー情報を取得
+     * - User モデルのプロパティ（id, name, email）に直接アクセス可能
+     * - 中間テーブルの情報（role）にアクセスするには: $user->pivot->role
+     * - メンバー一覧表示など、ユーザー情報が必要な場合に使用（推奨）
      */
     public function users(): BelongsToMany
     {

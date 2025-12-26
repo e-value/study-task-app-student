@@ -17,7 +17,7 @@ const fetchProjects = async () => {
     loading.value = true;
     error.value = null;
     const response = await axios.get("/api/projects");
-    projects.value = response.data.data;
+    projects.value = response.data.projects;
   } catch (err) {
     console.error("Failed to fetch projects:", err);
     error.value =
@@ -57,7 +57,7 @@ const filteredProjects = computed(() => {
       case "oldest":
         return new Date(a.created_at) - new Date(b.created_at);
       case "members":
-        return (b.memberships?.length || 0) - (a.memberships?.length || 0);
+        return (b.users?.length || 0) - (a.users?.length || 0);
       default:
         return 0;
     }
@@ -319,7 +319,7 @@ onMounted(() => {
                   </svg>
                 </div>
                 <span class="font-medium"
-                  >{{ project.memberships?.length || 0 }} 人のメンバー</span
+                  >{{ project.users?.length || 0 }} 人のメンバー</span
                 >
               </div>
 

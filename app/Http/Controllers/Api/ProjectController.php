@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Resources\ProjectResource;
-use App\Models\Membership;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends ApiController
@@ -15,15 +12,17 @@ class ProjectController extends ApiController
     /**
      * 自分が所属しているプロジェクト一覧を返す
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
         $projects = $request->user()
             ->projects()
-            ->with('memberships.user')
+            ->with('users')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return ProjectResource::collection($projects);
+        return response()->json([
+            'projects' => $projects,
+        ]);
     }
 
     /**
@@ -49,29 +48,27 @@ class ProjectController extends ApiController
             'is_archived' => $request->is_archived ?? false,
         ]);
 
-        // 作成者を自動的にオーナーとして追加
-        Membership::create([
-            'project_id' => $project->id,
-            'user_id' => $request->user()->id,
+        // 作成者を自動的にオーナーとして追加（users()リレーションのattach()を使用）
+        $project->users()->attach($request->user()->id, [
             'role' => 'project_owner',
         ]);
 
-        $project->load(['memberships.user']);
+        $project->load(['users']);
 
-        return (new ProjectResource($project))
-            ->additional(['message' => 'プロジェクトを作成しました'])
-            ->response()
-            ->setStatusCode(201);
+        return response()->json([
+            'project' => $project,
+            'message' => 'プロジェクトを作成しました',
+        ], 201);
     }
 
     /**
      * プロジェクト詳細を返す
      */
-    public function show(Request $request, Project $project): ProjectResource|JsonResponse
+    public function show(Request $request, Project $project): JsonResponse
     {
-        // 自分が所属しているかチェック
-        $isMember = $project->memberships()
-            ->where('user_id', $request->user()->id)
+        // 自分が所属しているかチェック（users()リレーションを使用）
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
             ->exists();
 
         if (!$isMember) {
@@ -80,22 +77,24 @@ class ProjectController extends ApiController
             ], 403);
         }
 
-        $project->load(['memberships.user', 'tasks.createdBy']);
+        $project->load(['users', 'tasks.createdBy']);
 
-        return new ProjectResource($project);
+        return response()->json([
+            'project' => $project,
+        ]);
     }
 
     /**
      * プロジェクト更新
      */
-    public function update(Request $request, Project $project): ProjectResource|JsonResponse
+    public function update(Request $request, Project $project): JsonResponse
     {
-        // 自分がオーナーまたは管理者かチェック
-        $myMembership = $project->memberships()
-            ->where('user_id', $request->user()->id)
+        // 自分がオーナーまたは管理者かチェック（users()リレーションを使用）
+        $myUser = $project->users()
+            ->where('users.id', $request->user()->id)
             ->first();
 
-        if (!$myMembership || !in_array($myMembership->role, ['project_owner', 'project_admin'])) {
+        if (!$myUser || !in_array($myUser->pivot->role, ['project_owner', 'project_admin'])) {
             return response()->json([
                 'message' => 'プロジェクトを編集する権限がありません',
             ], 403);
@@ -114,10 +113,12 @@ class ProjectController extends ApiController
         }
 
         $project->update($request->only(['name', 'is_archived']));
-        $project->load(['memberships.user', 'tasks.createdBy']);
+        $project->load(['users', 'tasks.createdBy']);
 
-        return (new ProjectResource($project))
-            ->additional(['message' => 'プロジェクトを更新しました']);
+        return response()->json([
+            'project' => $project,
+            'message' => 'プロジェクトを更新しました',
+        ]);
     }
 
     /**
@@ -125,12 +126,12 @@ class ProjectController extends ApiController
      */
     public function destroy(Request $request, Project $project): JsonResponse
     {
-        // 自分がオーナーかチェック
-        $myMembership = $project->memberships()
-            ->where('user_id', $request->user()->id)
+        // 自分がオーナーかチェック（users()リレーションを使用）
+        $myUser = $project->users()
+            ->where('users.id', $request->user()->id)
             ->first();
 
-        if (!$myMembership || $myMembership->role !== 'project_owner') {
+        if (!$myUser || $myUser->pivot->role !== 'project_owner') {
             return response()->json([
                 'message' => 'プロジェクトを削除する権限がありません（オーナーのみ）',
             ], 403);
