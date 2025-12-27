@@ -9,8 +9,6 @@
 3. **ルーティング定義** - `routes/api.php` にエンドポイントを定義する
 4. **ApiResource 設計** - フロントエンドに返す JSON 構造を考える
 
-**重要：** 実装はしません。構造を設計するだけです。
-
 ---
 
 ## 🌿 ブランチ作成
@@ -114,7 +112,7 @@ updated_at      timestamp
 | **Project**    | `tasks()`            | 1 対多       | Task       | プロジェクトのタスク一覧                                                                 |
 | **Task**       | `project()`          | 多対 1       | Project    | タスクが属するプロジェクト                                                               |
 | **Task**       | `createdBy()`        | 多対 1       | User       | タスクを作成したユーザー（外部キー: `created_by`）                                       |
-| **Membership** | （リレーションなし） | 中間テーブル | -          | Pivotモデル。`$project->users()`や`$user->projects()`経由でアクセス                       |
+| **Membership** | （リレーションなし） | 中間テーブル | -          | Pivot モデル。`$project->users()`や`$user->projects()`経由でアクセス                     |
 | **User**       | `projects()`         | 多対多       | Project    | ユーザーが所属するプロジェクト一覧を取得。中間テーブル: `memberships`, pivot: `role`     |
 | **User**       | `createdTasks()`     | 1 対多       | Task       | ユーザーが作成したタスク一覧（外部キー: `created_by`）                                   |
 
@@ -219,15 +217,6 @@ class HogeController extends Controller
 
 ---
 
-## 🚀 次の Lesson2 では...
-
--   あなたが設計したエンドポイントと ApiResource を**実装**します
--   バリデーション処理を追加します
--   権限チェックを実装します
--   業務ルール（ステータス遷移など）を実装します
-
----
-
 ## 📚 参考リンク
 
 -   [RESTful API 設計ガイド](https://restfulapi.net/)
@@ -238,13 +227,11 @@ class HogeController extends Controller
 
 ## 🎓 まとめ
 
-Lesson1 では、**「設計を考える力」** を養います。
+Lesson1 では、**エンドポイントとコントロラーの設計を考える力」** を養います。
 
 -   ✅ RESTful なエンドポイント設計
 -   ✅ Controller 責務分離の判断
 -   ✅ ルーティング定義
 -   ✅ ApiResource 設計
-
-実装は Lesson2 で行います。まずは設計をしっかり考えてください！
 
 **頑張ってください！** 🚀
