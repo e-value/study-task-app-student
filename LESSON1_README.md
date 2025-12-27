@@ -178,6 +178,15 @@ class HogeController extends Controller
 
 フロントエンドに返す JSON の構造を定義する ApiResource を作成してください。
 
+> **📚 事前学習：** ApiResource について知らない方は、まず Laravel の公式ドキュメントや参考資料で ApiResource の基本的な使い方を調べてから取り組んでください。
+>
+> 以下のキーワードで検索することをおすすめします：
+>
+> -   Laravel API Resources
+> -   Laravel Resource クラス
+> -   `php artisan make:resource`
+> -   Resource の `toArray()` メソッド
+
 **要件：**
 
 -   `app/Http/Resources/` に作成された各 Resource ファイルの `toArray()` メソッドを定義してください
@@ -227,7 +236,7 @@ class HogeController extends Controller
 
 ## 🎓 まとめ
 
-Lesson1 では、**エンドポイントとコントロラーの設計を考える力」** を養います。
+Lesson1 では、**エンドポイントとコントローラーの設計を考える力」** を養います。
 
 -   ✅ RESTful なエンドポイント設計
 -   ✅ Controller 責務分離の判断
