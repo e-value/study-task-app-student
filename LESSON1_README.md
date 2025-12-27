@@ -219,25 +219,6 @@ class HogeController extends Controller
 
 ---
 
-## 🧪 動作確認
-
-設計が完了したら、以下で確認してください：
-
-```bash
-# ルート一覧を表示
-sail artisan route:list --path=api
-```
-
-```bash
-# 動作確認（501エラーが返ればOK）
-sail artisan serve
-
-# 別ターミナルで
-curl -X GET http://localhost:8000/api/your-endpoint
-```
-
----
-
 ## 🚀 次の Lesson2 では...
 
 -   あなたが設計したエンドポイントと ApiResource を**実装**します
