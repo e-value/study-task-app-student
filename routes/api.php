@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\MembershipController;
+use App\Http\Controllers\Api\ProjectMemberController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use Illuminate\Http\Request;
@@ -21,7 +21,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy']); // プロジェクト削除
 
     // Project Members
-    Route::post('/projects/{project}/members', [MembershipController::class, 'store']); // プロジェクト内のメンバー追加
+    Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store']); // プロジェクト内のメンバー追加
 
     // Tasks
     Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);  // プロジェクト内のタスク一覧取得

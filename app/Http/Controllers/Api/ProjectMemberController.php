@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
-class MembershipController extends Controller
+class ProjectMemberController extends Controller
 {
     /**
      * プロジェクト内のメンバー追加
