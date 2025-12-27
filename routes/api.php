@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\MembershipController;
+use App\Http\Controllers\Api\ProjectMemberController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/tasks/{task}/complete', [TaskController::class, 'complete']);
 
     // Members
-    Route::get('/projects/{project}/members', [MembershipController::class, 'index']);
-    Route::post('/projects/{project}/members', [MembershipController::class, 'store']);
-    Route::delete('/projects/{project}/members/{user}', [MembershipController::class, 'destroy']);
+    Route::get('/projects/{project}/members', [ProjectMemberController::class, 'index']);
+    Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store']);
+    Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'destroy']);
 });
