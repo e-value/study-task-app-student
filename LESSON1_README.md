@@ -232,13 +232,14 @@ class HogeController extends Controller
 実装が完了したら、以下の形式でプルリクエストを作成してください：
 
 **プルリクエストのタイトル形式：**
+
 ```
 【名前】Lesson01 実装
 ```
 
 **例：**
-- 【宮田】Lesson01 実装
-- 【山田】Lesson01 実装
+
+-   【宮田】Lesson01 実装
 
 ---
 
