@@ -50,4 +50,4 @@ Route::post('/tasks/{task}/start', 'TasksController@start');
 Route::post('/tasks/{task}/complete', 'TasksController@complete');
 
 #自分のタスク一覧取得
-Route::get('/me/tasks', 'TasksController@index');
+Route::get('/me/tasks', 'TaskController@myTask');
