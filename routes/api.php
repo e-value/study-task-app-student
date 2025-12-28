@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\MembershipController;
+use App\Http\Controllers\Api\ProjectMemberController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use Illuminate\Http\Request;
@@ -24,10 +24,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/projects/{project}/members', [MembershipController::class, 'store']); // プロジェクト内のメンバー追加
 
     // Tasks
-    Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);  // プロジェクト内のタスク一覧取得
-    Route::post('/projects/{project}/tasks', [TaskController::class, 'store']); // プロジェクト内にタスク作成
-    Route::get('/tasks/{task}', [TaskController::class, 'show']);              // タスク詳細取得
-    Route::put('/tasks/{task}', [TaskController::class, 'update']);            // タスク更新
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);        // タスク削除
-    Route::get('/tasks', [TaskController::class, 'myTasks']);                  // 自分のタスク一覧取得
+    Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);
+    Route::post('/projects/{project}/tasks', [TaskController::class, 'store']);
+    Route::get('/tasks/{task}', [TaskController::class, 'show']);
+    Route::put('/tasks/{task}', [TaskController::class, 'update']);
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
+    Route::post('/tasks/{task}/start', [TaskController::class, 'start']);
+    Route::post('/tasks/{task}/complete', [TaskController::class, 'complete']);
+
+    // Members
+    Route::get('/projects/{project}/members', [ProjectMemberController::class, 'index']);
+    Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store']);
+    Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'destroy']);
 });
