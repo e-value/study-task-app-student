@@ -233,4 +233,14 @@ class TaskController extends ApiController
         return (new TaskResource($task))
             ->additional(['message' => 'タスクを完了しました']);
     }
+
+    /**
+     * ユーザーがプロジェクトのメンバーかチェック
+     */
+    private function isMember(Request $request, Project $project): bool
+    {
+        return $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+    }
 }
