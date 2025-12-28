@@ -34,14 +34,20 @@ Route::get('/projects/{project}/tasks', 'TasksController@index');
 #プロジェクト内にタスク作成
 Route::post('/projects/{project}/tasks', 'TasksController@store');
 
-#タスク詳細取得
+#プロジェクトのタスク詳細取得
 Route::get('/tasks/{task}', 'TasksController@show');
 
-#タスク更新
+#プロジェクトのタスク更新
 Route::put('/tasks/{task}', 'TasksController@update');
 
-#タスク削除
+#プロジェクトのタスク削除
 Route::delete('/tasks/{task}', 'TasksController@destroy');  
+
+#プロジェクトのタスクを開始
+Route::post('/tasks/{task}/start', 'TasksController@start');
+
+#プロジェクトのタスクを完了
+Route::post('/tasks/{task}/complete', 'TasksController@complete');
 
 #自分のタスク一覧取得
 Route::get('/me/tasks', 'TasksController@index');

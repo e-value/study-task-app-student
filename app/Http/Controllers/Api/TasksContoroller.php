@@ -31,5 +31,15 @@ class TasksController extends Controller
     {
         abort(501, 'Not Implemented');
     }
+
+    public function start(Task $task)
+    {
+        abort(501, 'Not Implemented');
+    }
+
+    public function complete(Task $task)
+    {
+        abort(501, 'Not Implemented');
+    }
 }
 
