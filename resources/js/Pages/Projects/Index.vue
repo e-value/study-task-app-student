@@ -319,7 +319,7 @@ onMounted(() => {
                   </svg>
                 </div>
                 <span class="font-medium"
-                  >{{ project.memberships?.length || 0 }} 人のメンバー</span
+                  >{{ project.users?.length || 0 }} 人のメンバー</span
                 >
               </div>
 

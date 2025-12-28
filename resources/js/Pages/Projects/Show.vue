@@ -44,7 +44,7 @@ const canDeleteMember = computed(() => {
 
 // メンバー追加可能なユーザー（既存メンバーを除外）
 const availableUsers = computed(() => {
-  const memberUserIds = members.value.map((m) => m.user_id);
+  const memberUserIds = members.value.map((m) => m.id || m.user_id);
   return allUsers.value.filter((user) => !memberUserIds.includes(user.id));
 });
 
@@ -113,7 +113,7 @@ const fetchProject = async () => {
     const response = await axios.get(`/api/projects/${projectId}`);
     project.value = response.data.data;
     tasks.value = response.data.data.tasks || [];
-    members.value = response.data.data.memberships || [];
+    members.value = response.data.data.users || [];
   } catch (err) {
     console.error("Failed to fetch project:", err);
     error.value =
@@ -178,15 +178,15 @@ const completeTask = async (taskId) => {
   }
 };
 
-const deleteMember = async (membershipId) => {
+const deleteMember = async (userId) => {
   if (!confirm("本当にこのメンバーを削除しますか？")) {
     return;
   }
 
   try {
     memberError.value = null;
-    const response = await axios.delete(`/api/memberships/${membershipId}`);
-    members.value = members.value.filter((m) => m.id !== membershipId);
+    const response = await axios.delete(`/api/projects/${projectId}/members/${userId}`);
+    members.value = members.value.filter((m) => (m.id || m.user_id) !== userId);
     toast.success(response.data.message || "メンバーを削除しました");
   } catch (err) {
     console.error("Failed to delete member:", err);
@@ -209,7 +209,21 @@ const addMember = async () => {
       `/api/projects/${projectId}/members`,
       newMember.value
     );
-    members.value.push(response.data.membership);
+    // APIレスポンスからmembershipオブジェクトを取得し、User形式に変換
+    const membership = response.data.membership;
+    if (membership && membership.user) {
+      members.value.push(membership.user);
+    } else if (membership) {
+      // フォールバック: membershipオブジェクトから直接ユーザー情報を構築
+      members.value.push({
+        id: membership.user_id,
+        name: membership.user?.name,
+        email: membership.user?.email,
+        pivot: {
+          role: membership.role,
+        },
+      });
+    }
     newMember.value = { user_id: "", role: "project_member" };
     showAddMemberForm.value = false;
     toast.success(response.data.message || "メンバーを追加しました");
@@ -965,8 +979,8 @@ onMounted(() => {
                   </thead>
                   <tbody class="divide-y divide-slate-200/50">
                     <tr
-                      v-for="membership in members"
-                      :key="membership.id"
+                      v-for="user in members"
+                      :key="user.id"
                       class="hover:bg-blue-50/30 transition-colors"
                     >
                       <td class="px-6 py-4 whitespace-nowrap">
@@ -974,33 +988,33 @@ onMounted(() => {
                           <div
                             class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold"
                           >
-                            {{ membership.user?.name?.charAt(0) || "?" }}
+                            {{ user.name?.charAt(0) || "?" }}
                           </div>
                           <span class="text-sm font-semibold text-slate-800">{{
-                            membership.user?.name
+                            user.name
                           }}</span>
                         </div>
                       </td>
                       <td
                         class="px-6 py-4 whitespace-nowrap text-sm text-slate-600"
                       >
-                        {{ membership.user?.email }}
+                        {{ user.email }}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         <span
                           :class="[
                             'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold backdrop-blur-lg border',
-                            membership.role === 'project_owner'
+                            user.pivot?.role === 'project_owner'
                               ? 'bg-purple-500/20 text-purple-700 border-purple-300/50'
-                              : membership.role === 'project_admin'
+                              : user.pivot?.role === 'project_admin'
                               ? 'bg-blue-500/20 text-blue-700 border-blue-300/50'
                               : 'bg-slate-500/20 text-slate-700 border-slate-300/50',
                           ]"
                         >
                           {{
-                            membership.role === "project_owner"
+                            user.pivot?.role === "project_owner"
                               ? "オーナー"
-                              : membership.role === "project_admin"
+                              : user.pivot?.role === "project_admin"
                               ? "管理者"
                               : "メンバー"
                           }}
@@ -1009,7 +1023,7 @@ onMounted(() => {
                       <td class="px-6 py-4 whitespace-nowrap text-right">
                         <button
                           v-if="canDeleteMember"
-                          @click="deleteMember(membership.id)"
+                          @click="deleteMember(user.id)"
                           class="px-4 py-2 bg-gradient-to-r from-red-400 to-rose-500 text-white text-sm font-semibold rounded-xl hover:shadow-lg transition-all duration-300 flex items-center gap-2 ml-auto"
                         >
                           <svg

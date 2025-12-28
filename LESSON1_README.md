@@ -9,23 +9,46 @@
 3. **ルーティング定義** - `routes/api.php` にエンドポイントを定義する
 4. **ApiResource 設計** - フロントエンドに返す JSON 構造を考える
 
-**重要：** 実装はしません。構造を設計するだけです。
+---
+
+## 🌿 ブランチ作成
+
+課題に取り組む前に、Lesson 用のブランチを作成してください：
+
+```bash
+# 現在のブランチを確認
+git branch
+
+# メインブランチに切り替え
+git checkout main
+
+# 最新の状態に更新（重要：必ずpullすること）
+git pull origin main
+
+# Lesson用のブランチを作成（例：lesson1, lesson01 など）
+git checkout -b lesson1
+```
+
+**推奨：** 各 Lesson ごとに専用のブランチを作成することで、作業を整理しやすくなります。
 
 ---
 
 ## 📋 要件：実現すべき機能
 
--   プロジェクト一覧取得
--   プロジェクト作成
--   プロジェクト詳細取得
--   プロジェクト更新
--   プロジェクト削除
--   プロジェクト内のメンバー追加
--   プロジェクト内のタスク一覧取得
--   プロジェクト内にタスク作成
--   タスク詳細取得
--   タスク更新
--   タスク削除
+-   プロジェクトの一覧取得
+-   プロジェクトの作成
+-   プロジェクトの詳細取得
+-   プロジェクトの更新
+-   プロジェクトの削除
+-   プロジェクトのメンバー追加
+-   プロジェクトのタスク一覧取得
+-   プロジェクトのメンバーを削除
+-   プロジェクトにタスク作成
+-   プロジェクトのタスク詳細取得
+-   プロジェクトのタスクを削除
+-   プロジェクトのタスクを更新
+-   プロジェクトのタスクを開始
+-   プロジェクトのタスクを完了
 -   自分のタスク一覧取得（自分が所属しているプロジェクトの全タスク）
 
 ---
@@ -77,6 +100,24 @@ email           string
 created_at      timestamp
 updated_at      timestamp
 ```
+
+---
+
+## 🔗 リレーション（Eloquent 関係）
+
+設計の参考に、`app/Models/` ディレクトリ内のモデルファイルを確認して、モデル間のリレーションを把握してください。
+
+以下の表は、各モデル間のリレーションをまとめたものです：
+
+| モデル         | リレーションメソッド | 関係の種類   | 関連モデル | 備考                                                                                     |
+| -------------- | -------------------- | ------------ | ---------- | ---------------------------------------------------------------------------------------- |
+| **Project**    | `users()`            | 多対多       | User       | プロジェクトのメンバー（ユーザー）一覧を取得。中間テーブル: `memberships`, pivot: `role` |
+| **Project**    | `tasks()`            | 1 対多       | Task       | プロジェクトのタスク一覧                                                                 |
+| **Task**       | `project()`          | 多対 1       | Project    | タスクが属するプロジェクト                                                               |
+| **Task**       | `createdBy()`        | 多対 1       | User       | タスクを作成したユーザー（外部キー: `created_by`）                                       |
+| **Membership** | （リレーションなし） | 中間テーブル | -          | Pivot モデル。`$project->users()`や`$user->projects()`経由でアクセス                     |
+| **User**       | `projects()`         | 多対多       | Project    | ユーザーが所属するプロジェクト一覧を取得。中間テーブル: `memberships`, pivot: `role`     |
+| **User**       | `createdTasks()`     | 1 対多       | Task       | ユーザーが作成したタスク一覧（外部キー: `created_by`）                                   |
 
 ---
 
@@ -140,11 +181,14 @@ class HogeController extends Controller
 
 フロントエンドに返す JSON の構造を定義する ApiResource を作成してください。
 
-```bash
-# ApiResourceの作成
-sail artisan make:resource ProjectResource
-sail artisan make:resource TaskResource
-```
+> **📚 事前学習：** ApiResource について知らない方は、まず Laravel の公式ドキュメントや参考資料で ApiResource の基本的な使い方を調べてから取り組んでください。
+>
+> 以下のキーワードで検索することをおすすめします：
+>
+> -   Laravel API Resources
+> -   Laravel Resource クラス
+> -   `php artisan make:resource`
+> -   Resource の `toArray()` メソッド
 
 **要件：**
 
@@ -185,31 +229,19 @@ sail artisan make:resource TaskResource
 
 ---
 
-## 🧪 動作確認
+## 🚀 実装完了後の作業
 
-設計が完了したら、以下で確認してください：
+実装が完了したら、以下の形式でプルリクエストを作成してください：
 
-```bash
-# ルート一覧を表示
-sail artisan route:list --path=api
+**プルリクエストのタイトル形式：**
+
+```
+【名前】Lesson01 実装
 ```
 
-```bash
-# 動作確認（501エラーが返ればOK）
-sail artisan serve
+**例：**
 
-# 別ターミナルで
-curl -X GET http://localhost:8000/api/your-endpoint
-```
-
----
-
-## 🚀 次の Lesson2 では...
-
--   あなたが設計したエンドポイントと ApiResource を**実装**します
--   バリデーション処理を追加します
--   権限チェックを実装します
--   業務ルール（ステータス遷移など）を実装します
+-   【宮田】Lesson01 実装
 
 ---
 
@@ -218,18 +250,3 @@ curl -X GET http://localhost:8000/api/your-endpoint
 -   [RESTful API 設計ガイド](https://restfulapi.net/)
 -   [Laravel Resource Controllers](https://laravel.com/docs/controllers#resource-controllers)
 -   [Laravel API Resources](https://laravel.com/docs/eloquent-resources)
-
----
-
-## 🎓 まとめ
-
-Lesson1 では、**「設計を考える力」** を養います。
-
--   ✅ RESTful なエンドポイント設計
--   ✅ Controller 責務分離の判断
--   ✅ ルーティング定義
--   ✅ ApiResource 設計
-
-実装は Lesson2 で行います。まずは設計をしっかり考えてください！
-
-**頑張ってください！** 🚀

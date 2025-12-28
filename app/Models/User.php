@@ -50,19 +50,12 @@ class User extends Authenticatable
     }
 
     /**
-     * ユーザーのメンバーシップ
-     */
-    public function memberships(): HasMany
-    {
-        return $this->hasMany(Membership::class);
-    }
-
-    /**
      * ユーザーが所属するプロジェクト
      */
     public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class, 'memberships')
+            ->using(Membership::class)
             ->withPivot('role')
             ->withTimestamps();
     }

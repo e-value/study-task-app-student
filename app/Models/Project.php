@@ -21,19 +21,12 @@ class Project extends Model
     ];
 
     /**
-     * プロジェクトのメンバーシップ
-     */
-    public function memberships(): HasMany
-    {
-        return $this->hasMany(Membership::class);
-    }
-
-    /**
      * プロジェクトのユーザー（中間テーブル経由）
      */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'memberships')
+            ->using(Membership::class)
             ->withPivot('role')
             ->withTimestamps();
     }
