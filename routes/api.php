@@ -1,6 +1,11 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Resources\ProjectsResource;
+use App\Http\Resources\TasksResource;
+use App\Http\Resources\TaskResource;
+use App\Models\Project;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -11,16 +16,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 #プロジェクト一覧取得
-Route::get('/projects', 'ProjectsController@index');
+Route::get('/projects', function () {
+    return ProjectsResource::collection(Project::all());
+});
 
 #プロジェクト作成
 Route::post('/projects', 'ProjectsController@store');
 
 #プロジェクト詳細取得
-Route::get('/projects/{project}', 'ProjectsController@show');
+Route::get('/projects/{project}', function (Project $project) {
+    return new ProjectsResource($project);
+});
 
 #プロジェクト更新
-Route::put('/tasks/{project}', 'ProjectsController@update');
+Route::put('/projects/{project}', 'ProjectsController@update');
 
 #プロジェクト削除
 Route::delete('/projects/{project}', 'ProjectsController@destroy');
@@ -29,13 +38,17 @@ Route::delete('/projects/{project}', 'ProjectsController@destroy');
 Route::post('/projects/{project}/members', 'MembershipsController@store');
 
 #プロジェクト内のタスク一覧取得
-Route::get('/projects/{project}/tasks', 'TasksController@index');
+Route::get('/projects/{project}/tasks', function (Project $project) {
+    return TasksResource::collection($project->tasks);
+});
 
 #プロジェクト内にタスク作成
 Route::post('/projects/{project}/tasks', 'TasksController@store');
 
 #プロジェクトのタスク詳細取得
-Route::get('/tasks/{task}', 'TasksController@show');
+Route::get('/tasks/{task}', function (Task $task) {
+    return new TasksResource($task);
+});
 
 #プロジェクトのタスク更新
 Route::put('/tasks/{task}', 'TasksController@update');
@@ -50,4 +63,7 @@ Route::post('/tasks/{task}/start', 'TasksController@start');
 Route::post('/tasks/{task}/complete', 'TasksController@complete');
 
 #自分のタスク一覧取得
-Route::get('/me/tasks', 'TaskController@myTask');
+Route::get('/me/tasks', function (Request $request) {
+    $user = $request->user();
+    return TaskResource::collection($user->createdTasks);
+});
