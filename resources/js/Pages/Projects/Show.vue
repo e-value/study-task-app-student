@@ -185,7 +185,9 @@ const deleteMember = async (userId) => {
 
   try {
     memberError.value = null;
-    const response = await axios.delete(`/api/projects/${projectId}/members/${userId}`);
+    const response = await axios.delete(
+      `/api/projects/${projectId}/members/${userId}`
+    );
     members.value = members.value.filter((m) => (m.id || m.user_id) !== userId);
     toast.success(response.data.message || "メンバーを削除しました");
   } catch (err) {

@@ -20,9 +20,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/projects/{project}', [ProjectController::class, 'update']); // プロジェクト更新
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy']); // プロジェクト削除
 
-    // Project Members
-    Route::post('/projects/{project}/members', [MembershipController::class, 'store']); // プロジェクト内のメンバー追加
-
     // Tasks
     Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);
     Route::post('/projects/{project}/tasks', [TaskController::class, 'store']);
@@ -34,6 +31,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Members
     Route::get('/projects/{project}/members', [ProjectMemberController::class, 'index']);
-    Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store']);
+    Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store']); // プロジェクト内のメンバー追加
     Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'destroy']);
 });
