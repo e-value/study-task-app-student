@@ -17,9 +17,15 @@ class TaskController extends ApiController
      */
     public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $project)) {
-            return response()->json(['message' => 'このプロジェクトにアクセスする権限がありません'], 403);
+        // 自分が所属しているかチェック
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
 
         $tasks = $project->tasks()
@@ -35,9 +41,15 @@ class TaskController extends ApiController
      */
     public function store(Request $request, Project $project): JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $project)) {
-            return response()->json(['message' => '権限がありません'], 403);
+        // 自分が所属しているかチェック
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -73,9 +85,16 @@ class TaskController extends ApiController
      */
     public function show(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $task->project)) {
-            return response()->json(['message' => '権限がありません'], 403);
+        // 自分が所属しているかチェック
+        $project = $task->project;
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
 
         $task->load(['createdBy', 'project']);
@@ -88,9 +107,16 @@ class TaskController extends ApiController
      */
     public function update(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $task->project)) {
-            return response()->json(['message' => '権限がありません'], 403);
+        // 自分が所属しているかチェック
+        $project = $task->project;
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -118,9 +144,16 @@ class TaskController extends ApiController
      */
     public function destroy(Request $request, Task $task): JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $task->project)) {
-            return response()->json(['message' => '権限がありません'], 403);
+        // 自分が所属しているかチェック
+        $project = $task->project;
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
 
         $task->delete();
@@ -135,9 +168,16 @@ class TaskController extends ApiController
      */
     public function start(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $task->project)) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        // 自分が所属しているかチェック
+        $project = $task->project;
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
 
         // 状態チェック
@@ -158,9 +198,16 @@ class TaskController extends ApiController
      */
     public function complete(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $task->project)) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        // 自分が所属しているかチェック
+        $project = $task->project;
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
 
         // 状態チェック
@@ -174,15 +221,5 @@ class TaskController extends ApiController
         $task->load('createdBy');
 
         return new TaskResource($task);
-    }
-
-    /**
-     * ユーザーがプロジェクトのメンバーかチェック
-     */
-    private function isMember(Request $request, Project $project): bool
-    {
-        return $project->users()
-            ->where('users.id', $request->user()->id)
-            ->exists();
     }
 }

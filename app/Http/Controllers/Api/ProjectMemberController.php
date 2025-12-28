@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\MembershipResource;
-use App\Models\Membership;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,9 +15,15 @@ class ProjectMemberController extends ApiController
      */
     public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $project)) {
-            return response()->json(['message' => 'このプロジェクトにアクセスする権限がありません'], 403);
+        // 自分が所属しているかチェック
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
 
         $users = $project->users()
@@ -118,9 +123,15 @@ class ProjectMemberController extends ApiController
      */
     public function destroy(Request $request, Project $project, $userId): JsonResponse
     {
-        // メンバーチェック
-        if (!$this->isMember($request, $project)) {
-            return response()->json(['message' => 'このプロジェクトにアクセスする権限がありません'], 403);
+        // 自分が所属しているかチェック
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
 
         // 削除対象のユーザーを取得
@@ -176,15 +187,5 @@ class ProjectMemberController extends ApiController
         return response()->json([
             'message' => 'メンバーを削除しました',
         ]);
-    }
-
-    /**
-     * ユーザーがプロジェクトのメンバーかチェック（users()リレーションを使用）
-     */
-    private function isMember(Request $request, Project $project): bool
-    {
-        return $project->users()
-            ->where('users.id', $request->user()->id)
-            ->exists();
     }
 }
