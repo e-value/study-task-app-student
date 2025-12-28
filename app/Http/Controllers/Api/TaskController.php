@@ -181,8 +181,8 @@ class TaskController extends ApiController
      */
     private function isMember(Request $request, Project $project): bool
     {
-        return $project->memberships()
-            ->where('user_id', $request->user()->id)
+        return $project->users()
+            ->where('users.id', $request->user()->id)
             ->exists();
     }
 }
