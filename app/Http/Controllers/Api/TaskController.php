@@ -86,17 +86,15 @@ class TaskController extends ApiController
      */
     public function show(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // タスクが属するプロジェクトを取得
-        $project = $task->project;
-
         // 自分が所属しているかチェック
+        $project = $task->project;
         $isMember = $project->users()
             ->where('users.id', $request->user()->id)
             ->exists();
 
         if (!$isMember) {
             return response()->json([
-                'message' => 'このタスクにアクセスする権限がありません',
+                'message' => 'このプロジェクトにアクセスする権限がありません',
             ], 403);
         }
 
@@ -110,17 +108,15 @@ class TaskController extends ApiController
      */
     public function update(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // タスクが属するプロジェクトを取得
-        $project = $task->project;
-
         // 自分が所属しているかチェック
+        $project = $task->project;
         $isMember = $project->users()
             ->where('users.id', $request->user()->id)
             ->exists();
 
         if (!$isMember) {
             return response()->json([
-                'message' => 'このタスクを編集する権限がありません',
+                'message' => 'このプロジェクトにアクセスする権限がありません',
             ], 403);
         }
 
@@ -149,17 +145,15 @@ class TaskController extends ApiController
      */
     public function destroy(Request $request, Task $task): JsonResponse
     {
-        // タスクが属するプロジェクトを取得
-        $project = $task->project;
-
         // 自分が所属しているかチェック
+        $project = $task->project;
         $isMember = $project->users()
             ->where('users.id', $request->user()->id)
             ->exists();
 
         if (!$isMember) {
             return response()->json([
-                'message' => 'このタスクを削除する権限がありません',
+                'message' => 'このプロジェクトにアクセスする権限がありません',
             ], 403);
         }
 
@@ -175,17 +169,15 @@ class TaskController extends ApiController
      */
     public function start(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // タスクが属するプロジェクトを取得
-        $project = $task->project;
-
         // 自分が所属しているかチェック
+        $project = $task->project;
         $isMember = $project->users()
             ->where('users.id', $request->user()->id)
             ->exists();
 
         if (!$isMember) {
             return response()->json([
-                'message' => 'このタスクを操作する権限がありません',
+                'message' => 'このプロジェクトにアクセスする権限がありません',
             ], 403);
         }
 
@@ -207,17 +199,15 @@ class TaskController extends ApiController
      */
     public function complete(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // タスクが属するプロジェクトを取得
-        $project = $task->project;
-
         // 自分が所属しているかチェック
+        $project = $task->project;
         $isMember = $project->users()
             ->where('users.id', $request->user()->id)
             ->exists();
 
         if (!$isMember) {
             return response()->json([
-                'message' => 'このタスクを操作する権限がありません',
+                'message' => 'このプロジェクトにアクセスする権限がありません',
             ], 403);
         }
 
@@ -232,15 +222,5 @@ class TaskController extends ApiController
 
         return (new TaskResource($task))
             ->additional(['message' => 'タスクを完了しました']);
-    }
-
-    /**
-     * ユーザーがプロジェクトのメンバーかチェック
-     */
-    private function isMember(Request $request, Project $project): bool
-    {
-        return $project->users()
-            ->where('users.id', $request->user()->id)
-            ->exists();
     }
 }
