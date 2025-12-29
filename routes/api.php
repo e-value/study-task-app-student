@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\TaskController;
+
 
 /**
  * Lesson1: API エンドポイント設計
@@ -39,6 +42,26 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 // 認証が必要な API
 Route::middleware(['auth:sanctum'])->group(function () {
 
-    // TODO: ここにエンドポイントを定義してください
+    //Route::apiResource('projects', ProjectController::class);
+    Route::get('/projects', [ProjectController::class, 'index']); // プロジェクト一覧取得
+    Route::post('/projects', [ProjectController::class, 'store']); // プロジェクト作成
+    Route::get('/projects/{project}', [ProjectController::class, 'show']); // プロジェクト詳細取得
+    Route::put('/projects/{project}', [ProjectController::class, 'update']); //プロジェクト更新
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']); //プロジェクト削除
+
+    Route::post('/projects/{project}/uses/(user)', [ProjectController::class, 'storeProjectMember']); //プロジェクトのメンバー追加
+    Route::delete('/projects/{project}/uses/(user)', [ProjectController::class, 'deleteProjectMember']); //プロジェクトのメンバー削除
+
+    Route::get('/projects/{project}/tasks', [TaskController::class, 'index']); //プロジェクト内のタスク一覧取得
+    Route::post('/projects/{project}/tasks', [TaskController::class, 'store']); //プロジェクトにタスク作成
+    Route::get('/tasks/{task}', [TaskController::class, 'show']); // プロジェクトのタスク詳細取得
+    Route::put('/tasks/{task}', [TaskController::class, 'update']); //プロジェクトのタスク更新
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy']); //プロジェクトのタスク削除
+    
+    Route::put('/tasks/{task}/update-todo', [TaskController::class, 'updateToDo']); //プロジェクトのタスクを開始
+    Route::put('/tasks/{task}/update-done', [TaskController::class, 'updateDone']); //プロジェクトのタスクを完了
+    
+    Route::get('users/{user}/tasks',[TaskController::class, 'getTasksforUser']);// 自分のタスク一覧取得（自分が所属しているプロジェクトの全タスク）
 
 });
+
