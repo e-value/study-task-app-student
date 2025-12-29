@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Resources\MembershipResource;
+use App\Http\Resources\ProjectMemberResource;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,27 +26,14 @@ class ProjectMemberController extends ApiController
             ], 403);
         }
 
-        $users = $project->users()
+        // 2. メンバー一覧の取得
+        // withPivot に 'id' を含めることで、Membership の ID も取得できます
+        $members = $project->users()
+            ->withPivot('id', 'role')
             ->get();
 
-        // MembershipResourceの形式に合わせて変換
-        $memberships = $users->map(function ($user) use ($project) {
-            // Membershipモデルのインスタンスを作成（Resourceクラスが期待する形式）
-            $membership = new \App\Models\Membership();
-            $membership->id = \App\Models\Membership::where('project_id', $project->id)
-                ->where('user_id', $user->id)
-                ->value('id');
-            $membership->project_id = $project->id;
-            $membership->user_id = $user->id;
-            $membership->role = $user->pivot->role;
-            $membership->created_at = $user->pivot->created_at;
-            $membership->updated_at = $user->pivot->updated_at;
-            $membership->setRelation('user', $user);
-
-            return $membership;
-        });
-
-        return MembershipResource::collection($memberships);
+        // 3. Resourceに渡すだけ
+        return ProjectMemberResource::collection($members);
     }
 
     /**
@@ -99,22 +86,10 @@ class ProjectMemberController extends ApiController
 
         // ユーザー情報を含めて返す
         $user = $project->users()->find($validated['user_id']);
-        $membershipId = \App\Models\Membership::where('project_id', $project->id)
-            ->where('user_id', $validated['user_id'])
-            ->value('id');
-
-        $membership = new \App\Models\Membership();
-        $membership->id = $membershipId;
-        $membership->project_id = $project->id;
-        $membership->user_id = $user->id;
-        $membership->role = $user->pivot->role;
-        $membership->created_at = $user->pivot->created_at;
-        $membership->updated_at = $user->pivot->updated_at;
-        $membership->setRelation('user', $user);
 
         return response()->json([
             'message' => 'メンバーを追加しました',
-            'membership' => new MembershipResource($membership),
+            'membership' => new ProjectMemberResource($user),
         ], 201);
     }
 
