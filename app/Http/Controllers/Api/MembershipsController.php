@@ -12,5 +12,10 @@ class MembershipsController extends Controller
         abort(501, 'Not Implemented');
     }
 
+    public function destroy(Project $project)
+    {
+        abort(501, 'Not Implemented');
+    }
+
 }
 

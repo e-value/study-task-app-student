@@ -42,6 +42,9 @@ Route::get('/projects/{project}/tasks', function (Project $project) {
     return TasksResource::collection($project->tasks);
 });
 
+#プロジェクト内のメンバー削除
+Route::delete('/projects/{project}/members', 'MembershipsController@destroy');
+
 #プロジェクト内にタスク作成
 Route::post('/projects/{project}/tasks', 'TasksController@store');
 
@@ -50,11 +53,11 @@ Route::get('/tasks/{task}', function (Task $task) {
     return new TasksResource($task);
 });
 
-#プロジェクトのタスク更新
-Route::put('/tasks/{task}', 'TasksController@update');
-
 #プロジェクトのタスク削除
 Route::delete('/tasks/{task}', 'TasksController@destroy');  
+
+#プロジェクトのタスク更新
+Route::put('/tasks/{task}', 'TasksController@update');
 
 #プロジェクトのタスクを開始
 Route::post('/tasks/{task}/start', 'TasksController@start');
