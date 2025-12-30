@@ -21,15 +21,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('projects/{project}/members/{member}', [ProjectMemberController::class, 'destroy']);
 
     // プロジェクトタスクに関する操作
+    //プロジェクトタスクのCRUD
     Route::get('projects/{project}/tasks', [ProjectTaskController::class, 'index']);
     Route::post('projects/{project}/tasks', [ProjectTaskController::class, 'store']);
     Route::get('projects/{project}/tasks/{task}', [ProjectTaskController::class, 'show']);
     Route::patch('projects/{project}/tasks/{task}', [ProjectTaskController::class, 'update']);
     Route::delete('projects/{project}/tasks/{task}', [ProjectTaskController::class, 'destroy']);
 
+    //プロジェクトタスクの状態更新
     Route::post('projects/{project}/tasks/{task}/start', [ProjectTaskController::class, 'start']);
     Route::post('projects/{project}/tasks/{task}/complete', [ProjectTaskController::class, 'complete']);
 
-    // ユーザーが持つプロジェクトのタスク関する操作
+    //特定のユーザーに割り当てられたプロジェクトタスクを取得
     Route::get('users/{user}/projects/tasks', [ProjectTaskController::class, 'getUserAllTasks']);
 });
