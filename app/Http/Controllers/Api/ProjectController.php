@@ -30,17 +30,7 @@ class ProjectController extends ApiController
      */
     public function store(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'is_archived' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
+        # バリデーションを記載
 
         // プロジェクト作成
         $project = Project::create([
@@ -49,9 +39,7 @@ class ProjectController extends ApiController
         ]);
 
         // 作成者を自動的にオーナーとして追加（users()リレーションのattach()を使用）
-        $project->users()->attach($request->user()->id, [
-            'role' => 'project_owner',
-        ]);
+
 
         $project->load(['users']);
 
@@ -66,17 +54,13 @@ class ProjectController extends ApiController
      */
     public function show(Request $request, Project $project): ProjectResource|JsonResponse
     {
-        // 自分が所属しているかチェック（users()リレーションを使用）
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
-            ->exists();
+        // 自分がプロジェクトのメンバーかチェック（users()リレーションを使用）
 
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
-        }
+        // メンバーでなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
 
+
+        // 読み込み（N+1問題を防ぐため）
         $project->load(['users', 'tasks.createdBy']);
 
         return new ProjectResource($project);
@@ -88,29 +72,17 @@ class ProjectController extends ApiController
     public function update(Request $request, Project $project): ProjectResource|JsonResponse
     {
         // 自分がオーナーまたは管理者かチェック（users()リレーションを使用）
-        $myUser = $project->users()
-            ->where('users.id', $request->user()->id)
-            ->first();
 
-        if (!$myUser || !in_array($myUser->pivot->role, ['project_owner', 'project_admin'])) {
-            return response()->json([
-                'message' => 'プロジェクトを編集する権限がありません',
-            ], 403);
-        }
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255',
-            'is_archived' => 'sometimes|boolean',
-        ]);
+        // 権限がなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: プロジェクトを更新する権限がありません
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
+        // バリデーションを記載
 
+        // プロジェクトを更新
         $project->update($request->only(['name', 'is_archived']));
+
+        // 読み込み（N+1問題を防ぐため）
         $project->load(['users', 'tasks.createdBy']);
 
         return (new ProjectResource($project))
@@ -122,16 +94,10 @@ class ProjectController extends ApiController
      */
     public function destroy(Request $request, Project $project): JsonResponse
     {
-        // 自分がオーナーかチェック（users()リレーションを使用）
-        $myUser = $project->users()
-            ->where('users.id', $request->user()->id)
-            ->first();
+        // 自分がオーナーかチェック（users()リレーションを使用
 
-        if (!$myUser || $myUser->pivot->role !== 'project_owner') {
-            return response()->json([
-                'message' => 'プロジェクトを削除する権限がありません（オーナーのみ）',
-            ], 403);
-        }
+        // 権限がなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: プロジェクトを削除する権限がありません
 
         $project->delete();
 
