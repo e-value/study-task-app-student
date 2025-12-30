@@ -4,8 +4,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProjectController;
-use App\Http\Controllers\Api\MemberController;
-use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\ProjectMemberController;
+use App\Http\Controllers\Api\ProjectTaskController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
@@ -16,20 +16,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('projects', ProjectController::class)
         ->only(['index', 'store', 'show', 'update', 'destroy']);
 
-    // メンバーに関する操作
-    Route::post('projects/{project}/members', [MemberController::class, 'store']);
-    Route::delete('projects/{project}/members/{member}', [MemberController::class, 'destroy']);
+    // プロジェクトメンバーに関する操作
+    Route::post('projects/{project}/members', [ProjectMemberController::class, 'store']);
+    Route::delete('projects/{project}/members/{member}', [ProjectMemberController::class, 'destroy']);
 
-    // タスクに関する操作
-    Route::get('projects/{project}/tasks', [TaskController::class, 'index']);
-    Route::post('projects/{project}/tasks', [TaskController::class, 'store']);
-    Route::get('projects/{project}/tasks/{task}', [TaskController::class, 'show']);
-    Route::patch('projects/{project}/tasks/{task}', [TaskController::class, 'update']);
-    Route::delete('projects/{project}/tasks/{task}', [TaskController::class, 'destroy']);
+    // プロジェクトタスクに関する操作
+    Route::get('projects/{project}/tasks', [ProjectTaskController::class, 'index']);
+    Route::post('projects/{project}/tasks', [ProjectTaskController::class, 'store']);
+    Route::get('projects/{project}/tasks/{task}', [ProjectTaskController::class, 'show']);
+    Route::patch('projects/{project}/tasks/{task}', [ProjectTaskController::class, 'update']);
+    Route::delete('projects/{project}/tasks/{task}', [ProjectTaskController::class, 'destroy']);
 
-    Route::post('projects/{project}/tasks/{task}/start', [TaskController::class, 'start']);
-    Route::post('projects/{project}/tasks/{task}/complete', [TaskController::class, 'complete']);
+    Route::post('projects/{project}/tasks/{task}/start', [ProjectTaskController::class, 'start']);
+    Route::post('projects/{project}/tasks/{task}/complete', [ProjectTaskController::class, 'complete']);
 
-    // 自分のタスクに関する操作
-    Route::get('users/{user}/projects/tasks', [TaskController::class, 'getUserAllTasks']);
+    // ユーザーが持つプロジェクトのタスク関する操作
+    Route::get('users/{user}/projects/tasks', [ProjectTaskController::class, 'getUserAllTasks']);
 });
