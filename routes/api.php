@@ -12,19 +12,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 #プロジェクトの一覧取得
-Route::get('/projects', [ProductController::class, 'index']);
+Route::get('/projects', [ProjectController::class, 'index']);
 
 #プロジェクトの作成
-Route::post('/projects', [ProductController::class, 'create']);
+Route::post('/projects', [ProjectController::class, 'create']);
 
 #プロジェクトの詳細取得
-Route::get('/projects/{project}', [ProductController::class, 'store']);
+Route::get('/projects/{project}', [ProjectController::class, 'store']);
 
 #プロジェクトの更新
-Route::put('/projects/{project}', [ProductController::class, 'update']);
+Route::put('/projects/{project}', [ProjectController::class, 'update']);
 
 #プロジェクトの削除
-Route::delete('/projects/{project}',  [ProductController::class, 'delete']);
+Route::delete('/projects/{project}',  [ProjectController::class, 'delete']);
 
 #プロジェクトのメンバー追加
 Route::post('/projects/{project}/members', [MembershipsController::class,'add']);
