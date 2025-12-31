@@ -59,17 +59,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/',[TaskController::class,'index'])->name('index');
             // プロジェクト内にタスク作成
             Route::post('/',[TaskController::class,'store'])->name('store');
+            
             // タスク詳細取得
             Route::get('{task}',[TaskController::class,'show'])->name('show');
             // タスク更新
             Route::put('{task}',[TaskController::class,'update'])->name('update');
             // タスク削除
             Route::delete('{task}',[TaskController::class,'destroy'])->name('destroy');
+            
             // 自分のタスク一覧取得
             Route::get('own',[TaskController::class,'index'])->name('own'); # ルートの名前で条件分岐
         });
     });
-    
-
-
 });
