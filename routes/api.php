@@ -41,4 +41,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // TODO: ここにエンドポイントを定義してください
 
+    // ProjectのCRUD + プロジェクト内のメンバー追加 /projects/{id}
+    // /projects
+    Route::apiResource('projects', ProjectController::class);
+
+    // TaskのCRUD
+    // /projects/{id}/tasks 
+    Route::apiResource('projects.tasks', TaskController::class);
+
 });
