@@ -37,6 +37,8 @@ Lesson3 では、次のステップとして、
 
 ### ① FormRequest について調べる
 
+FormRequest について知らない場合は、以下を調べてから実装してください：
+
 -   FormRequest の役割
 -   Request クラスとの違い
 -   `authorize()` と `rules()` の責務
@@ -122,6 +124,12 @@ Lesson3 では、以下の 2 点を行います。
 -   Controller に書かれている処理をそのまま Service に移す
 -   public メソッドと private メソッドを使って整理する
 -   Controller が「処理の呼び出し役」になっているかを確認する
+
+### 📌 参考実装について
+
+-   **ProjectService の `store` メソッドを例として、Service への切り分けと private メソッドの使い方が実装されています**
+-   Service への移し方・private メソッドの切り方の参考にしてください
+-   同じ形にする必要はありませんが、考え方は参考にしてください
 
 ---
 
