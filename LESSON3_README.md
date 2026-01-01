@@ -93,6 +93,8 @@ Service の役割を把握したら、次に **Service 内をどう整理する�
 
 ## 📖 事前学習 ③：FormRequest について調べる
 
+FormRequest について知らない場合は、以下を調べてから実装してください：
+
 -   FormRequest の役割
 -   通常の Request との違い
 -   `authorize()` と `rules()` の責務
@@ -151,7 +153,7 @@ Service に移した後、以下を意識してください：
 
 ### 📌 参考実装について
 
--   **ProjectService には、1 つメソッドを切り分けたサンプル実装が用意されています**
+-   **ProjectService の `store` メソッドを例として、Service への切り分けと private メソッドの使い方が実装されています**
 -   Service への移し方・private メソッドの切り方の参考にしてください
 -   同じ形にする必要はありませんが、考え方は参考にしてください
 
