@@ -8,9 +8,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Validator;
+use App\Services\ProjectService;
+use App\Http\Requests\ProjectRequest;
 
 class ProjectController extends ApiController
 {
+    public function __construct(
+        private ProjectService $projectService
+    ) {}
+
     /**
      * 自分が所属しているプロジェクト一覧を返す
      */
@@ -28,32 +34,12 @@ class ProjectController extends ApiController
     /**
      * プロジェクト新規作成
      */
-    public function store(Request $request): JsonResponse
+    public function store(ProjectRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'is_archived' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        // プロジェクト作成
-        $project = Project::create([
-            'name' => $request->name,
-            'is_archived' => $request->is_archived ?? false,
-        ]);
-
-        // 作成者を自動的にオーナーとして追加（users()リレーションのattach()を使用）
-        $project->users()->attach($request->user()->id, [
-            'role' => 'project_owner',
-        ]);
-
-        $project->load(['users']);
+        $project = $this->projectService->createProject(
+            $request->validated(),
+            $request->user()
+        );
 
         return (new ProjectResource($project))
             ->additional(['message' => 'プロジェクトを作成しました'])
