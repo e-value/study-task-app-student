@@ -1,11 +1,3 @@
-**結論**
-はい、その順番の方が自然で理解しやすいです 👍
-**「Service とは何か → その中をどう整理するか（private）」** という流れに直し、
-あわせて **ProjectService に切り分けたサンプルメソッドを参考にする旨** を README に追記します。
-以下は **そのまま差し替えできる修正版 README（完成版）** です。
-
----
-
 # Lesson3: FormRequest と Service への切り分けを体験する
 
 ## 🎯 この Lesson の目的
@@ -62,7 +54,6 @@ Lesson3 では、これらを整理するために、
 ## 📖 事前学習 ①：Service クラスについて調べる
 
 まずは、**Service クラスとは何か**を把握してください。
-この時点では「便利そう」「処理をまとめる場所なんだな」程度の理解で十分です。
 
 -   ▼ Laravel サービスクラスを活用したメソッドの実装方法
     [https://zenn.dev/imkei/articles/5b1f7948a78f6f](https://zenn.dev/imkei/articles/5b1f7948a78f6f)
@@ -136,7 +127,7 @@ Lesson3 では、以下の 2 点を行います。
 
 #### 基本方針
 
--   **まずは Controller の処理を、そのまま Service に移動してください**
+-   **まずは Service クラスを作成して、Controller のメソッドを Service クラスのメソッドに移動してください**
 -   最初から整理しきる必要はありません
 
 #### Service 内での整理（private メソッド）
