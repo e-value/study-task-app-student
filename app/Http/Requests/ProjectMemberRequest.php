@@ -4,19 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProjectRequest extends FormRequest
+class ProjectMemberRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        // store（POST）の場合はログインユーザーであれば作成できる
-        if ($this->isMethod('POST')) {
-            return $this->user() !== null;
-        }
-
-        // update（PUT/PATCH）の場合はオーナーまたは管理者かチェック
+        // プロジェクトのオーナーまたは管理者かチェック
         $project = $this->route('project');
         
         if (!$project) {
@@ -41,12 +36,10 @@ class ProjectRequest extends FormRequest
      */
     public function rules(): array
     {
-        // store（POST）の場合は必須、update（PUT/PATCH）の場合はsometimes
-        $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
-        
         return [
-            'name' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
-            'is_archived' => $isUpdate ? 'sometimes|boolean' : 'boolean',
+            'user_id' => 'required|exists:users,id',
+            'role' => 'nullable|in:project_owner,project_admin,project_member',
         ];
     }
 }
+

@@ -4,34 +4,29 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProjectRequest extends FormRequest
+class TaskRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        // store（POST）の場合はログインユーザーであれば作成できる
-        if ($this->isMethod('POST')) {
-            return $this->user() !== null;
-        }
-
-        // update（PUT/PATCH）の場合はオーナーまたは管理者かチェック
+        // プロジェクトのメンバーかチェック
         $project = $this->route('project');
+        $task = $this->route('task');
         
-        if (!$project) {
+        // storeの場合はprojectから、updateの場合はtaskからprojectを取得
+        if ($project) {
+            $targetProject = $project;
+        } elseif ($task) {
+            $targetProject = $task->project;
+        } else {
             return false;
         }
 
-        $myUser = $project->users()
+        return $targetProject->users()
             ->where('users.id', $this->user()->id)
-            ->first();
-
-        if (!$myUser) {
-            return false;
-        }
-
-        return in_array($myUser->pivot->role, ['project_owner', 'project_admin']);
+            ->exists();
     }
 
     /**
@@ -45,8 +40,10 @@ class ProjectRequest extends FormRequest
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
         
         return [
-            'name' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
-            'is_archived' => $isUpdate ? 'sometimes|boolean' : 'boolean',
+            'title' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => $isUpdate ? 'sometimes|in:todo,doing,done' : 'nullable',
         ];
     }
 }
+

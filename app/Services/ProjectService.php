@@ -33,11 +33,83 @@ class ProjectService
         return $project;
     }
 
-    // 他のメソッドもここに記載
-    public function updateProject() {}
+    /**
+     * プロジェクトを更新する
+     *
+     * @param Project $project プロジェクト
+     * @param array $data 更新データ（name, is_archived）
+     * @return Project
+     */
+    public function updateProject(Project $project, array $data): Project
+    {
+        $project->update($data);
+        $project->load(['users', 'tasks.createdBy']);
 
-    // 他のメソッドもここに記載
+        return $project;
+    }
 
+    /**
+     * プロジェクトを削除する
+     *
+     * @param Project $project プロジェクト
+     * @return void
+     */
+    public function deleteProject(Project $project): void
+    {
+        $project->delete();
+    }
 
-    // privateメソッドも定義
+    /**
+     * プロジェクトのメンバーかチェック
+     *
+     * @param Project $project プロジェクト
+     * @param User $user ユーザー
+     * @return bool
+     */
+    public function isProjectMember(Project $project, User $user): bool
+    {
+        return $project->users()
+            ->where('users.id', $user->id)
+            ->exists();
+    }
+
+    /**
+     * プロジェクトのオーナーまたは管理者かチェック
+     *
+     * @param Project $project プロジェクト
+     * @param User $user ユーザー
+     * @return bool
+     */
+    public function isProjectOwnerOrAdmin(Project $project, User $user): bool
+    {
+        $myUser = $project->users()
+            ->where('users.id', $user->id)
+            ->first();
+
+        if (!$myUser) {
+            return false;
+        }
+
+        return in_array($myUser->pivot->role, ['project_owner', 'project_admin']);
+    }
+
+    /**
+     * プロジェクトのオーナーかチェック
+     *
+     * @param Project $project プロジェクト
+     * @param User $user ユーザー
+     * @return bool
+     */
+    public function isProjectOwner(Project $project, User $user): bool
+    {
+        $myUser = $project->users()
+            ->where('users.id', $user->id)
+            ->first();
+
+        if (!$myUser) {
+            return false;
+        }
+
+        return $myUser->pivot->role === 'project_owner';
+    }
 }
