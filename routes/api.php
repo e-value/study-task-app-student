@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\MembershipController;
 
 /**
  * Lesson1: API エンドポイント設計
@@ -54,6 +55,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // プロジェクト削除
         Route::delete('{project}',[ProjectController::class,'destroy'])->name('destroy');
 
+        Route::group(['prefix'=>'{project}/members', 'as'=>'members.'],function(){
+            // プロジェクトのメンバー追加
+            Route::post('/add',[MembershipController::class,'store'])->name('store');
+            // プロジェクトのメンバーを削除
+            Route::delete('{membership}',[MembershipController::class,'destroy'])->name('destroy');
+        });
+
         Route::group(['prefix'=>'{project}/tasks', 'as'=>'tasks.'],function(){
             // プロジェクト内のタスク一覧取得
             Route::get('/',[TaskController::class,'index'])->name('index');
@@ -68,7 +76,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::delete('{task}',[TaskController::class,'destroy'])->name('destroy');
             
             // 自分のタスク一覧取得
-            Route::get('own',[TaskController::class,'index'])->name('own'); # ルートの名前で条件分岐
+            Route::get('own',[TaskController::class,'index'])->name('own'); # Indexメソッドの中で、ルート名を判定し、ルートの名前で条件分岐
         });
     });
 });
