@@ -9,10 +9,16 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Validator;
+use App\Services\TaskService;
+use App\Http\Requests\TaskRequest;
 use App\Http\Requests\ProjectMemberRequest;
+
 
 class TaskController extends ApiController
 {
+    public function __construct(
+        private TaskService $taskService
+    ) {}
     /**
      * プロジェクトのタスク一覧を取得
      */
@@ -29,26 +35,13 @@ class TaskController extends ApiController
     /**
      * タスク作成
      */
-    public function store(ProjectMemberRequest $request, Project $project): JsonResponse
+    public function store(TaskRequest $request, Project $project): JsonResponse
     {
-        $validator = $request->validated();
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $task = Task::create([
-            'project_id' => $project->id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => 'todo',
-            'created_by' => $request->user()->id,
-        ]);
-
-        $task->load('createdBy');
+        $task = $this->taskService->createTask(
+            $request->validated(),
+            $project, 
+            $request->user()
+        );
 
         return (new TaskResource($task))
             ->additional(['message' => 'タスクを作成しました'])
@@ -59,7 +52,7 @@ class TaskController extends ApiController
     /**
      * タスク詳細を取得
      */
-    public function show(ProjectMemberRequest $request, Task $task): TaskResource|JsonResponse
+    public function show(TaskRequest $request, Task $task): TaskResource|JsonResponse
     {
         $task->load(['createdBy', 'project']);
         return new TaskResource($task);
@@ -68,10 +61,12 @@ class TaskController extends ApiController
     /**
      * タスク更新
      */
-    public function update(ProjectMemberRequest $request, Task $task): TaskResource|JsonResponse
+    public function update(TaskRequest $request, Task $task): TaskResource|JsonResponse
     {
-        $task->update($request->only(['title', 'description', 'status']));
-        $task->load('createdBy');
+        $task = $this->taskService->updateTask(
+            $task,
+            $request->only(['title', 'description', 'status'])
+        );
 
         return (new TaskResource($task))
             ->additional(['message' => 'タスクを更新しました']);
@@ -80,10 +75,9 @@ class TaskController extends ApiController
     /**
      * タスク削除
      */
-    public function destroy(ProjectMemberRequest $request, Task $task): JsonResponse
+    public function destroy(TaskRequest $request, Task $task): JsonResponse
     {
-        $task->delete();
-
+        $this->taskService->deleteTask($task);
         return response()->json([
             'message' => 'タスクを削除しました',
         ]);
@@ -92,36 +86,22 @@ class TaskController extends ApiController
     /**
      * タスクを開始（todo → doing）
      */
-    public function start(ProjectMemberRequest $request, Task $task): TaskResource|JsonResponse
+    public function start(TaskRequest $request, Task $task):JsonResponse
     {
-        // 状態チェック
-        if ($task->status !== 'todo') {
-            return response()->json([
-                'message' => '未着手のタスクのみ開始できます',
-            ], 409);
-        }
+        $task = $this->taskService->startTask($task);
 
-        $task->update(['status' => 'doing']);
-        $task->load('createdBy');
-
-        return new TaskResource($task);
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを開始しました']);
     }
 
     /**
      * タスクを完了（doing → done）
      */
-    public function complete(ProjectMemberRequest $request, Task $task): TaskResource|JsonResponse
+    public function complete(TaskRequest $request, Task $task):JsonResponse
     {
-        // 状態チェック
-        if ($task->status !== 'doing') {
-            return response()->json([
-                'message' => '作業中のタスクのみ完了できます',
-            ], 409);
-        }
+        $task = $this->taskService->completeTask($task);
 
-        $task->update(['status' => 'done']);
-        $task->load('createdBy');
-
-        return new TaskResource($task);
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを完了しました']);
     }
 }

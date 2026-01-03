@@ -13,6 +13,7 @@ use App\Http\Requests\ProjectRequest;
 use App\Http\Requests\ProjectMemberRequest;
 use App\Http\Requests\OwnerAdminRequest;
 use App\Http\Requests\OwnerRequest;
+use App\Services\CommentService;
 
 class ProjectController extends ApiController
 {
@@ -56,7 +57,6 @@ class ProjectController extends ApiController
     public function show(ProjectMemberRequest $request, Project $project): ProjectResource|JsonResponse
     {
         $project->load(['users', 'tasks.createdBy']);
-
         return new ProjectResource($project);
     }
 
@@ -65,8 +65,10 @@ class ProjectController extends ApiController
      */
     public function update(OwnerAdminRequest $request, Project $project): ProjectResource|JsonResponse
     {
-        $project->update($request->only(['name', 'is_archived']));
-        $project->load(['users', 'tasks.createdBy']);
+        $project = $this->projectService->updateProject(
+            $project,
+            $request->validated()
+        );
 
         return (new ProjectResource($project))
             ->additional(['message' => 'プロジェクトを更新しました']);
@@ -77,9 +79,7 @@ class ProjectController extends ApiController
      */
     public function destroy(OwnerRequest $request, Project $project): JsonResponse
     {
-
-        $project->delete();
-
+        $this->projectService->deleteProject($project);
         return response()->json([
             'message' => 'プロジェクトを削除しました',
         ]);

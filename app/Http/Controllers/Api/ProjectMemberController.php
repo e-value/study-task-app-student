@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\ProjectMemberResource;
 use App\Models\Project;
+use App\Services\ProjectService;
+use App\Services\ProjectMemberService;
 use App\Http\Requests\ProjectMemberRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,6 +14,11 @@ use App\Http\Requests\OwnerAdminRequest;
 
 class ProjectMemberController extends ApiController
 {
+    public function __construct(
+        private ProjectService $projectService,
+        private ProjectMemberService $projectMemberService
+    ) {}
+
     /**
      * プロジェクトのメンバー一覧を取得
      */
@@ -34,20 +41,8 @@ class ProjectMemberController extends ApiController
     {
         // バリデーション
         $validated = $request->validated();
-
         // デフォルトロール設定
         $role = $validated['role'] ?? 'project_member';
-
-        // 既にメンバーかチェック（users()リレーションを使用）
-        $existingUser = $project->users()
-            ->where('users.id', $validated['user_id'])
-            ->first();
-
-        if ($existingUser) {
-            return response()->json([
-                'message' => 'このユーザーは既にプロジェクトのメンバーです',
-            ], 409);
-        }
 
         // 自分自身を追加しようとしていないかチェック
         if ($validated['user_id'] == $request->user()->id) {
@@ -56,18 +51,13 @@ class ProjectMemberController extends ApiController
             ], 409);
         }
 
-        // メンバーシップ作成（users()リレーションのattach()を使用）
-        $project->users()->attach($validated['user_id'], [
-            'role' => $role,
-        ]);
+        $user = $this->projectMemberService->addMember(
+            $request->validated(),
+            $request->user()
+        );
 
-        // ユーザー情報を含めて返す
-        $user = $project->users()->find($validated['user_id']);
-
-        return response()->json([
-            'message' => 'メンバーを追加しました',
-            'membership' => new ProjectMemberResource($user),
-        ], 201);
+        return (new ProjectMemberResource($user))
+            ->additional(['message' => 'メンバーを追加しました']);
     }
 
     /**
@@ -112,10 +102,9 @@ class ProjectMemberController extends ApiController
         }
 
         // 削除実行（users()リレーションのdetach()を使用）
-        $project->users()->detach($userId);
-
+        $this->projectService->deleteProject($project);
         return response()->json([
-            'message' => 'メンバーを削除しました',
+            'message' => 'プロジェクトを削除しました',
         ]);
     }
 }
