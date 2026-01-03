@@ -9,8 +9,17 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Validator;
 
+use Illuminate\Support\Facades\Auth;
+
 class ProjectController extends ApiController
 {
+     protected $currentUser;
+
+     public function __construct()
+     {
+         $this->currentUser = Auth::user();
+     }
+
     /**
      * 自分が所属しているプロジェクト一覧を返す
      */
@@ -31,6 +40,10 @@ class ProjectController extends ApiController
     public function store(Request $request): JsonResponse
     {
         # バリデーションを記載
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string'],
+            'is_archived' => ['required', 'boolean']
+        ]);
 
         // プロジェクト作成
         $project = Project::create([
@@ -39,7 +52,7 @@ class ProjectController extends ApiController
         ]);
 
         // 作成者を自動的にオーナーとして追加（users()リレーションのattach()を使用）
-
+        $project->users()->attach($this->currentUser->id, ['role' => 'project_owner']);
 
         $project->load(['users']);
 
@@ -55,10 +68,12 @@ class ProjectController extends ApiController
     public function show(Request $request, Project $project): ProjectResource|JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック（users()リレーションを使用）
-
-        // メンバーでなければエラーを返す
-        // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
-
+        if(!$project->users()->where('user_id', $this->currentUser->id)->exists())
+        {
+            // メンバーでなければエラーを返す
+            // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+            return response()->json(['message' => "このプロジェクトにアクセスする権限がありません"], 403);
+        }
 
         // 読み込み（N+1問題を防ぐため）
         $project->load(['users', 'tasks.createdBy']);
@@ -72,12 +87,21 @@ class ProjectController extends ApiController
     public function update(Request $request, Project $project): ProjectResource|JsonResponse
     {
         // 自分がオーナーまたは管理者かチェック（users()リレーションを使用）
-
-
-        // 権限がなければエラーを返す
-        // エラーコード: 403, エラーメッセージ: プロジェクトを更新する権限がありません
+        if($project->users()->where('user_id', $this->currentUser->id)->exists()){
+            $currentUserRole = $project->users()->where('user_id', $this->currentUser->id)->role;
+            if(!$currentUserRole == 'project_owner' &&  !$currentUserRole == 'project_admin' )
+            {
+                // 権限がなければエラーを返す
+                // エラーコード: 403, エラーメッセージ: プロジェクトを更新する権限がありません
+                return response()->json(['message' => "プロジェクトを更新する権限がありません"], 403);
+            }
+        }
 
         // バリデーションを記載
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string'],
+            'is_archived' => ['required', 'boolean']
+        ]);
 
         // プロジェクトを更新
         $project->update($request->only(['name', 'is_archived']));
@@ -95,9 +119,13 @@ class ProjectController extends ApiController
     public function destroy(Request $request, Project $project): JsonResponse
     {
         // 自分がオーナーかチェック（users()リレーションを使用
-
-        // 権限がなければエラーを返す
-        // エラーコード: 403, エラーメッセージ: プロジェクトを削除する権限がありません
+        $currentUserRole = $project->users()->where('user_id', $this->currentUser->id)->role;
+        if(!$currentUserRole == 'project_owner')
+        {
+            // 権限がなければエラーを返す
+            // エラーコード: 403, エラーメッセージ: プロジェクトを削除する権限がありません
+            return response()->json(['message' => "プロジェクトを削除する権限がありません"], 403);
+        }
 
         $project->delete();
 
