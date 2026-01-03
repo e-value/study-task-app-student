@@ -21,6 +21,21 @@ Lesson4：Lesson2 と Lesson3 を比較する ← 今ここ
 
 ---
 
+## 🌿 ブランチ作成
+
+```bash
+git checkout main
+git pull origin main
+
+git fetch origin lesson4
+git checkout lesson4
+git pull origin lesson4
+
+git checkout -b lesson4_自分の名字
+```
+
+---
+
 ## 👀 まず最初にやること（重要）
 
 ### ブランチを見比べる
@@ -39,7 +54,7 @@ Lesson4：Lesson2 と Lesson3 を比較する ← 今ここ
 -   Controller には何が残っているか
 -   Service にはどんな処理が集まっているか
 -   Service のメソッド名・private メソッド名は何を表しているか
--   どのファイルが読みやすいと感じるか
+-   どういったところが改善されてたと感じるか
 
 ---
 
