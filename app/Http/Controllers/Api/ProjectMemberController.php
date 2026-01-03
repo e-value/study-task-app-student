@@ -4,28 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\ProjectMemberResource;
 use App\Models\Project;
+use App\Http\Requests\ProjectMemberRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Http\Requests\OwnerAdminRequest;
 
 class ProjectMemberController extends ApiController
 {
     /**
      * プロジェクトのメンバー一覧を取得
      */
-    public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
+    public function index(ProjectMemberRequest $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
-            ->exists();
-
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
-        }
-
         // 2. メンバー一覧の取得
         // withPivot に 'id' を含めることで、Membership の ID も取得できます
         $members = $project->users()
@@ -39,24 +30,10 @@ class ProjectMemberController extends ApiController
     /**
      * プロジェクトにメンバーを追加
      */
-    public function store(Request $request, Project $project): JsonResponse
+    public function store(OwnerAdminRequest $request, Project $project): JsonResponse
     {
-        // 自分がowner/adminかチェック（users()リレーションを使用）
-        $myUser = $project->users()
-            ->where('users.id', $request->user()->id)
-            ->first();
-
-        if (!$myUser || !in_array($myUser->pivot->role, ['project_owner', 'project_admin'])) {
-            return response()->json([
-                'message' => 'メンバーを追加する権限がありません（オーナーまたは管理者のみ）',
-            ], 403);
-        }
-
         // バリデーション
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'role' => 'nullable|in:project_owner,project_admin,project_member',
-        ]);
+        $validated = $request->validated();
 
         // デフォルトロール設定
         $role = $validated['role'] ?? 'project_member';
@@ -96,19 +73,8 @@ class ProjectMemberController extends ApiController
     /**
      * プロジェクトからメンバーを削除（users()リレーションを使用）
      */
-    public function destroy(Request $request, Project $project, $userId): JsonResponse
+    public function destroy(OwnerAdminRequest $request, Project $project, $userId): JsonResponse
     {
-        // 自分が所属しているかチェック
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
-            ->exists();
-
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
-        }
-
         // 削除対象のユーザーを取得
         $targetUser = $project->users()
             ->where('users.id', $userId)
@@ -118,17 +84,6 @@ class ProjectMemberController extends ApiController
             return response()->json([
                 'message' => 'User is not a member of this project.',
             ], 404);
-        }
-
-        // 自分がowner/adminかチェック（users()リレーションを使用）
-        $myUser = $project->users()
-            ->where('users.id', $request->user()->id)
-            ->first();
-
-        if (!$myUser || !in_array($myUser->pivot->role, ['project_owner', 'project_admin'])) {
-            return response()->json([
-                'message' => 'メンバーを削除する権限がありません（オーナーまたは管理者のみ）',
-            ], 403);
         }
 
         // Owner維持チェック（Owner削除後に0人になる場合は不可）
