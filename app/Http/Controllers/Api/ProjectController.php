@@ -51,16 +51,14 @@ class ProjectController extends ApiController
      */
     public function show(Request $request, Project $project): ProjectResource|JsonResponse
     {
-        // 自分が所属しているかチェック
-        if (!$this->projectService->isProjectMember($project, $request->user())) {
+        try {
+            $project = $this->projectService->getProject($project, $request->user());
+            return new ProjectResource($project);
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
+                'message' => $e->getMessage(),
             ], 403);
         }
-
-        $project->load(['users', 'tasks.createdBy']);
-
-        return new ProjectResource($project);
     }
 
     /**
@@ -68,10 +66,20 @@ class ProjectController extends ApiController
      */
     public function update(ProjectRequest $request, Project $project): ProjectResource|JsonResponse
     {
-        $project = $this->projectService->updateProject($project, $request->validated());
+        try {
+            $project = $this->projectService->updateProject(
+                $project,
+                $request->validated(),
+                $request->user()
+            );
 
-        return (new ProjectResource($project))
-            ->additional(['message' => 'プロジェクトを更新しました']);
+            return (new ProjectResource($project))
+                ->additional(['message' => 'プロジェクトを更新しました']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 403);
+        }
     }
 
     /**
@@ -79,17 +87,16 @@ class ProjectController extends ApiController
      */
     public function destroy(Request $request, Project $project): JsonResponse
     {
-        // 自分がオーナーかチェック
-        if (!$this->projectService->isProjectOwner($project, $request->user())) {
+        try {
+            $this->projectService->deleteProject($project, $request->user());
+
             return response()->json([
-                'message' => 'プロジェクトを削除する権限がありません（オーナーのみ）',
+                'message' => 'プロジェクトを削除しました',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
             ], 403);
         }
-
-        $this->projectService->deleteProject($project);
-
-        return response()->json([
-            'message' => 'プロジェクトを削除しました',
-        ]);
     }
 }

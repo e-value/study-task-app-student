@@ -13,7 +13,7 @@ class ProjectMemberRequest extends FormRequest
     {
         // プロジェクトのオーナーまたは管理者かチェック
         $project = $this->route('project');
-        
+
         if (!$project) {
             return false;
         }
@@ -42,4 +42,3 @@ class ProjectMemberRequest extends FormRequest
         ];
     }
 }
-

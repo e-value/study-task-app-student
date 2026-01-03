@@ -34,14 +34,40 @@ class ProjectService
     }
 
     /**
+     * プロジェクト詳細を取得
+     *
+     * @param Project $project プロジェクト
+     * @param User $user ユーザー
+     * @return Project
+     */
+    public function getProject(Project $project, User $user): Project
+    {
+        // メンバーかチェック
+        if (!$this->isProjectMember($project, $user)) {
+            throw new \Exception('このプロジェクトにアクセスする権限がありません');
+        }
+
+        // リレーションをロード
+        $project->load(['users', 'tasks.createdBy']);
+
+        return $project;
+    }
+
+    /**
      * プロジェクトを更新する
      *
      * @param Project $project プロジェクト
      * @param array $data 更新データ（name, is_archived）
+     * @param User $user ユーザー
      * @return Project
      */
-    public function updateProject(Project $project, array $data): Project
+    public function updateProject(Project $project, array $data, User $user): Project
     {
+        // オーナーまたは管理者かチェック
+        if (!$this->isProjectOwnerOrAdmin($project, $user)) {
+            throw new \Exception('プロジェクトを更新する権限がありません（オーナー・管理者のみ）');
+        }
+
         $project->update($data);
         $project->load(['users', 'tasks.createdBy']);
 
@@ -52,10 +78,16 @@ class ProjectService
      * プロジェクトを削除する
      *
      * @param Project $project プロジェクト
+     * @param User $user ユーザー
      * @return void
      */
-    public function deleteProject(Project $project): void
+    public function deleteProject(Project $project, User $user): void
     {
+        // 権限チェック（オーナーのみ）
+        if (!$this->isProjectOwner($project, $user)) {
+            throw new \Exception('プロジェクトを削除する権限がありません（オーナーのみ）');
+        }
+
         $project->delete();
     }
 
@@ -66,7 +98,7 @@ class ProjectService
      * @param User $user ユーザー
      * @return bool
      */
-    public function isProjectMember(Project $project, User $user): bool
+    private function isProjectMember(Project $project, User $user): bool
     {
         return $project->users()
             ->where('users.id', $user->id)
@@ -80,11 +112,9 @@ class ProjectService
      * @param User $user ユーザー
      * @return bool
      */
-    public function isProjectOwnerOrAdmin(Project $project, User $user): bool
+    private function isProjectOwnerOrAdmin(Project $project, User $user): bool
     {
-        $myUser = $project->users()
-            ->where('users.id', $user->id)
-            ->first();
+        $myUser = $this->getProjectUser($project, $user);
 
         if (!$myUser) {
             return false;
@@ -100,16 +130,28 @@ class ProjectService
      * @param User $user ユーザー
      * @return bool
      */
-    public function isProjectOwner(Project $project, User $user): bool
+    private function isProjectOwner(Project $project, User $user): bool
     {
-        $myUser = $project->users()
-            ->where('users.id', $user->id)
-            ->first();
+        $myUser = $this->getProjectUser($project, $user);
 
         if (!$myUser) {
             return false;
         }
 
         return $myUser->pivot->role === 'project_owner';
+    }
+
+    /**
+     * プロジェクトのユーザー情報を取得
+     *
+     * @param Project $project プロジェクト
+     * @param User $user ユーザー
+     * @return User|null
+     */
+    private function getProjectUser(Project $project, User $user): ?User
+    {
+        return $project->users()
+            ->where('users.id', $user->id)
+            ->first();
     }
 }

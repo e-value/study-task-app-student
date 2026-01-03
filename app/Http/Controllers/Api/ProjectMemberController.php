@@ -20,19 +20,14 @@ class ProjectMemberController extends ApiController
      */
     public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
-        // 自分が所属しているかチェック
-        if (!$this->projectMemberService->isProjectMember($project, $request->user())) {
+        try {
+            $members = $this->projectMemberService->getMembers($project, $request->user());
+            return ProjectMemberResource::collection($members);
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
+                'message' => $e->getMessage(),
             ], 403);
         }
-
-        // メンバー一覧の取得
-        $members = $project->users()
-            ->withPivot('id', 'role')
-            ->get();
-
-        return ProjectMemberResource::collection($members);
     }
 
     /**
@@ -63,28 +58,14 @@ class ProjectMemberController extends ApiController
      */
     public function destroy(Request $request, Project $project, $userId): JsonResponse
     {
-        // 自分が所属しているかチェック
-        if (!$this->projectMemberService->isProjectMember($project, $request->user())) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
-        }
-
-        // 自分がowner/adminかチェック
-        if (!$this->projectMemberService->isProjectOwnerOrAdmin($project, $request->user())) {
-            return response()->json([
-                'message' => 'メンバーを削除する権限がありません（オーナーまたは管理者のみ）',
-            ], 403);
-        }
-
         try {
-            $this->projectMemberService->removeMember($project, (int)$userId);
+            $this->projectMemberService->removeMember($project, (int)$userId, $request->user());
 
             return response()->json([
                 'message' => 'メンバーを削除しました',
             ]);
         } catch (\Exception $e) {
-            $statusCode = str_contains($e->getMessage(), 'not a member') ? 404 : 409;
+            $statusCode = str_contains($e->getMessage(), 'not a member') ? 404 : 403;
             return response()->json([
                 'message' => $e->getMessage(),
             ], $statusCode);

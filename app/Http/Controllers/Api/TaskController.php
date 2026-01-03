@@ -18,22 +18,22 @@ class TaskController extends ApiController
     ) {}
     /**
      * プロジェクトのタスク一覧を取得
+     *
+     * @param Request $request
+     * @param Project $project
+     * @return AnonymousResourceCollection|JsonResponse
      */
     public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
-        // 自分が所属しているかチェック
-        if (!$this->taskService->isProjectMember($project, $request->user())) {
+        try {
+            $tasks = $this->taskService->getTasks($project, $request->user());
+
+            return TaskResource::collection($tasks);
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
+                'message' => $e->getMessage(),
             ], 403);
         }
-
-        $tasks = $project->tasks()
-            ->with('createdBy')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return TaskResource::collection($tasks);
     }
 
     /**
@@ -41,16 +41,22 @@ class TaskController extends ApiController
      */
     public function store(TaskRequest $request, Project $project): JsonResponse
     {
-        $task = $this->taskService->createTask(
-            $request->validated(),
-            $project,
-            $request->user()
-        );
+        try {
+            $task = $this->taskService->createTask(
+                $request->validated(),
+                $project,
+                $request->user()
+            );
 
-        return (new TaskResource($task))
-            ->additional(['message' => 'タスクを作成しました'])
-            ->response()
-            ->setStatusCode(201);
+            return (new TaskResource($task))
+                ->additional(['message' => 'タスクを作成しました'])
+                ->response()
+                ->setStatusCode(201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 403);
+        }
     }
 
     /**
@@ -58,17 +64,14 @@ class TaskController extends ApiController
      */
     public function show(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $project = $task->project;
-        if (!$this->taskService->isProjectMember($project, $request->user())) {
+        try {
+            $task = $this->taskService->getTask($task, $request->user());
+            return new TaskResource($task);
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
+                'message' => $e->getMessage(),
             ], 403);
         }
-
-        $task->load(['createdBy', 'project']);
-
-        return new TaskResource($task);
     }
 
     /**
@@ -76,10 +79,20 @@ class TaskController extends ApiController
      */
     public function update(TaskRequest $request, Task $task): TaskResource|JsonResponse
     {
-        $task = $this->taskService->updateTask($task, $request->validated());
+        try {
+            $task = $this->taskService->updateTask(
+                $task,
+                $request->validated(),
+                $request->user()
+            );
 
-        return (new TaskResource($task))
-            ->additional(['message' => 'タスクを更新しました']);
+            return (new TaskResource($task))
+                ->additional(['message' => 'タスクを更新しました']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 403);
+        }
     }
 
     /**
@@ -87,19 +100,17 @@ class TaskController extends ApiController
      */
     public function destroy(Request $request, Task $task): JsonResponse
     {
-        // 自分が所属しているかチェック
-        $project = $task->project;
-        if (!$this->taskService->isProjectMember($project, $request->user())) {
+        try {
+            $this->taskService->deleteTask($task, $request->user());
+
             return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
+                'message' => 'タスクを削除しました',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
             ], 403);
         }
-
-        $this->taskService->deleteTask($task);
-
-        return response()->json([
-            'message' => 'タスクを削除しました',
-        ]);
     }
 
     /**
@@ -107,21 +118,14 @@ class TaskController extends ApiController
      */
     public function start(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $project = $task->project;
-        if (!$this->taskService->isProjectMember($project, $request->user())) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
-        }
-
         try {
-            $task = $this->taskService->startTask($task);
+            $task = $this->taskService->startTask($task, $request->user());
             return new TaskResource($task);
         } catch (\Exception $e) {
+            $statusCode = str_contains($e->getMessage(), '権限がありません') ? 403 : 409;
             return response()->json([
                 'message' => $e->getMessage(),
-            ], 409);
+            ], $statusCode);
         }
     }
 
@@ -130,21 +134,14 @@ class TaskController extends ApiController
      */
     public function complete(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $project = $task->project;
-        if (!$this->taskService->isProjectMember($project, $request->user())) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
-        }
-
         try {
-            $task = $this->taskService->completeTask($task);
+            $task = $this->taskService->completeTask($task, $request->user());
             return new TaskResource($task);
         } catch (\Exception $e) {
+            $statusCode = str_contains($e->getMessage(), '権限がありません') ? 403 : 409;
             return response()->json([
                 'message' => $e->getMessage(),
-            ], 409);
+            ], $statusCode);
         }
     }
 }

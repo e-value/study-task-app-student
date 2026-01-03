@@ -14,7 +14,7 @@ class TaskRequest extends FormRequest
         // プロジェクトのメンバーかチェック
         $project = $this->route('project');
         $task = $this->route('task');
-        
+
         // storeの場合はprojectから、updateの場合はtaskからprojectを取得
         if ($project) {
             $targetProject = $project;
@@ -38,7 +38,7 @@ class TaskRequest extends FormRequest
     {
         // store（POST）の場合は必須、update（PUT/PATCH）の場合はsometimes
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
-        
+
         return [
             'title' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
             'description' => 'nullable|string',
@@ -46,4 +46,3 @@ class TaskRequest extends FormRequest
         ];
     }
 }
-
