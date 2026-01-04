@@ -12,6 +12,13 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/test', function () {
+    throw new \Exception("テストエラー");
+});
+
+// Projects
+Route::get('/test/projects', [ProjectController::class, 'index']);
+
 // 認証が必要なAPI
 Route::middleware(['auth:sanctum'])->group(function () {
     // Users
