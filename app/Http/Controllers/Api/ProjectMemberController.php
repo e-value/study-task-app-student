@@ -6,6 +6,7 @@ use App\Http\Resources\ProjectMemberResource;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreProjectMemberRequest;å
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ProjectMemberController extends ApiController
@@ -39,7 +40,7 @@ class ProjectMemberController extends ApiController
     /**
      * プロジェクトにメンバーを追加
      */
-    public function store(Request $request, Project $project): JsonResponse
+    public function store(storeStoreProjectMemberRequest $request, Project $project): JsonResponse
     {
         // 自分がowner/adminかチェック（users()リレーションを使用）
         $myUser = $project->users()
@@ -52,18 +53,12 @@ class ProjectMemberController extends ApiController
             ], 403);
         }
 
-        // バリデーション
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'role' => 'nullable|in:project_owner,project_admin,project_member',
-        ]);
-
         // デフォルトロール設定
-        $role = $validated['role'] ?? 'project_member';
+        $role = $request->validated['role'] ?? 'project_member';
 
         // 既にメンバーかチェック（users()リレーションを使用）
         $existingUser = $project->users()
-            ->where('users.id', $validated['user_id'])
+            ->where('users.id', $request->validated['user_id'])
             ->first();
 
         if ($existingUser) {
@@ -80,12 +75,12 @@ class ProjectMemberController extends ApiController
         }
 
         // メンバーシップ作成（users()リレーションのattach()を使用）
-        $project->users()->attach($validated['user_id'], [
+        $project->users()->attach($request->validated['user_id'], [
             'role' => $role,
         ]);
 
         // ユーザー情報を含めて返す
-        $user = $project->users()->find($validated['user_id']);
+        $user = $project->users()->find($requesst->validated['user_id']);
 
         return response()->json([
             'message' => 'メンバーを追加しました',
