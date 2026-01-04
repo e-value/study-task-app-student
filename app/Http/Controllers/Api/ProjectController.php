@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Validator;
 use App\Services\ProjectService;
-use App\Http\Requests\ProjectRequest;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
 
 class ProjectController extends ApiController
 {
@@ -34,7 +35,7 @@ class ProjectController extends ApiController
     /**
      * プロジェクト新規作成
      */
-    public function store(ProjectRequest $request): JsonResponse
+    public function store(StoreProjectRequest $request): JsonResponse
     {
         $project = $this->projectService->createProject(
             $request->validated(),
@@ -71,7 +72,7 @@ class ProjectController extends ApiController
     /**
      * プロジェクト更新
      */
-    public function update(Request $request, Project $project): ProjectResource|JsonResponse
+    public function update(UpdateProjectRequest $request, Project $project): ProjectResource|JsonResponse
     {
         // 自分がオーナーまたは管理者かチェック（users()リレーションを使用）
         $myUser = $project->users()
@@ -84,19 +85,8 @@ class ProjectController extends ApiController
             ], 403);
         }
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255',
-            'is_archived' => 'sometimes|boolean',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $project->update($request->only(['name', 'is_archived']));
+        $project->update($request->validated());
         $project->load(['users', 'tasks.createdBy']);
 
         return (new ProjectResource($project))
