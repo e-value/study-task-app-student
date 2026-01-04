@@ -9,6 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 
 class TaskController extends ApiController
 {
@@ -39,7 +41,7 @@ class TaskController extends ApiController
     /**
      * タスク作成
      */
-    public function store(Request $request, Project $project): JsonResponse
+    public function store(StoreTaskRequest $request, Project $project): JsonResponse
     {
         // 自分が所属しているかチェック
         $isMember = $project->users()
@@ -52,25 +54,13 @@ class TaskController extends ApiController
             ], 403);
         }
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $task = Task::create([
+        $additionalData =  [
             'project_id' => $project->id,
-            'title' => $request->title,
-            'description' => $request->description,
             'status' => 'todo',
             'created_by' => $request->user()->id,
-        ]);
+        ];
+        $dataToSave = array_merge($request->validated(), $additionalData);
+        $task = Task::create($dataToSave);
 
         $task->load('createdBy');
 
@@ -105,7 +95,7 @@ class TaskController extends ApiController
     /**
      * タスク更新
      */
-    public function update(Request $request, Task $task): TaskResource|JsonResponse
+    public function update(UpdateTaskRequest $request, Task $task): TaskResource|JsonResponse
     {
         // 自分が所属しているかチェック
         $project = $task->project;
@@ -119,20 +109,7 @@ class TaskController extends ApiController
             ], 403);
         }
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'sometimes|in:todo,doing,done',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $task->update($request->only(['title', 'description', 'status']));
+        $task->update($request->validated());
         $task->load('createdBy');
 
         return (new TaskResource($task))
