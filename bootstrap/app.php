@@ -29,36 +29,37 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        Integration::handles($exceptions);
         // 研修用に必要に応じてコメントアウト
-        $response = new ApiResponse();
+        // Integration::handles($exceptions);
 
-        $exceptions->render(function (NotFoundHttpException $e, Request $request) use ($response) {
-            if ($request->is('api/*')) {
-                return $response->notFound();
-            }
-        });
+        // $response = new ApiResponse();
 
-        $exceptions->render(function (ValidationException $e, Request $request) use ($response) {
-            if ($request->is('api/*')) {
-                return $response->validationError('バリデーションエラー', $e->errors());
-            }
-        });
+        // $exceptions->render(function (NotFoundHttpException $e, Request $request) use ($response) {
+        //     if ($request->is('api/*')) {
+        //         return $response->notFound();
+        //     }
+        // });
 
-        $exceptions->render(function (AuthenticationException $e, Request $request) use ($response) {
-            if ($request->is('api/*')) {
-                return $response->unauthorized();
-            }
-        });
+        // $exceptions->render(function (ValidationException $e, Request $request) use ($response) {
+        //     if ($request->is('api/*')) {
+        //         return $response->validationError('バリデーションエラー', $e->errors());
+        //     }
+        // });
 
-        // どれにも当てはまらない場合はサーバーエラーとして処理
-        // 注意：この処理は最後に配置すること
-        $exceptions->render(function (Throwable $e, Request $request) use ($response) {
-            if ($request->is('api/*')) {
-                app('sentry')->captureException($e); // ← ★これを追加
-                // 本番では固定メッセージ、開発中は詳細表示
-                $message = config('app.debug') ? $e->getMessage() : 'サーバーエラー';
-                return $response->serverError($message);
-            }
-        });
+        // $exceptions->render(function (AuthenticationException $e, Request $request) use ($response) {
+        //     if ($request->is('api/*')) {
+        //         return $response->unauthorized();
+        //     }
+        // });
+
+        // // どれにも当てはまらない場合はサーバーエラーとして処理
+        // // 注意：この処理は最後に配置すること
+        // $exceptions->render(function (Throwable $e, Request $request) use ($response) {
+        //     if ($request->is('api/*')) {
+        //         app('sentry')->captureException($e); // ← ★これを追加
+        //         // 本番では固定メッセージ、開発中は詳細表示
+        //         $message = config('app.debug') ? $e->getMessage() : 'サーバーエラー';
+        //         return $response->serverError($message);
+        //     }
+        // });
     })->create();
