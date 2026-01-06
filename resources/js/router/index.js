@@ -20,6 +20,7 @@ import ProjectDetail from "../Pages/Projects/Show.vue";
 import ProjectEdit from "../Pages/Projects/Edit.vue";
 import TaskDetail from "../Pages/Tasks/Show.vue";
 import UserList from "../Pages/Users/Index.vue";
+import NotFound from "../Pages/NotFound.vue";
 
 const routes = [
     {
@@ -105,6 +106,13 @@ const routes = [
         name: "users",
         component: UserList,
         meta: { requiresAuth: true, layout: "authenticated" },
+    },
+    // キャッチオールルート（404ページ）- 最後に配置すること
+    {
+        path: "/:pathMatch(.*)*",
+        name: "notfound",
+        component: NotFound,
+        meta: { layout: "guest" },
     },
 ];
 
