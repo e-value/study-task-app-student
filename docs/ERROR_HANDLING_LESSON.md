@@ -36,7 +36,7 @@
 
 👩‍💻「クライアントさん『意味不明な英語がいっぱい出てきて怖い』って…😱」
 
-🐘「**あちゃー、これはアカンやつや！**DBのファイルパスとか丸見えやないか！セキュリティ事故一歩手前やで！」
+🐘「**あちゃー、これはアカンやつや！**DB のファイルパスとか丸見えやないか！セキュリティ事故一歩手前やで！」
 
 👩‍💻「え、これってそんなにまずいんですか？」
 
@@ -52,7 +52,7 @@
 
 ---
 
-## 📚 第1章：エラーハンドリングとは何か？
+## 📚 第 1 章：エラーハンドリングとは何か？
 
 👩‍💻「そもそも『エラーハンドリング』って何ですか？」
 
@@ -83,7 +83,7 @@
 
 ---
 
-## 🚨 第2章：なぜエラーハンドリングが重要なのか？
+## 🚨 第 2 章：なぜエラーハンドリングが重要なのか？
 
 👩‍💻「でも、ちゃんとコード書いてたらエラーって起きないんじゃ…」
 
@@ -117,41 +117,41 @@
 
 ---
 
-## 🎭 第3章：エラーの種類を知ろう
+## 🎭 第 3 章：エラーの種類を知ろう
 
 👩‍💻「エラーって一口に言っても色々ありますよね？」
 
-🐘「ええとこに気づいたな！エラーには大きく分けて**3つのカテゴリ**があるんや」
+🐘「ええとこに気づいたな！エラーには大きく分けて**3 つのカテゴリ**があるんや」
 
 ### 📊 エラーの分類表
 
-| カテゴリ | 説明 | 例 | 対処の責任 |
-|---|---|---|---|
-| 🔴 **文法エラー（Syntax Error）** | コードの書き方が間違ってる | セミコロン忘れ、括弧の対応ミス | 開発者が直す |
-| 🟠 **実行時エラー（Runtime Error）** | 動かしてみたら起きる | null参照、0除算、ファイルがない | try-catchで対処 |
-| 🟡 **業務エラー（Business Error）** | ビジネスルール違反 | 権限なし、不正なステータス遷移 | アプリで適切に処理 |
+| カテゴリ                             | 説明                       | 例                                | 対処の責任         |
+| ------------------------------------ | -------------------------- | --------------------------------- | ------------------ |
+| 🔴 **文法エラー（Syntax Error）**    | コードの書き方が間違ってる | セミコロン忘れ、括弧の対応ミス    | 開発者が直す       |
+| 🟠 **実行時エラー（Runtime Error）** | 動かしてみたら起きる       | null 参照、0 除算、ファイルがない | try-catch で対処   |
+| 🟡 **業務エラー（Business Error）**  | ビジネスルール違反         | 権限なし、不正なステータス遷移    | アプリで適切に処理 |
 
-👩‍💻「HTTPのエラーコードとかもありますよね？404とか500とか」
+👩‍💻「HTTP のエラーコードとかもありますよね？404 とか 500 とか」
 
-🐘「おお、それも大事やな！HTTPステータスコードを整理したるわ」
+🐘「おお、それも大事やな！HTTP ステータスコードを整理したるわ」
 
-### 📊 よく見るHTTPステータスコード
+### 📊 よく見る HTTP ステータスコード
 
-| コード | 名前 | 意味 | 誰の責任？ |
-|---|---|---|---|
-| `200` | OK | 成功 | - |
-| `201` | Created | 作成成功 | - |
-| `400` | Bad Request | リクエストがおかしい | クライアント |
-| `401` | Unauthorized | 認証が必要 | クライアント |
-| `403` | Forbidden | 権限がない | クライアント |
-| `404` | Not Found | リソースがない | クライアント |
-| `405` | Method Not Allowed | HTTPメソッドが違う | クライアント |
-| `409` | Conflict | 状態の競合 | クライアント |
-| `422` | Unprocessable Entity | バリデーションエラー | クライアント |
-| `500` | Internal Server Error | サーバー側のエラー | サーバー |
-| `503` | Service Unavailable | サービス停止中 | サーバー |
+| コード | 名前                  | 意味                 | 誰の責任？   |
+| ------ | --------------------- | -------------------- | ------------ |
+| `200`  | OK                    | 成功                 | -            |
+| `201`  | Created               | 作成成功             | -            |
+| `400`  | Bad Request           | リクエストがおかしい | クライアント |
+| `401`  | Unauthorized          | 認証が必要           | クライアント |
+| `403`  | Forbidden             | 権限がない           | クライアント |
+| `404`  | Not Found             | リソースがない       | クライアント |
+| `405`  | Method Not Allowed    | HTTP メソッドが違う  | クライアント |
+| `409`  | Conflict              | 状態の競合           | クライアント |
+| `422`  | Unprocessable Entity  | バリデーションエラー | クライアント |
+| `500`  | Internal Server Error | サーバー側のエラー   | サーバー     |
+| `503`  | Service Unavailable   | サービス停止中       | サーバー     |
 
-👩‍💻「4xxはクライアント（リクエスト側）の問題で、5xxはサーバー側の問題ってことですね！」
+👩‍💻「4xx はクライアント（リクエスト側）の問題で、5xx はサーバー側の問題ってことですね！」
 
 🐘「さすがやな！ワシの教え子のアラン・チューリングくんも『問題を分類できれば、半分は解決したようなもんや』って言うとったわ」
 
@@ -161,13 +161,13 @@
 
 ---
 
-## 🏗️ 第4章：Laravelのデフォルトのエラーハンドリング
+## 🏗️ 第 4 章：Laravel のデフォルトのエラーハンドリング
 
-👩‍💻「Laravelって、何もしなくてもエラー画面出ますよね？」
+👩‍💻「Laravel って、何もしなくてもエラー画面出ますよね？」
 
-🐘「せや！Laravelは優秀やから、最初から**例外ハンドラー**が用意されとるんや」
+🐘「せや！Laravel は優秀やから、最初から**例外ハンドラー**が用意されとるんや」
 
-### 🔧 Laravelの例外処理の仕組み
+### 🔧 Laravel の例外処理の仕組み
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -219,10 +219,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
 🐘「せや！`.env`の`APP_DEBUG`で挙動が変わるんや」
 
-| 環境 | APP_DEBUG | 表示内容 |
-|---|---|---|
-| 開発 | `true` | 詳細なエラー情報（スタックトレース等） |
-| 本番 | `false` | シンプルなエラーページ（情報漏洩防止） |
+| 環境 | APP_DEBUG | 表示内容                               |
+| ---- | --------- | -------------------------------------- |
+| 開発 | `true`    | 詳細なエラー情報（スタックトレース等） |
+| 本番 | `false`   | シンプルなエラーページ（情報漏洩防止） |
 
 ```
 【開発環境 APP_DEBUG=true】
@@ -251,7 +251,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
 👩‍💻「あ！さっきクライアントに表示されたエラー画面、まさに`APP_DEBUG=true`の状態だったんですね！本番環境なのに！」
 
-🐘「**せや！それが大問題やったんや！** 本番で`APP_DEBUG=true`にしたらDBの接続情報とかパスワードとか丸見えになるで。ワシの教え子のスノーデンくんも言うとったわ、『情報漏洩は内部から起きる』ってな」
+🐘「**せや！それが大問題やったんや！** 本番で`APP_DEBUG=true`にしたら DB の接続情報とかパスワードとか丸見えになるで。ワシの教え子のスノーデンくんも言うとったわ、『情報漏洩は内部から起きる』ってな」
 
 👩‍💻「それ、ちょっと文脈違いません…？」
 
@@ -259,9 +259,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
 ---
 
-## 🎣 第5章：try-catchとは何か？
+## 🎣 第 5 章：try-catch とは何か？
 
-👩‍💻「さっきから出てくる`try-catch`って何ですか？」
+👩‍💻「よく出てくる`try-catch`って何ですか？」
 
 🐘「よっしゃ、ここからが本番や！**try-catch**は**例外を捕まえる網**みたいなもんや」
 
@@ -271,7 +271,7 @@ return Application::configure(basePath: dirname(__DIR__))
 【try-catchのイメージ】
 
         🎪 サーカスの綱渡り
-        
+
      try（挑戦するエリア）
     ━━━━━━━━━━━━━━━━━━━━━
           🏃 綱渡り中...
@@ -282,17 +282,17 @@ return Application::configure(basePath: dirname(__DIR__))
      catch（セーフティネット）
     ========================
           😮‍💨 助かった！
-          
+
     「落ちても大丈夫」という安心感
 ```
 
-| サーカスの例え | プログラムでは |
-|---|---|
-| 綱渡りに挑戦 | `try`ブロック内の処理を実行 |
-| 落ちる（失敗） | 例外（Exception）が発生 |
-| セーフティネット | `catch`ブロック |
-| ネットで受け止める | 例外をキャッチして処理 |
-| 観客に謝る | エラーメッセージを返す |
+| サーカスの例え     | プログラムでは              |
+| ------------------ | --------------------------- |
+| 綱渡りに挑戦       | `try`ブロック内の処理を実行 |
+| 落ちる（失敗）     | 例外（Exception）が発生     |
+| セーフティネット   | `catch`ブロック             |
+| ネットで受け止める | 例外をキャッチして処理      |
+| 観客に謝る         | エラーメッセージを返す      |
 
 ### 📝 基本構文
 
@@ -302,12 +302,12 @@ return Application::configure(basePath: dirname(__DIR__))
 try {
     // 🎯 ここに「失敗するかもしれない処理」を書く
     $result = riskyOperation();
-    
+
 } catch (Exception $e) {
     // 🛡️ 例外が発生したらここに来る
     // $e には例外の情報が入ってる
     Log::error($e->getMessage());
-    
+
     return response()->json([
         'message' => 'エラーが発生しました'
     ], 500);
@@ -320,13 +320,13 @@ try {
 
 ---
 
-## ⚡ 第6章：try-catchがある時とない時の違い
+## ⚡ 第 6 章：try-catch がある時とない時の違い
 
 👩‍💻「`try-catch`がないとどうなるんですか？」
 
 🐘「ええ質問や！実際に比較してみよか」
 
-### 🔴 try-catchがない場合
+### 🔴 try-catch がない場合
 
 ```php
 <?php
@@ -342,7 +342,7 @@ class TaskController extends ApiController
     {
         // ⚠️ try-catchなし
         $task = $this->taskService->getTask($task, $request->user());
-        
+
         return new TaskResource($task);
     }
 }
@@ -374,7 +374,7 @@ class TaskController extends ApiController
 　 （本来は403 Forbiddenが適切）
 ```
 
-### 🟢 try-catchがある場合
+### 🟢 try-catch がある場合
 
 ```php
 <?php
@@ -391,14 +391,14 @@ class TaskController extends ApiController
     public function __construct(
         private TaskService $taskService
     ) {}
-    
+
     public function show(Request $request, Task $task)
     {
         try {
             $task = $this->taskService->getTask($task, $request->user());
-            
+
             return new TaskResource($task);
-            
+
         } catch (\Exception $e) {
             // 🎯 権限エラーの場合は403を返す
             return response()->json([
@@ -438,20 +438,20 @@ class TaskController extends ApiController
 
 ### 📊 比較表
 
-| 項目 | try-catchなし | try-catchあり |
-|---|---|---|
-| エラー時の挙動 | Laravelのデフォルト | 自分で制御可能 |
-| メッセージ | 英語の定型文 | 日本語カスタム可能 |
-| HTTPステータス | 500（不適切） | 403（適切） |
-| エラーコード | なし | 独自コード設定可能 |
-| ログ記録 | デフォルトのみ | 詳細なログ可能 |
-| 後続処理 | できない | 可能 |
+| 項目            | try-catch なし       | try-catch あり     |
+| --------------- | -------------------- | ------------------ |
+| エラー時の挙動  | Laravel のデフォルト | 自分で制御可能     |
+| メッセージ      | 英語の定型文         | 日本語カスタム可能 |
+| HTTP ステータス | 500（不適切）        | 403（適切）        |
+| エラーコード    | なし                 | 独自コード設定可能 |
+| ログ記録        | デフォルトのみ       | 詳細なログ可能     |
+| 後続処理        | できない             | 可能               |
 
 👩‍💻「なるほど！でも全部に`try-catch`書くのは大変そう…」
 
 🐘「せやから、**適材適所**や！何でもかんでも書く必要はないんや」
 
-### 🎯 try-catchを使うべき場面
+### 🎯 try-catch を使うべき場面
 
 ```
 ┌────────────────────────────────────────────────┐
@@ -475,7 +475,7 @@ class TaskController extends ApiController
 
 ---
 
-## 🚀 第7章：throw newとサービス層
+## 🚀 第 7 章：throw new とサービス層
 
 👩‍💻「`throw new`って何ですか？自分でエラーを起こすってこと？」
 
@@ -501,14 +501,14 @@ class TaskController extends ApiController
    問題を見つけたら「throw」で報告する
 ```
 
-| 工場の例え | プログラムでは |
-|---|---|
-| 不良品を発見 | ビジネスルール違反を検知 |
-| 「不良品です！」と報告 | `throw new Exception()` |
-| どんな不良か伝える | 例外クラスとメッセージ |
-| 対処部門に回す | catchブロックで処理 |
+| 工場の例え             | プログラムでは           |
+| ---------------------- | ------------------------ |
+| 不良品を発見           | ビジネスルール違反を検知 |
+| 「不良品です！」と報告 | `throw new Exception()`  |
+| どんな不良か伝える     | 例外クラスとメッセージ   |
+| 対処部門に回す         | catch ブロックで処理     |
 
-### 📝 サービス層でのthrow
+### 📝 サービス層での throw
 
 ```php
 <?php
@@ -528,20 +528,20 @@ class TaskService
     {
         // 1️⃣ 権限チェック
         $this->checkTaskPermission($task, $user);
-        
+
         // 2️⃣ 状態チェック → 問題あればthrow！
         if ($task->status !== 'todo') {
             // 🚨 問題発見！例外を投げる！
             throw new \Exception('未着手のタスクのみ開始できます');
         }
-        
+
         // 3️⃣ すべてOK → 状態を更新
         $task->update(['status' => 'doing']);
         $task->load('createdBy');
-        
+
         return $task;
     }
-    
+
     /**
      * タスクを完了する（doing → done）
      */
@@ -549,20 +549,20 @@ class TaskService
     {
         // 1️⃣ 権限チェック
         $this->checkTaskPermission($task, $user);
-        
+
         // 2️⃣ 状態チェック → 問題あればthrow！
         if ($task->status !== 'doing') {
             // 🚨 問題発見！例外を投げる！
             throw new \Exception('作業中のタスクのみ完了できます');
         }
-        
+
         // 3️⃣ すべてOK → 状態を更新
         $task->update(['status' => 'done']);
         $task->load('createdBy');
-        
+
         return $task;
     }
-    
+
     /**
      * プロジェクトのメンバーかチェック
      */
@@ -572,7 +572,7 @@ class TaskService
             ->where('users.id', $user->id)
             ->exists();
     }
-    
+
     /**
      * タスクに対する権限チェック
      */
@@ -603,7 +603,7 @@ use Exception;
 class InvalidTaskStatusException extends Exception
 {
     protected $code = 409; // Conflict
-    
+
     public function __construct(
         string $message = 'タスクの状態遷移が不正です',
         public readonly string $currentStatus = '',
@@ -611,7 +611,7 @@ class InvalidTaskStatusException extends Exception
     ) {
         parent::__construct($message, $this->code);
     }
-    
+
     /**
      * HTTPレスポンスとしてレンダリング
      */
@@ -640,7 +640,7 @@ use Exception;
 class TaskPermissionDeniedException extends Exception
 {
     protected $code = 403; // Forbidden
-    
+
     public function __construct(
         string $message = 'このプロジェクトにアクセスする権限がありません',
         public readonly int $projectId = 0,
@@ -648,7 +648,7 @@ class TaskPermissionDeniedException extends Exception
     ) {
         parent::__construct($message, $this->code);
     }
-    
+
     /**
      * HTTPレスポンスとしてレンダリング
      */
@@ -667,13 +667,13 @@ class TaskPermissionDeniedException extends Exception
 }
 ```
 
-👩‍💻「`render()`メソッドがあると、Laravelが自動でこのレスポンスを返してくれるんですね！」
+👩‍💻「`render()`メソッドがあると、Laravel が自動でこのレスポンスを返してくれるんですね！」
 
-🐘「せや！Laravelは賢いから、例外クラスに`render()`があれば、それを使ってレスポンスを生成してくれるんや」
+🐘「せや！Laravel は賢いから、例外クラスに`render()`があれば、それを使ってレスポンスを生成してくれるんや」
 
 ---
 
-## 🎭 第8章：throw newとtry-catchの組み合わせ
+## 🎭 第 8 章：throw new と try-catch の組み合わせ
 
 👩‍💻「`throw`と`try-catch`を組み合わせると、どういう流れになるんですか？」
 
@@ -779,7 +779,7 @@ class TaskService
                 projectId: $project->id
             );
         }
-        
+
         // 2️⃣ 状態チェック → 問題あればthrow！
         if ($task->status !== 'todo') {
             throw new InvalidTaskStatusException(
@@ -788,14 +788,14 @@ class TaskService
                 expectedStatus: 'todo'
             );
         }
-        
+
         // 3️⃣ すべてOK → タスクを開始
         $task->update(['status' => 'doing']);
         $task->load('createdBy');
-        
+
         return $task;
     }
-    
+
     public function completeTask(Task $task, User $user): Task
     {
         // 1️⃣ 権限チェック → 問題あればthrow！
@@ -806,7 +806,7 @@ class TaskService
                 projectId: $project->id
             );
         }
-        
+
         // 2️⃣ 状態チェック → 問題あればthrow！
         if ($task->status !== 'doing') {
             throw new InvalidTaskStatusException(
@@ -815,14 +815,14 @@ class TaskService
                 expectedStatus: 'doing'
             );
         }
-        
+
         // 3️⃣ すべてOK → タスクを完了
         $task->update(['status' => 'done']);
         $task->load('createdBy');
-        
+
         return $task;
     }
-    
+
     private function isProjectMember($project, $user): bool
     {
         return $project->users()
@@ -856,7 +856,7 @@ class TaskController extends Controller
     public function __construct(
         private TaskService $taskService
     ) {}
-    
+
     /**
      * タスクを開始（todo → doing）
      */
@@ -865,11 +865,11 @@ class TaskController extends Controller
         try {
             // 🎯 サービス層の処理を呼び出し
             $task = $this->taskService->startTask($task, $request->user());
-            
+
             // ✅ 成功時
             return (new TaskResource($task))
                 ->additional(['message' => 'タスクを開始しました']);
-            
+
         } catch (TaskPermissionDeniedException $e) {
             // 🔴 権限エラー
             return response()->json([
@@ -880,7 +880,7 @@ class TaskController extends Controller
                     'project_id' => $e->projectId,
                 ]
             ], 403);
-            
+
         } catch (InvalidTaskStatusException $e) {
             // 🟠 状態遷移エラー
             return response()->json([
@@ -892,7 +892,7 @@ class TaskController extends Controller
                     'expected_status' => $e->expectedStatus,
                 ]
             ], 409);
-            
+
         } catch (ModelNotFoundException $e) {
             // 🟡 タスクが見つからない
             return response()->json([
@@ -900,7 +900,7 @@ class TaskController extends Controller
                 'message' => '指定されたタスクが見つかりません',
                 'error_code' => 'TASK_NOT_FOUND'
             ], 404);
-            
+
         } catch (\Exception $e) {
             // 🔵 その他の予期せぬエラー
             Log::error('タスク開始処理で予期せぬエラー', [
@@ -908,7 +908,7 @@ class TaskController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'システムエラーが発生しました',
@@ -916,7 +916,7 @@ class TaskController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * タスクを完了（doing → done）
      */
@@ -925,11 +925,11 @@ class TaskController extends Controller
         try {
             // 🎯 サービス層の処理を呼び出し
             $task = $this->taskService->completeTask($task, $request->user());
-            
+
             // ✅ 成功時
             return (new TaskResource($task))
                 ->additional(['message' => 'タスクを完了しました']);
-            
+
         } catch (TaskPermissionDeniedException $e) {
             // 🔴 権限エラー
             return response()->json([
@@ -940,7 +940,7 @@ class TaskController extends Controller
                     'project_id' => $e->projectId,
                 ]
             ], 403);
-            
+
         } catch (InvalidTaskStatusException $e) {
             // 🟠 状態遷移エラー
             return response()->json([
@@ -952,7 +952,7 @@ class TaskController extends Controller
                     'expected_status' => $e->expectedStatus,
                 ]
             ], 409);
-            
+
         } catch (ModelNotFoundException $e) {
             // 🟡 タスクが見つからない
             return response()->json([
@@ -960,7 +960,7 @@ class TaskController extends Controller
                 'message' => '指定されたタスクが見つかりません',
                 'error_code' => 'TASK_NOT_FOUND'
             ], 404);
-            
+
         } catch (\Exception $e) {
             // 🔵 その他の予期せぬエラー
             Log::error('タスク完了処理で予期せぬエラー', [
@@ -968,7 +968,7 @@ class TaskController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'システムエラーが発生しました',
@@ -981,15 +981,15 @@ class TaskController extends Controller
 
 ### 📊 各シナリオの挙動
 
-| シナリオ | Service層 | Controller | レスポンス |
-|---|---|---|---|
-| 正常 | 処理完了 → return | 成功レスポンス | 200 OK |
-| 権限なし | throw TaskPermissionDenied | 1番目のcatch | 403 Forbidden |
-| 状態不正 | throw InvalidTaskStatus | 2番目のcatch | 409 Conflict |
-| タスクなし | ModelNotFoundException | 3番目のcatch | 404 Not Found |
-| その他エラー | throw Exception | 最後のcatch | 500 Internal Error |
+| シナリオ     | Service 層                 | Controller     | レスポンス         |
+| ------------ | -------------------------- | -------------- | ------------------ |
+| 正常         | 処理完了 → return          | 成功レスポンス | 200 OK             |
+| 権限なし     | throw TaskPermissionDenied | 1 番目の catch | 403 Forbidden      |
+| 状態不正     | throw InvalidTaskStatus    | 2 番目の catch | 409 Conflict       |
+| タスクなし   | ModelNotFoundException     | 3 番目の catch | 404 Not Found      |
+| その他エラー | throw Exception            | 最後の catch   | 500 Internal Error |
 
-👩‍💻「catchの順番も大事なんですね！」
+👩‍💻「catch の順番も大事なんですね！」
 
 🐘「せや！**具体的な例外から順番に書く**のがポイントや。`Exception`を最初に書いたら、全部そこでキャッチされてまうからな」
 
@@ -1017,7 +1017,7 @@ try {
 
 ---
 
-## 🌐 第9章：グローバル例外ハンドラー
+## 🌐 第 9 章：グローバル例外ハンドラー
 
 👩‍💻「全部のコントローラーに`try-catch`書くのって大変じゃないですか？」
 
@@ -1050,28 +1050,28 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         // 🎯 グローバル例外ハンドラー
         $response = new ApiResponse();
-        
+
         // 404エラー
         $exceptions->render(function (NotFoundHttpException $e, Request $request) use ($response) {
             if ($request->is('api/*')) {
                 return $response->notFound('リソースが見つかりません');
             }
         });
-        
+
         // バリデーションエラー
         $exceptions->render(function (ValidationException $e, Request $request) use ($response) {
             if ($request->is('api/*')) {
                 return $response->validationError('入力内容に誤りがあります', $e->errors());
             }
         });
-        
+
         // 認証エラー
         $exceptions->render(function (AuthenticationException $e, Request $request) use ($response) {
             if ($request->is('api/*')) {
                 return $response->unauthorized('認証が必要です');
             }
         });
-        
+
         // タスク権限エラー
         $exceptions->render(function (TaskPermissionDeniedException $e, Request $request) use ($response) {
             if ($request->is('api/*')) {
@@ -1082,7 +1082,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 403);
             }
         });
-        
+
         // タスク状態エラー
         $exceptions->render(function (InvalidTaskStatusException $e, Request $request) use ($response) {
             if ($request->is('api/*')) {
@@ -1093,7 +1093,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 409);
             }
         });
-        
+
         // その他すべての例外（最後のセーフティネット）
         $exceptions->render(function (Throwable $e, Request $request) use ($response) {
             if ($request->is('api/*')) {
@@ -1133,7 +1133,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
 ---
 
-## 🎓 第10章：まとめ
+## 🎓 第 10 章：まとめ
 
 🐘「よっしゃ、今日の内容をまとめたるわ！」
 
@@ -1171,14 +1171,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
 ### 📝 覚えておくべきポイント
 
-| 項目 | ポイント |
-|---|---|
-| **try-catch** | 例外を捕まえるセーフティネット |
-| **throw new** | 問題を発見したら例外を投げて報告 |
-| **カスタム例外** | 業務エラーを明確に表現できる |
-| **catchの順番** | 具体的なものから順に書く |
-| **グローバルハンドラー** | 最後の砦、漏れを防ぐ |
-| **APP_DEBUG** | 本番では必ず`false`に！ |
+| 項目                     | ポイント                         |
+| ------------------------ | -------------------------------- |
+| **try-catch**            | 例外を捕まえるセーフティネット   |
+| **throw new**            | 問題を発見したら例外を投げて報告 |
+| **カスタム例外**         | 業務エラーを明確に表現できる     |
+| **catch の順番**         | 具体的なものから順に書く         |
+| **グローバルハンドラー** | 最後の砦、漏れを防ぐ             |
+| **APP_DEBUG**            | 本番では必ず`false`に！          |
 
 👩‍💻「わかりやすかったです！でも、全部のメソッドに`try-catch`書くべきですか？」
 
@@ -1253,7 +1253,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
 🐘「…まぁ、言うてそうやない？💦 大事なのは本質や！**エラーは起きる。だから備える。**これがプロの仕事や！」
 
-👩‍💻「名言風にごまかそうとしてますね…でも、内容は納得です！早速以下の対応をしてきます！」
+👩‍💻「名言風にごまかそうとしてますね…でも、内容は納得です！早速実装してきます！」
 
 ### 🎯 今すぐやるべきこと
 
@@ -1266,7 +1266,7 @@ return Application::configure(basePath: dirname(__DIR__))
    → TaskPermissionDeniedException
 
 3️⃣ TaskService の修正
-   → throw new \Exception() 
+   → throw new \Exception()
      ↓
      throw new カスタム例外()
 
@@ -1279,50 +1279,3 @@ return Application::configure(basePath: dirname(__DIR__))
 ```
 
 🐘「おう！次回教えて欲しかったら、あんみつ持ってくるんやで！🍨 **さすガネーシャや！**」
-
----
-
-## 📚 補足：このシステムの現在のエラーハンドリング
-
-### 🔍 現状分析
-
-```php
-// 現在の TaskService.php
-public function startTask(Task $task, User $user): Task
-{
-    $this->checkTaskPermission($task, $user);
-    $this->validateTaskStatusForStart($task); // ← この中で throw new \Exception()
-    
-    $task->update(['status' => 'doing']);
-    return $task;
-}
-
-private function validateTaskStatusForStart(Task $task): void
-{
-    if ($task->status !== 'todo') {
-        throw new \Exception('未着手のタスクのみ開始できます'); // ← 汎用Exception
-    }
-}
-```
-
-### 🎯 改善案
-
-```php
-// 改善後の TaskService.php
-public function startTask(Task $task, User $user): Task
-{
-    $this->checkTaskPermission($task, $user);
-    
-    if ($task->status !== 'todo') {
-        throw new InvalidTaskStatusException( // ← カスタム例外
-            message: '未着手のタスクのみ開始できます',
-            currentStatus: $task->status,
-            expectedStatus: 'todo'
-        );
-    }
-    
-    $task->update(['status' => 'doing']);
-    return $task;
-}
-```
-
