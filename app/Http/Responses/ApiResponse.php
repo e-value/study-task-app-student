@@ -172,7 +172,7 @@ class ApiResponse
      *     "message": "ユーザーが見つかりません"
      * }
      */
-    public function notFound(string $message = 'リソースが見つかりません'): JsonResponse
+    public function notFound(string $message = '指定されたデータが見つかりません'): JsonResponse
     {
         return $this->respond(false, $message, null, 404);
     }
