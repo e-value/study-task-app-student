@@ -141,6 +141,21 @@ cd study-task-app-student
 | admin@example.com  | password   | 管理者   |
 | member@example.com | password   | メンバー |
 
+### 5️⃣ Postman でAPIテスト
+
+APIエンドポイントをテストするには、Postmanを使用します。
+
+> **📮 Postman導入ガイド**
+> - **クイックスタート（5分）**: [POSTMAN_QUICKSTART.md](./POSTMAN_QUICKSTART.md)
+> - **完全ガイド**: [POSTMAN_SETUP_GUIDE.md](./POSTMAN_SETUP_GUIDE.md)
+
+**固定トークン（そのまま使えます）**:
+```
+1|postman-owner-test-token-abc123def456ghi789jkl012mno345pqr678stu901vwx234
+```
+
+このトークンをPostmanの環境変数に設定するだけで、すぐにAPIテストを開始できます！
+
 ---
 
 ## 📝 課題について
