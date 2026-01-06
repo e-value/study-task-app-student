@@ -8,6 +8,7 @@ use App\Http\Responses\ApiResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\AuthenticationException;
+use Sentry\Laravel\Integration;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -28,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        Integration::handles($exceptions);
         // 研修用に必要に応じてコメントアウト
         $response = new ApiResponse();
 
@@ -53,6 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // 注意：この処理は最後に配置すること
         $exceptions->render(function (Throwable $e, Request $request) use ($response) {
             if ($request->is('api/*')) {
+                app('sentry')->captureException($e); // ← ★これを追加
                 // 本番では固定メッセージ、開発中は詳細表示
                 $message = config('app.debug') ? $e->getMessage() : 'サーバーエラー';
                 return $response->serverError($message);
