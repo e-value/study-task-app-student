@@ -34,8 +34,9 @@ export function useApiError() {
      * @param {string} defaultMessage - デフォルトメッセージ
      */
     const handleError = (err, defaultMessage = "エラーが発生しました") => {
-        // 開発環境でのみコンソールに詳細ログを出力
-        if (import.meta.env.DEV) {
+        // .env の APP_DEBUG が true の場合のみコンソールに詳細ログを出力
+        // これにより、.env の APP_DEBUG で手動に切り替えて挙動を確認できる
+        if (import.meta.env.APP_DEBUG) {
             console.group("🚨 API Error");
             console.error("Error:", err);
             if (err.response) {
@@ -47,7 +48,7 @@ export function useApiError() {
             }
             console.groupEnd();
         }
-        // 本番環境ではコンソールに何も出力しない（Sentryなどのエラー監視ツールで管理）
+        // APP_DEBUG=false の場合はコンソールに何も出力しない（Sentryなどのエラー監視ツールで管理）
 
         // エラーメッセージを抽出（画面表示用 - 常に固定メッセージ）
         error.value = extractErrorMessage(err, defaultMessage);
