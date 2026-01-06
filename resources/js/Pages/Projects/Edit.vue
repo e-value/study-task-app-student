@@ -3,6 +3,8 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import ApiError from "@/Components/ApiError.vue";
+import { useApiError } from "@/composables/useApiError";
 
 const route = useRoute();
 const router = useRouter();
@@ -12,8 +14,9 @@ const project = ref(null);
 const loading = ref(true);
 const updating = ref(false);
 const deleting = ref(false);
-const error = ref(null);
-const validationErrors = ref({});
+
+// エラーハンドリング用のComposable
+const { error, validationErrors, handleError, clearError } = useApiError();
 
 const form = ref({
   name: "",
@@ -23,16 +26,16 @@ const form = ref({
 const fetchProject = async () => {
   try {
     loading.value = true;
+    clearError();
     const response = await axios.get(`/api/projects/${projectId}`);
-    project.value = response.data.data;
+    // ProjectResourceは直接dataを返すか、dataプロパティを持つ
+    project.value = response.data.data || response.data;
 
     // フォームに現在の値を設定
     form.value.name = project.value.name;
     form.value.is_archived = project.value.is_archived;
   } catch (err) {
-    console.error("Failed to fetch project:", err);
-    error.value =
-      err.response?.data?.message || "プロジェクトの読み込みに失敗しました";
+    handleError(err, "プロジェクトの読み込みに失敗しました");
   } finally {
     loading.value = false;
   }
@@ -41,22 +44,14 @@ const fetchProject = async () => {
 const updateProject = async () => {
   try {
     updating.value = true;
-    error.value = null;
-    validationErrors.value = {};
+    clearError();
 
     await axios.put(`/api/projects/${projectId}`, form.value);
 
     // 更新成功後、プロジェクト詳細へ戻る
     router.push({ name: "project.detail", params: { id: projectId } });
   } catch (err) {
-    console.error("Failed to update project:", err);
-
-    if (err.response?.data?.errors) {
-      validationErrors.value = err.response.data.errors;
-    }
-
-    error.value =
-      err.response?.data?.message || "プロジェクトの更新に失敗しました";
+    handleError(err, "プロジェクトの更新に失敗しました");
   } finally {
     updating.value = false;
   }
@@ -75,16 +70,14 @@ const confirmDelete = () => {
 const deleteProject = async () => {
   try {
     deleting.value = true;
-    error.value = null;
+    clearError();
 
     await axios.delete(`/api/projects/${projectId}`);
 
     // 削除成功後、プロジェクト一覧へ
     router.push({ name: "projects" });
   } catch (err) {
-    console.error("Failed to delete project:", err);
-    error.value =
-      err.response?.data?.message || "プロジェクトの削除に失敗しました";
+    handleError(err, "プロジェクトの削除に失敗しました");
     deleting.value = false;
   }
 };
@@ -347,30 +340,12 @@ onMounted(() => {
           </div>
         </template>
 
-        <!-- エラー（プロジェクトが見つからない） -->
-        <div
+        <!-- エラー（プロジェクトが見つからない、またはその他のエラー） -->
+        <ApiError
           v-else
-          class="backdrop-blur-lg bg-red-500/10 border border-red-300/50 rounded-2xl p-6 shadow-xl"
-        >
-          <div class="flex items-center gap-3">
-            <svg
-              class="w-6 h-6 text-red-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p class="text-red-800 font-medium">
-              プロジェクトが見つかりませんでした
-            </p>
-          </div>
-        </div>
+          :message="error"
+          fallback-message="プロジェクトが見つかりませんでした"
+        />
       </div>
     </div>
   </AuthenticatedLayout>

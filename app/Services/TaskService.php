@@ -175,7 +175,7 @@ class TaskService
     private function checkTaskPermission(Task $task, User $user): void
     {
         $project = $task->project;
-        if ($this->isProjectMember($project, $user)) {
+        if (!$this->isProjectMember($project, $user)) {
             throw new \Exception('このプロジェクトにアクセスする権限がありません');
         }
     }
