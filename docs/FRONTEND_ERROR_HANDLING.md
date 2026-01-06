@@ -8,13 +8,13 @@
 
 ### 1. ユーティリティ関数 (`utils/apiError.js`)
 
-APIエラーからメッセージを抽出する関数を提供します。
+API エラーからメッセージを抽出する関数を提供します。
 
 ```javascript
-import { extractErrorMessage, extractValidationErrors } from '@/utils/apiError';
+import { extractErrorMessage, extractValidationErrors } from "@/utils/apiError";
 
 // エラーメッセージを抽出
-const message = extractErrorMessage(error, 'デフォルトメッセージ');
+const message = extractErrorMessage(error, "デフォルトメッセージ");
 
 // バリデーションエラーを抽出
 const validationErrors = extractValidationErrors(error);
@@ -22,10 +22,10 @@ const validationErrors = extractValidationErrors(error);
 
 ### 2. Composable (`composables/useApiError.js`)
 
-エラーハンドリング用のComposableを提供します。
+エラーハンドリング用の Composable を提供します。
 
 ```javascript
-import { useApiError } from '@/composables/useApiError';
+import { useApiError } from "@/composables/useApiError";
 
 const { error, validationErrors, handleError, clearError } = useApiError();
 ```
@@ -44,10 +44,10 @@ const { error, validationErrors, handleError, clearError } = useApiError();
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import { useApiError } from '@/composables/useApiError';
-import ApiError from '@/Components/ApiError.vue';
+import { ref } from "vue";
+import axios from "axios";
+import { useApiError } from "@/composables/useApiError";
+import ApiError from "@/Components/ApiError.vue";
 
 const data = ref(null);
 const loading = ref(false);
@@ -56,30 +56,30 @@ const loading = ref(false);
 const { error, handleError, clearError } = useApiError();
 
 const fetchData = async () => {
-  try {
-    loading.value = true;
-    clearError(); // エラーをクリア
-    
-    const response = await axios.get('/api/data');
-    data.value = response.data.data || response.data;
-  } catch (err) {
-    handleError(err, 'データの読み込みに失敗しました');
-  } finally {
-    loading.value = false;
-  }
+    try {
+        loading.value = true;
+        clearError(); // エラーをクリア
+
+        const response = await axios.get("/api/data");
+        data.value = response.data.data || response.data;
+    } catch (err) {
+        handleError(err, "データの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
 };
 </script>
 
 <template>
-  <div>
-    <!-- エラー表示 -->
-    <ApiError v-if="error" :message="error" />
-    
-    <!-- データ表示 -->
-    <div v-else-if="data">
-      {{ data }}
+    <div>
+        <!-- エラー表示 -->
+        <ApiError v-if="error" :message="error" />
+
+        <!-- データ表示 -->
+        <div v-else-if="data">
+            {{ data }}
+        </div>
     </div>
-  </div>
 </template>
 ```
 
@@ -87,48 +87,48 @@ const fetchData = async () => {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import { useApiError } from '@/composables/useApiError';
-import ApiError from '@/Components/ApiError.vue';
-import InputError from '@/Components/InputError.vue';
+import { ref } from "vue";
+import axios from "axios";
+import { useApiError } from "@/composables/useApiError";
+import ApiError from "@/Components/ApiError.vue";
+import InputError from "@/Components/InputError.vue";
 
 const form = ref({
-  name: '',
-  email: '',
+    name: "",
+    email: "",
 });
 
 const { error, validationErrors, handleError, clearError } = useApiError();
 
 const submit = async () => {
-  try {
-    clearError();
-    await axios.post('/api/form', form.value);
-    // 成功処理
-  } catch (err) {
-    handleError(err, '送信に失敗しました');
-  }
+    try {
+        clearError();
+        await axios.post("/api/form", form.value);
+        // 成功処理
+    } catch (err) {
+        handleError(err, "送信に失敗しました");
+    }
 };
 </script>
 
 <template>
-  <form @submit.prevent="submit">
-    <!-- エラー表示 -->
-    <ApiError v-if="error" :message="error" />
-    
-    <!-- バリデーションエラー表示 -->
-    <div>
-      <input v-model="form.name" />
-      <InputError :message="validationErrors.name?.[0]" />
-    </div>
-    
-    <div>
-      <input v-model="form.email" />
-      <InputError :message="validationErrors.email?.[0]" />
-    </div>
-    
-    <button type="submit">送信</button>
-  </form>
+    <form @submit.prevent="submit">
+        <!-- エラー表示 -->
+        <ApiError v-if="error" :message="error" />
+
+        <!-- バリデーションエラー表示 -->
+        <div>
+            <input v-model="form.name" />
+            <InputError :message="validationErrors.name?.[0]" />
+        </div>
+
+        <div>
+            <input v-model="form.email" />
+            <InputError :message="validationErrors.email?.[0]" />
+        </div>
+
+        <button type="submit">送信</button>
+    </form>
 </template>
 ```
 
@@ -136,12 +136,12 @@ const submit = async () => {
 
 ```vue
 <template>
-  <!-- エラーがない場合、フォールバックメッセージを表示 -->
-  <ApiError
-    v-else
-    :message="error"
-    fallback-message="データが見つかりませんでした"
-  />
+    <!-- エラーがない場合、フォールバックメッセージを表示 -->
+    <ApiError
+        v-else
+        :message="error"
+        fallback-message="データが見つかりませんでした"
+    />
 </template>
 ```
 
@@ -154,19 +154,19 @@ const submit = async () => {
 const error = ref(null);
 
 const fetchData = async () => {
-  try {
-    const response = await axios.get('/api/data');
-    data.value = response.data;
-  } catch (err) {
-    error.value = err.response?.data?.message || 'エラーが発生しました';
-  }
+    try {
+        const response = await axios.get("/api/data");
+        data.value = response.data;
+    } catch (err) {
+        error.value = err.response?.data?.message || "エラーが発生しました";
+    }
 };
 </script>
 
 <template>
-  <div v-if="error" class="error">
-    {{ error }}
-  </div>
+    <div v-if="error" class="error">
+        {{ error }}
+    </div>
 </template>
 ```
 
@@ -174,24 +174,24 @@ const fetchData = async () => {
 
 ```vue
 <script setup>
-import { useApiError } from '@/composables/useApiError';
-import ApiError from '@/Components/ApiError.vue';
+import { useApiError } from "@/composables/useApiError";
+import ApiError from "@/Components/ApiError.vue";
 
 const { error, handleError, clearError } = useApiError();
 
 const fetchData = async () => {
-  try {
-    clearError();
-    const response = await axios.get('/api/data');
-    data.value = response.data;
-  } catch (err) {
-    handleError(err, 'エラーが発生しました');
-  }
+    try {
+        clearError();
+        const response = await axios.get("/api/data");
+        data.value = response.data;
+    } catch (err) {
+        handleError(err, "エラーが発生しました");
+    }
 };
 </script>
 
 <template>
-  <ApiError v-if="error" :message="error" />
+    <ApiError v-if="error" :message="error" />
 </template>
 ```
 
@@ -201,16 +201,16 @@ const fetchData = async () => {
 
 ```json
 {
-  "success": false,
-  "message": "エラーメッセージ"
+    "success": false,
+    "message": "エラーメッセージ"
 }
 ```
 
-### 2. コントローラーのtry-catch
+### 2. コントローラーの try-catch
 
 ```json
 {
-  "message": "エラーメッセージ"
+    "message": "エラーメッセージ"
 }
 ```
 
@@ -218,11 +218,11 @@ const fetchData = async () => {
 
 ```json
 {
-  "message": "バリデーションエラー",
-  "errors": {
-    "name": ["名前は必須です"],
-    "email": ["メールアドレスの形式が正しくありません"]
-  }
+    "message": "バリデーションエラー",
+    "errors": {
+        "name": ["名前は必須です"],
+        "email": ["メールアドレスの形式が正しくありません"]
+    }
 }
 ```
 
@@ -231,8 +231,8 @@ const fetchData = async () => {
 1. **コードの重複削減**: エラーメッセージ抽出ロジックを一元化
 2. **保守性の向上**: エラーハンドリングの変更が一箇所で済む
 3. **一貫性**: すべてのコンポーネントで同じエラーハンドリングロジックを使用
-4. **再利用性**: Composableとコンポーネントを再利用可能
-5. **型安全性**: TypeScript対応も容易
+4. **再利用性**: Composable とコンポーネントを再利用可能
+5. **型安全性**: TypeScript 対応も容易
 
 ## 🔧 カスタマイズ
 
@@ -243,13 +243,13 @@ const fetchData = async () => {
 const { error, handleError } = useApiError();
 
 try {
-  await axios.get('/api/data');
+    await axios.get("/api/data");
 } catch (err) {
-  if (err.response?.status === 404) {
-    handleError(err, 'データが見つかりませんでした');
-  } else {
-    handleError(err, 'エラーが発生しました');
-  }
+    if (err.response?.status === 404) {
+        handleError(err, "データが見つかりませんでした");
+    } else {
+        handleError(err, "エラーが発生しました");
+    }
 }
 ```
 
@@ -259,18 +259,18 @@ try {
 const { error, setError } = useApiError();
 
 // 手動でエラーメッセージを設定
-setError('カスタムエラーメッセージ');
+setError("カスタムエラーメッセージ");
 ```
 
 ## 📚 関連ファイル
 
-- `resources/js/utils/apiError.js` - エラーメッセージ抽出ユーティリティ
-- `resources/js/composables/useApiError.js` - エラーハンドリングComposable
-- `resources/js/Components/ApiError.vue` - エラー表示コンポーネント
+-   `resources/js/utils/apiError.js` - エラーメッセージ抽出ユーティリティ
+-   `resources/js/composables/useApiError.js` - エラーハンドリング Composable
+-   `resources/js/Components/ApiError.vue` - エラー表示コンポーネント
 
 ## 🚀 今後の拡張
 
-- [ ] TypeScript対応
-- [ ] エラーログの自動送信（Sentry等）
-- [ ] リトライ機能
-- [ ] エラーの種類に応じた表示のカスタマイズ
+-   [ ] TypeScript 対応
+-   [ ] エラーログの自動送信（Sentry 等）
+-   [ ] リトライ機能
+-   [ ] エラーの種類に応じた表示のカスタマイズ

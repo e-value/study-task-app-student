@@ -6,7 +6,7 @@ defineProps({
   },
   fallbackMessage: {
     type: String,
-    default: 'エラーが発生しました',
+    default: "エラーが発生しました",
   },
 });
 </script>
