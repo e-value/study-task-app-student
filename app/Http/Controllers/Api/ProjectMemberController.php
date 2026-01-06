@@ -56,14 +56,14 @@ class ProjectMemberController extends ApiController
             'project_id' => [
                 'required',
                 'exists:projects,id',
-                    Rule::unique('memberships')->where(function($query) use($request) {
+                Rule::unique('memberships')->where(function($query) use($request) {
                     $query->where('user_id', $request->input('user_id'));
                 }) // 同一の`user_id`との組み合わせで、すでに登録のあるレコードがないかを確認
             ],
             'user_id' => [
                 'required',
                 'exists:users,id',
-                    Rule::unique('memberships')->where(function($query) use($request) {
+                Rule::unique('memberships')->where(function($query) use($request) {
                     $query->where('project_id', $request->input('project_id'));
                 }) // 同一の`project_id`との組み合わせで、すでに登録のあるレコードがないかを確認
             ],
