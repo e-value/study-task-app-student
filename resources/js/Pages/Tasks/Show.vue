@@ -19,7 +19,7 @@ const saving = ref(false);
 const deleting = ref(false);
 
 // エラーハンドリング用のComposable
-const { error, handleError, clearError } = useApiError();
+const { error, requestId, statusCode, handleError, clearError } = useApiError();
 
 const form = ref({
   title: "",
@@ -345,7 +345,11 @@ onMounted(() => {
 
           <!-- エラー表示 -->
           <div v-if="error" class="mb-6">
-            <ApiError :message="error" />
+            <ApiError
+              :message="error"
+              :request-id="requestId"
+              :status-code="statusCode"
+            />
           </div>
 
           <!-- メインコンテンツ -->
@@ -545,6 +549,8 @@ onMounted(() => {
           v-else
           :message="error"
           fallback-message="タスクが見つかりませんでした"
+          :request-id="requestId"
+          :status-code="statusCode"
         />
       </div>
     </div>

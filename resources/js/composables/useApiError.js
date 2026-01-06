@@ -26,6 +26,8 @@ import { extractErrorMessage, extractValidationErrors } from "@/utils/apiError";
 export function useApiError() {
     const error = ref(null);
     const validationErrors = ref({});
+    const requestId = ref(null);
+    const statusCode = ref(null);
 
     /**
      * エラーを処理する
@@ -53,6 +55,15 @@ export function useApiError() {
         // エラーメッセージを抽出（画面表示用 - 常に固定メッセージ）
         error.value = extractErrorMessage(err, defaultMessage);
 
+        // リクエストIDとステータスコードを取得
+        if (err.response?.data) {
+            requestId.value = err.response.data.request_id || null;
+            statusCode.value = err.response.status || null;
+        } else {
+            requestId.value = null;
+            statusCode.value = null;
+        }
+
         // バリデーションエラーを抽出
         const validation = extractValidationErrors(err);
         if (validation) {
@@ -68,6 +79,8 @@ export function useApiError() {
     const clearError = () => {
         error.value = null;
         validationErrors.value = {};
+        requestId.value = null;
+        statusCode.value = null;
     };
 
     /**
@@ -82,6 +95,8 @@ export function useApiError() {
     return {
         error,
         validationErrors,
+        requestId,
+        statusCode,
         handleError,
         clearError,
         setError,

@@ -16,7 +16,7 @@ const updating = ref(false);
 const deleting = ref(false);
 
 // エラーハンドリング用のComposable
-const { error, validationErrors, handleError, clearError } = useApiError();
+const { error, validationErrors, requestId, statusCode, handleError, clearError } = useApiError();
 
 const form = ref({
   name: "",
@@ -344,6 +344,8 @@ onMounted(() => {
         <ApiError
           v-else
           :message="error"
+          :request-id="requestId"
+          :status-code="statusCode"
           fallback-message="プロジェクトが見つかりませんでした"
         />
       </div>
