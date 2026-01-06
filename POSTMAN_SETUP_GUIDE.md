@@ -123,19 +123,20 @@ sail artisan migrate:fresh --seed
 
 環境変数を以下のように追加します：
 
-| VARIABLE | INITIAL VALUE | CURRENT VALUE                                                              |
-| -------- | ------------- | -------------------------------------------------------------------------- | --- | -------------------------------------------------------------------------- |
-| `token`  | `1            | postman-owner-test-token-abc123def456ghi789jkl012mno345pqr678stu901vwx234` | `1  | postman-owner-test-token-abc123def456ghi789jkl012mno345pqr678stu901vwx234` |
+| Variable | Value                                                                      |
+| -------- | -------------------------------------------------------------------------- |
+| `token`  | `1\|postman-owner-test-token-abc123def456ghi789jkl012mno345pqr678stu901vwx234` |
 
 **入力手順：**
 
-1. 「**VARIABLE**」列に `token` と入力
-2. 「**INITIAL VALUE**」列に以下をコピペ：
+1. 「**Variable**」列に `token` と入力
+2. 「**Value**」列に以下をコピペ：
     ```
     1|postman-owner-test-token-abc123def456ghi789jkl012mno345pqr678stu901vwx234
     ```
-3. 「**CURRENT VALUE**」列にも同じ値をコピペ
-4. 右上の「**Save**」ボタンをクリック
+3. 右上の「**Save**」ボタンをクリック
+
+> **💡 Tip**: トークンは `1|` から始まる長い文字列です。すべてコピーしてください。
 
 ### ステップ 2-3: 環境を選択
 
