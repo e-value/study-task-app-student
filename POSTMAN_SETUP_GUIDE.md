@@ -70,29 +70,43 @@ sail artisan migrate:fresh --seed
 
 ---
 
-## 1. Postman のインストール
+## 1. Postman のセットアップ
+
+### 推奨：Postman Web アプリを使用（インストール不要）
+
+**Postman Web アプリ**を使用すれば、アプリのインストールなしですぐに API テストを開始できます。
+
+### ステップ 1-1: Postman Web アプリにアクセス
+
+1. ブラウザで以下の URL にアクセス: https://identity.getpostman.com/signup
+2. アカウントを作成（または既存アカウントでログイン）
+3. ログイン後、自動的に Postman Web アプリが起動します
+
+> **💡 メリット**:
+>
+> -   ✅ インストール不要、ブラウザだけで使える
+> -   ✅ どのパソコンからでもアクセス可能
+> -   ✅ 設定が自動的にクラウドに保存される
+
+✅ **これで Postman が使える状態です**
+
+---
+
+### オプション：デスクトップアプリを使用したい場合
 
 > **📚 詳しいインストール方法はこちら**  
 > Postman の詳細なダウンロード・インストール手順は以下の記事を参考にしてください：  
 > [2026 最新：Postman をダウンロードしてインストールする](https://apidog.com/jp/blog/download-install-postman-jp/)
 
-### ステップ 1-1: Postman をダウンロード
+**手順**:
 
 1. 公式サイトにアクセス: https://www.postman.com/downloads/
 2. お使いの OS（Mac / Windows / Linux）に合わせてダウンロード
 3. インストーラーを実行してインストール
-
-> **💡 Tip**: Postman は Windows、macOS、Linux に対応しています。  
-> デスクトップアプリをインストールしたくない場合は、[Postman Web アプリ](https://identity.getpostman.com/signup)も利用可能です。
-
-### ステップ 1-2: Postman を起動
-
-1. Postman アプリを起動
-2. アカウント作成を求められた場合：
+4. アプリを起動
+5. アカウント作成を求められた場合：
     - **「Skip and go to the app」**をクリック（アカウントなしでも使用可能）
     - または、アカウントを作成してログイン（推奨：設定が保存されます）
-
-✅ **ここまで完了したら Postman が使える状態です**
 
 ---
 
