@@ -141,20 +141,20 @@ cd study-task-app-student
 | admin@example.com  | password   | 管理者   |
 | member@example.com | password   | メンバー |
 
-### 5️⃣ Postman でAPIテスト
+### 5️⃣ Postman で API テスト
 
-APIエンドポイントをテストするには、Postmanを使用します。
+API エンドポイントをテストするには、Postman を使用します。
 
-> **📮 Postman導入ガイド**
-> - **クイックスタート（5分）**: [POSTMAN_QUICKSTART.md](./POSTMAN_QUICKSTART.md)
-> - **完全ガイド**: [POSTMAN_SETUP_GUIDE.md](./POSTMAN_SETUP_GUIDE.md)
+> **📮 Postman 導入ガイド**  
+> 詳しい手順は [POSTMAN_SETUP_GUIDE.md](./POSTMAN_SETUP_GUIDE.md) をご覧ください。
 
 **固定トークン（そのまま使えます）**:
+
 ```
 1|postman-owner-test-token-abc123def456ghi789jkl012mno345pqr678stu901vwx234
 ```
 
-このトークンをPostmanの環境変数に設定するだけで、すぐにAPIテストを開始できます！
+このトークンを Postman の環境変数に設定するだけで、すぐに API テストを開始できます！
 
 ---
 
@@ -359,6 +359,7 @@ sleep 15
 **A.** 依存関係の競合エラーが出た場合は、以下を試してください。
 
 **エラー例**:
+
 ```
 npm error ERESOLVE could not resolve
 npm error Conflicting peer dependency: vite@7.3.0
@@ -367,14 +368,15 @@ npm error Conflicting peer dependency: vite@7.3.0
 **解決方法**:
 
 1. **package.json の確認**（推奨）
-   - `vite` と `laravel-vite-plugin` のバージョンが互換性があるか確認
-   - `laravel-vite-plugin@2.x` を使う場合は `vite@^7.0.0` が必要
-   - `@vitejs/plugin-vue` も Vite のバージョンに合わせる
+
+    - `vite` と `laravel-vite-plugin` のバージョンが互換性があるか確認
+    - `laravel-vite-plugin@2.x` を使う場合は `vite@^7.0.0` が必要
+    - `@vitejs/plugin-vue` も Vite のバージョンに合わせる
 
 2. **強制インストール**（一時的な回避策）
-   ```bash
-   ./vendor/bin/sail npm install --legacy-peer-deps
-   ```
+    ```bash
+    ./vendor/bin/sail npm install --legacy-peer-deps
+    ```
 
 ### Q4. フロントエンドが表示されない
 
