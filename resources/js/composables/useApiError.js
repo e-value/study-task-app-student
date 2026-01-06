@@ -34,9 +34,22 @@ export function useApiError() {
      * @param {string} defaultMessage - デフォルトメッセージ
      */
     const handleError = (err, defaultMessage = "エラーが発生しました") => {
-        console.error("API Error:", err);
+        // 開発環境でのみコンソールに詳細ログを出力
+        if (import.meta.env.DEV) {
+            console.group("🚨 API Error");
+            console.error("Error:", err);
+            if (err.response) {
+                console.error("Status:", err.response.status);
+                console.error("Data:", err.response.data);
+                console.error("URL:", err.config?.url);
+            } else {
+                console.error("Network Error:", err.message);
+            }
+            console.groupEnd();
+        }
+        // 本番環境ではコンソールに何も出力しない（Sentryなどのエラー監視ツールで管理）
 
-        // エラーメッセージを抽出
+        // エラーメッセージを抽出（画面表示用 - 常に固定メッセージ）
         error.value = extractErrorMessage(err, defaultMessage);
 
         // バリデーションエラーを抽出
