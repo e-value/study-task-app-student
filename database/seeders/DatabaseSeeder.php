@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             ProjectSeeder::class,
             MembershipSeeder::class,
             TaskSeeder::class,
+            TestTokenSeeder::class,
         ]);
     }
 }
