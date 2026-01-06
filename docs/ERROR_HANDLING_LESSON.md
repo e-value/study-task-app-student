@@ -1255,27 +1255,4 @@ return Application::configure(basePath: dirname(__DIR__))
 
 👩‍💻「名言風にごまかそうとしてますね…でも、内容は納得です！早速実装してきます！」
 
-### 🎯 今すぐやるべきこと
-
-```
-1️⃣ APP_DEBUG の確認
-   → .env で APP_DEBUG=false になっているか確認
-
-2️⃣ カスタム例外クラスの作成
-   → InvalidTaskStatusException
-   → TaskPermissionDeniedException
-
-3️⃣ TaskService の修正
-   → throw new \Exception()
-     ↓
-     throw new カスタム例外()
-
-4️⃣ TaskController の修正
-   → 必要に応じてtry-catchを追加
-   → エラーコードを統一
-
-5️⃣ グローバルハンドラーの確認
-   → bootstrap/app.php の設定を確認
-```
-
 🐘「おう！次回教えて欲しかったら、あんみつ持ってくるんやで！🍨 **さすガネーシャや！**」
