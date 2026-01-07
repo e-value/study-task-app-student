@@ -4,10 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
-use App\Http\Responses\ApiResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Auth\AuthenticationException;
+use App\Exceptions\ApiExceptionHandler;
 use Sentry\Laravel\Integration;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -29,37 +26,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // 研修用に必要に応じてコメントアウト
+        // Sentry統合（研修用に必要に応じてコメントアウト）
         // Integration::handles($exceptions);
 
-        // $response = new ApiResponse();
+        // API例外ハンドラーを登録
+        $apiHandler = new ApiExceptionHandler();
 
-        // $exceptions->render(function (NotFoundHttpException $e, Request $request) use ($response) {
-        //     if ($request->is('api/*')) {
-        //         return $response->notFound();
-        //     }
-        // });
-
-        // $exceptions->render(function (ValidationException $e, Request $request) use ($response) {
-        //     if ($request->is('api/*')) {
-        //         return $response->validationError('バリデーションエラー', $e->errors());
-        //     }
-        // });
-
-        // $exceptions->render(function (AuthenticationException $e, Request $request) use ($response) {
-        //     if ($request->is('api/*')) {
-        //         return $response->unauthorized();
-        //     }
-        // });
-
-        // // どれにも当てはまらない場合はサーバーエラーとして処理
-        // // 注意：この処理は最後に配置すること
-        // $exceptions->render(function (Throwable $e, Request $request) use ($response) {
-        //     if ($request->is('api/*')) {
-        //         app('sentry')->captureException($e); // ← ★これを追加
-        //         // 本番では固定メッセージ、開発中は詳細表示
-        //         $message = config('app.debug') ? $e->getMessage() : 'サーバーエラー';
-        //         return $response->serverError($message);
-        //     }
-        // });
+        $exceptions->render(function (\Throwable $e, Request $request) use ($apiHandler) {
+            return $apiHandler->handle($e, $request);
+        });
     })->create();
