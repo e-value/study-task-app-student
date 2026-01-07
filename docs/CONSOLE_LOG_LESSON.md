@@ -830,7 +830,7 @@ catch (err) {
 **いつ起きる？**
 
 -   タイトルを空欄にして送信した時
--   タイトルが255文字を超えた時
+-   タイトルが 255 文字を超えた時
 -   必須項目が入力されていない時
 
 **ガネーシャ 🐘**：「実際のプロジェクトのバリデーションルールを見てみよう」
@@ -857,13 +857,13 @@ public function rules(): array
 ```javascript
 // ❌ パターン1：タイトルを空にして送信
 const response = await axios.post("/api/projects/1/tasks", {
-    title: "",  // 空欄！
+    title: "", // 空欄！
     description: "これはサンプルです",
 });
 
 // ❌ パターン2：タイトルを256文字以上にする
 const response = await axios.post("/api/projects/1/tasks", {
-    title: "あ".repeat(256),  // 256文字！（255文字がmax）
+    title: "あ".repeat(256), // 256文字！（255文字がmax）
     description: "これはサンプルです",
 });
 ```
@@ -885,7 +885,7 @@ const response = await axios.post("/api/projects/1/tasks", {
 }
 ```
 
-**Console に表示される内容（タイトル256文字の場合）：**
+**Console に表示される内容（タイトル 256 文字の場合）：**
 
 ```javascript
 📊 err.response: {
@@ -937,7 +937,7 @@ catch (err) {
 └─────────┴──────────────────────────────────────┘
 ```
 
-**Console 出力（タイトル256文字の場合）：**
+**Console 出力（タイトル 256 文字の場合）：**
 
 ```
 📝 バリデーションエラー
@@ -1451,9 +1451,9 @@ const createTask = async () => {
 
 **生徒 👩‍💻**：「カスタムレスポンス...ですか？」
 
-**ガネーシャ 🐘**：「せや！Laravel側で`additional(['message' => 'タスクを作成しました'])`って追加しとるんや。実際のコードを見てみよう」
+**ガネーシャ 🐘**：「せや！Laravel 側で`additional(['message' => 'タスクを作成しました'])`って追加しとるんや。実際のコードを見てみよう」
 
-#### 💡 Laravel側のコード（TaskController.php）
+#### 💡 Laravel 側のコード（TaskController.php）
 
 ```php
 public function store(TaskRequest $request, Project $project): JsonResponse
@@ -1504,11 +1504,11 @@ public function store(TaskRequest $request, Project $project): JsonResponse
 }
 ```
 
-**ガネーシャ 🐘**：「見てみ？`data.data`（TaskResourceのデータ）と`data.message`（カスタムメッセージ）の両方が返ってきとるやろ」
+**ガネーシャ 🐘**：「見てみ？`data.data`（TaskResource のデータ）と`data.message`（カスタムメッセージ）の両方が返ってきとるやろ」
 
 #### ❌ エラー時のレスポンス（バリデーションエラーの例）
 
-**ガネーシャ 🐘**：「次はエラー時や。バリデーションエラーは**422ステータス**で返ってくるんや」
+**ガネーシャ 🐘**：「次はエラー時や。バリデーションエラーは**422 ステータス**で返ってくるんや」
 
 ```javascript
 // バリデーションエラー（422）のレスポンス
