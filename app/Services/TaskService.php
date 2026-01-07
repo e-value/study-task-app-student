@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use App\Exceptions\ConflictException;
 
 class TaskService
 {
@@ -19,7 +21,7 @@ class TaskService
     {
         // メンバーかチェック
         if (!$this->isProjectMember($project, $user)) {
-            throw new \Exception('このプロジェクトにアクセスする権限がありません');
+            throw new AuthorizationException('このプロジェクトにアクセスする権限がありません');
         }
 
         return $project->tasks()
@@ -40,7 +42,7 @@ class TaskService
     {
         // プロジェクトメンバーかチェック
         if (!$this->isProjectMember($project, $user)) {
-            throw new \Exception('このプロジェクトのタスクを作成する権限がありません');
+            throw new AuthorizationException('このプロジェクトのタスクを作成する権限がありません');
         }
 
         $task = Task::create([
@@ -176,7 +178,7 @@ class TaskService
     {
         $project = $task->project;
         if (!$this->isProjectMember($project, $user)) {
-            throw new \Exception('このプロジェクトにアクセスする権限がありません');
+            throw new AuthorizationException('このプロジェクトにアクセスする権限がありません');
         }
     }
 
@@ -190,7 +192,7 @@ class TaskService
     private function validateTaskStatusForStart(Task $task): void
     {
         if ($task->status !== 'todo') {
-            throw new \Exception('未着手のタスクのみ開始できます');
+            throw new ConflictException('未着手のタスクのみ開始できます');
         }
     }
 
@@ -204,7 +206,7 @@ class TaskService
     private function validateTaskStatusForComplete(Task $task): void
     {
         if ($task->status !== 'doing') {
-            throw new \Exception('作業中のタスクのみ完了できます');
+            throw new ConflictException('作業中のタスクのみ完了できます');
         }
     }
 }

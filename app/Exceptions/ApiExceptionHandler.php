@@ -8,6 +8,9 @@ use App\Http\Responses\ApiResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Exceptions\ConflictException;
 use Throwable;
 
 class ApiExceptionHandler
@@ -36,8 +39,11 @@ class ApiExceptionHandler
         // 例外タイプに応じて処理を振り分け
         return match (true) {
             $exception instanceof NotFoundHttpException => $this->handleNotFound(),
+            $exception instanceof ModelNotFoundException => $this->handleNotFound($exception->getMessage()),
             $exception instanceof ValidationException => $this->handleValidation($exception),
             $exception instanceof AuthenticationException => $this->handleAuthentication(),
+            $exception instanceof AuthorizationException => $this->handleForbidden($exception),
+            $exception instanceof ConflictException => $this->handleConflict($exception),
             default => $this->handleServerError($exception),
         };
     }
@@ -45,9 +51,31 @@ class ApiExceptionHandler
     /**
      * 404エラー
      */
-    private function handleNotFound(): JsonResponse
+    private function handleNotFound(?string $message = null): JsonResponse
     {
-        return $this->response->notFound();
+        return $this->response->notFound($message ?? '指定されたデータが見つかりません');
+    }
+
+    /**
+     * 権限エラー（403）
+     * Laravel標準のAuthorizationExceptionを処理
+     */
+    private function handleForbidden(AuthorizationException $exception): JsonResponse
+    {
+        return $this->response->forbidden($exception->getMessage());
+    }
+
+    /**
+     * 競合エラー（409）
+     * カスタム例外（Laravel標準にないため）
+     */
+    private function handleConflict(ConflictException $exception): JsonResponse
+    {
+        // 409 Conflictのレスポンスを返す
+        return response()->json([
+            'success' => false,
+            'message' => $exception->getMessage(),
+        ], 409);
     }
 
     /**

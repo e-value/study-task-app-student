@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Exceptions\ConflictException;
 
 class ProjectMemberService
 {
@@ -18,7 +21,7 @@ class ProjectMemberService
     {
         // 権限チェック
         if (!$this->isProjectMember($project, $user)) {
-            throw new \Exception('このプロジェクトにアクセスする権限がありません');
+            throw new AuthorizationException('このプロジェクトにアクセスする権限がありません');
         }
 
         return $project->users()
@@ -68,12 +71,12 @@ class ProjectMemberService
     {
         // 権限チェック（メンバーか）
         if (!$this->isProjectMember($project, $currentUser)) {
-            throw new \Exception('このプロジェクトにアクセスする権限がありません');
+            throw new AuthorizationException('このプロジェクトにアクセスする権限がありません');
         }
 
         // 権限チェック（オーナーまたは管理者か）
         if (!$this->isProjectOwnerOrAdmin($project, $currentUser)) {
-            throw new \Exception('メンバーを削除する権限がありません（オーナーまたは管理者のみ）');
+            throw new AuthorizationException('メンバーを削除する権限がありません（オーナーまたは管理者のみ）');
         }
 
         // 削除対象のユーザーを取得
@@ -82,7 +85,7 @@ class ProjectMemberService
             ->first();
 
         if (!$targetUser) {
-            throw new \Exception('User is not a member of this project.');
+            throw new ModelNotFoundException('指定されたユーザーはこのプロジェクトのメンバーではありません');
         }
 
         // Owner維持チェック
@@ -156,7 +159,7 @@ class ProjectMemberService
             ->first();
 
         if ($existingUser) {
-            throw new \Exception('このユーザーは既にプロジェクトのメンバーです');
+            throw new ConflictException('このユーザーは既にプロジェクトのメンバーです');
         }
     }
 
@@ -171,7 +174,7 @@ class ProjectMemberService
     private function checkSelfAddition(int $userId, int $currentUserId): void
     {
         if ($userId == $currentUserId) {
-            throw new \Exception('あなたは既にこのプロジェクトのメンバーです');
+            throw new ConflictException('あなたは既にこのプロジェクトのメンバーです');
         }
     }
 
@@ -191,7 +194,7 @@ class ProjectMemberService
                 ->count();
 
             if ($ownerCount <= 1) {
-                throw new \Exception('プロジェクトの最後のオーナーは削除できません');
+                throw new ConflictException('プロジェクトの最後のオーナーは削除できません');
             }
         }
     }
@@ -212,7 +215,7 @@ class ProjectMemberService
             ->exists();
 
         if ($hasIncompleteTasks) {
-            throw new \Exception('未完了のタスクがあるメンバーは削除できません');
+            throw new ConflictException('未完了のタスクがあるメンバーは削除できません');
         }
     }
 }

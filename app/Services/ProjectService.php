@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class ProjectService
 {
@@ -44,7 +45,7 @@ class ProjectService
     {
         // メンバーかチェック
         if (!$this->isProjectMember($project, $user)) {
-            throw new \Exception('このプロジェクトにアクセスする権限がありません');
+            throw new AuthorizationException('このプロジェクトにアクセスする権限がありません');
         }
 
         // リレーションをロード
@@ -65,7 +66,7 @@ class ProjectService
     {
         // オーナーまたは管理者かチェック
         if (!$this->isProjectOwnerOrAdmin($project, $user)) {
-            throw new \Exception('プロジェクトを更新する権限がありません（オーナー・管理者のみ）');
+            throw new AuthorizationException('プロジェクトを更新する権限がありません（オーナー・管理者のみ）');
         }
 
         $project->update($data);
@@ -85,7 +86,7 @@ class ProjectService
     {
         // 権限チェック（オーナーのみ）
         if (!$this->isProjectOwner($project, $user)) {
-            throw new \Exception('プロジェクトを削除する権限がありません（オーナーのみ）');
+            throw new AuthorizationException('プロジェクトを削除する権限がありません（オーナーのみ）');
         }
 
         $project->delete();

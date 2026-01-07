@@ -18,16 +18,10 @@ class ProjectMemberController extends ApiController
     /**
      * プロジェクトのメンバー一覧を取得
      */
-    public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
+    public function index(Request $request, Project $project): AnonymousResourceCollection
     {
-        try {
-            $members = $this->projectMemberService->getMembers($project, $request->user());
-            return ProjectMemberResource::collection($members);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        $members = $this->projectMemberService->getMembers($project, $request->user());
+        return ProjectMemberResource::collection($members);
     }
 
     /**
@@ -35,22 +29,15 @@ class ProjectMemberController extends ApiController
      */
     public function store(ProjectMemberRequest $request, Project $project): JsonResponse
     {
-        try {
-            $user = $this->projectMemberService->addMember(
-                $project,
-                $request->validated(),
-                $request->user()
-            );
+        $user = $this->projectMemberService->addMember(
+            $project,
+            $request->validated(),
+            $request->user()
+        );
 
-            return response()->json([
-                'message' => 'メンバーを追加しました',
-                'membership' => new ProjectMemberResource($user),
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 409);
-        }
+        return $this->response()->created([
+            'membership' => new ProjectMemberResource($user),
+        ], 'メンバーを追加しました');
     }
 
     /**
@@ -58,17 +45,8 @@ class ProjectMemberController extends ApiController
      */
     public function destroy(Request $request, Project $project, $userId): JsonResponse
     {
-        try {
-            $this->projectMemberService->removeMember($project, (int)$userId, $request->user());
+        $this->projectMemberService->removeMember($project, (int)$userId, $request->user());
 
-            return response()->json([
-                'message' => 'メンバーを削除しました',
-            ]);
-        } catch (\Exception $e) {
-            $statusCode = str_contains($e->getMessage(), 'not a member') ? 404 : 403;
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], $statusCode);
-        }
+        return $this->response()->success(null, 'メンバーを削除しました');
     }
 }

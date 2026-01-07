@@ -21,19 +21,13 @@ class TaskController extends ApiController
      *
      * @param Request $request
      * @param Project $project
-     * @return AnonymousResourceCollection|JsonResponse
+     * @return AnonymousResourceCollection
      */
-    public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
+    public function index(Request $request, Project $project): AnonymousResourceCollection
     {
-        try {
-            $tasks = $this->taskService->getTasks($project, $request->user());
+        $tasks = $this->taskService->getTasks($project, $request->user());
 
-            return TaskResource::collection($tasks);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        return TaskResource::collection($tasks);
     }
 
     /**
@@ -41,58 +35,40 @@ class TaskController extends ApiController
      */
     public function store(TaskRequest $request, Project $project): JsonResponse
     {
-        try {
-            $task = $this->taskService->createTask(
-                $request->validated(),
-                $project,
-                $request->user()
-            );
+        $task = $this->taskService->createTask(
+            $request->validated(),
+            $project,
+            $request->user()
+        );
 
-            return (new TaskResource($task))
-                ->additional(['message' => 'タスクを作成しました'])
-                ->response()
-                ->setStatusCode(201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを作成しました'])
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
      * タスク詳細を取得
      */
-    public function show(Request $request, Task $task): TaskResource|JsonResponse
+    public function show(Request $request, Task $task): TaskResource
     {
-        try {
-            $task = $this->taskService->getTask($task, $request->user());
-            return new TaskResource($task);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        $task = $this->taskService->getTask($task, $request->user());
+        return new TaskResource($task);
     }
 
     /**
      * タスク更新
      */
-    public function update(TaskRequest $request, Task $task): TaskResource|JsonResponse
+    public function update(TaskRequest $request, Task $task): TaskResource
     {
-        try {
-            $task = $this->taskService->updateTask(
-                $task,
-                $request->validated(),
-                $request->user()
-            );
+        $task = $this->taskService->updateTask(
+            $task,
+            $request->validated(),
+            $request->user()
+        );
 
-            return (new TaskResource($task))
-                ->additional(['message' => 'タスクを更新しました']);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを更新しました']);
     }
 
     /**
@@ -100,48 +76,26 @@ class TaskController extends ApiController
      */
     public function destroy(Request $request, Task $task): JsonResponse
     {
-        try {
-            $this->taskService->deleteTask($task, $request->user());
+        $this->taskService->deleteTask($task, $request->user());
 
-            return response()->json([
-                'message' => 'タスクを削除しました',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        return $this->response()->success(null, 'タスクを削除しました');
     }
 
     /**
      * タスクを開始（todo → doing）
      */
-    public function start(Request $request, Task $task): TaskResource|JsonResponse
+    public function start(Request $request, Task $task): TaskResource
     {
-        try {
-            $task = $this->taskService->startTask($task, $request->user());
-            return new TaskResource($task);
-        } catch (\Exception $e) {
-            $statusCode = str_contains($e->getMessage(), '権限がありません') ? 403 : 409;
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], $statusCode);
-        }
+        $task = $this->taskService->startTask($task, $request->user());
+        return new TaskResource($task);
     }
 
     /**
      * タスクを完了（doing → done）
      */
-    public function complete(Request $request, Task $task): TaskResource|JsonResponse
+    public function complete(Request $request, Task $task): TaskResource
     {
-        try {
-            $task = $this->taskService->completeTask($task, $request->user());
-            return new TaskResource($task);
-        } catch (\Exception $e) {
-            $statusCode = str_contains($e->getMessage(), '権限がありません') ? 403 : 409;
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], $statusCode);
-        }
+        $task = $this->taskService->completeTask($task, $request->user());
+        return new TaskResource($task);
     }
 }

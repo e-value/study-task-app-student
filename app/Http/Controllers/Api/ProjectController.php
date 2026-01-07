@@ -49,37 +49,25 @@ class ProjectController extends ApiController
     /**
      * プロジェクト詳細を返す
      */
-    public function show(Request $request, Project $project): ProjectResource|JsonResponse
+    public function show(Request $request, Project $project): ProjectResource
     {
-        try {
-            $project = $this->projectService->getProject($project, $request->user());
-            return new ProjectResource($project);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        $project = $this->projectService->getProject($project, $request->user());
+        return new ProjectResource($project);
     }
 
     /**
      * プロジェクト更新
      */
-    public function update(ProjectRequest $request, Project $project): ProjectResource|JsonResponse
+    public function update(ProjectRequest $request, Project $project): ProjectResource
     {
-        try {
-            $project = $this->projectService->updateProject(
-                $project,
-                $request->validated(),
-                $request->user()
-            );
+        $project = $this->projectService->updateProject(
+            $project,
+            $request->validated(),
+            $request->user()
+        );
 
-            return (new ProjectResource($project))
-                ->additional(['message' => 'プロジェクトを更新しました']);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        return (new ProjectResource($project))
+            ->additional(['message' => 'プロジェクトを更新しました']);
     }
 
     /**
@@ -87,16 +75,8 @@ class ProjectController extends ApiController
      */
     public function destroy(Request $request, Project $project): JsonResponse
     {
-        try {
-            $this->projectService->deleteProject($project, $request->user());
+        $this->projectService->deleteProject($project, $request->user());
 
-            return response()->json([
-                'message' => 'プロジェクトを削除しました',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        return $this->response()->success(null, 'プロジェクトを削除しました');
     }
 }
