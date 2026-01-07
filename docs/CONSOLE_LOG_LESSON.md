@@ -142,21 +142,26 @@ const fetchTask = async () => {
         const response = await axios.get(`/api/tasks/${taskId}`);
         task.value = response.data.data || response.data;
     } catch (err) {
-        // エラーが発生した場合の処理
-        console.error(err);
+        // 後で詳しく学ぶ handleError
+        handleError(err, "タスクの読み込みに失敗しました");
     } finally {
         loading.value = false;
     }
 };
 ```
 
-**ガネーシャ 🐘**：「このコードにな、console.log を仕込むんや！こうやって書いてみ：」
+**ガネーシャ 🐘**：「このコードにな、console.log を仕込むんや！でもな、まずは**handleError を使わずに**、生のエラーを確認する方法を教えたるわ」
 
-**追加後のコード：**
+**生徒 👩‍💻**：「handleError って何ですか？」
+
+**ガネーシャ 🐘**：「それはな、このプロジェクトで用意されとる便利な関数や。でも最初は**生の console.log でエラーを見る練習**が大事なんや。料理でいうたら、インスタント使う前に基本の出汁の取り方を学ぶようなもんやな」
+
+**追加後のコード（handleError なしバージョン）：**
 
 ```javascript
 const fetchTask = async () => {
     console.log("🚀 fetchTask が呼ばれたで！");
+    console.log("📍 タスクID:", taskId);
 
     try {
         loading.value = true;
@@ -171,10 +176,15 @@ const fetchTask = async () => {
 
         task.value = response.data.data || response.data;
     } catch (err) {
-        console.error("❌ エラーが発生したで！", err);
-        console.error("🔍 エラーの詳細：", err.response);
-        console.error("📊 ステータスコード:", err.response?.status);
-        console.error("💬 エラーメッセージ:", err.response?.data);
+        // ❌ ここが重要！生のエラーをそのまま確認する
+        console.error("❌ エラーが発生したで！");
+        console.error("🔍 エラーオブジェクト全体:", err);
+        console.error("📊 エラーレスポンス:", err.response);
+        console.error("📋 ステータスコード:", err.response?.status);
+        console.error("💬 エラーデータ:", err.response?.data);
+        
+        // 画面にもエラーを表示（ユーザー向け）
+        alert("タスクの読み込みに失敗しました");
     } finally {
         loading.value = false;
         console.log("🏁 fetchTask 終了！");
@@ -244,6 +254,420 @@ const response = await axios.get(`/api/tasks/${taskId}`);
 ```
 
 **ガネーシャ 🐘**：「さすガネーシャや！これで**成功した時**と**失敗した時**の両方の流れが見えるようになったな！」
+
+---
+
+### 📝 手順5：Laravel のエラーを完全理解する（超重要！）
+
+**ガネーシャ 🐘**：「ここからが本番や！エラーが出た時に、**何が起きてるか理解できる**ようになるで」
+
+**生徒👩‍💻**：「エラーって難しそう...」
+
+**ガネーシャ🐘**：「怖ないで！エラーはな、**プログラムからの手紙**なんや。『ここがおかしいで！』って優しく教えてくれとるんや」
+
+---
+
+#### 📊 エラーオブジェクトの構造を完全理解
+
+**ガネーシャ🐘**：「エラーが起きた時、axios は `err` っていうオブジェクトを返すんや。まずはこいつの構造を見てみよう」
+
+**Console で確認する方法：**
+
+```javascript
+catch (err) {
+    console.error("❌ エラーオブジェクト全体:", err);
+    console.error("📊 err.response:", err.response);
+    console.error("📦 err.response.data:", err.response?.data);
+}
+```
+
+**Console に表示される内容（404エラーの場合）：**
+
+```
+❌ エラーオブジェクト全体: Error: Request failed with status code 404
+  ├─ message: "Request failed with status code 404"
+  ├─ name: "AxiosError"
+  ├─ code: "ERR_BAD_REQUEST"
+  │
+  ├─ config: {...}  // リクエストの設定情報
+  │   ├─ url: "/api/tasks/99999"
+  │   ├─ method: "get"
+  │   └─ headers: {...}
+  │
+  ├─ request: {...}  // 送信したリクエスト
+  │
+  └─ response: {...}  // ⭐ ここが最重要！
+      ├─ status: 404  // HTTPステータスコード
+      ├─ statusText: "Not Found"
+      ├─ headers: {...}
+      │
+      └─ data: {...}  // ⭐⭐ Laravel が返したデータ
+          ├─ success: false
+          ├─ message: "タスクが見つかりません"
+          ├─ request_id: "req_abc123"
+          └─ status_code: 404
+```
+
+**ガネーシャ🐘**：「この中で、特に重要なのが **`err.response.data`** や！ここに Laravel からのメッセージが入っとるんや」
+
+**生徒👩‍💻**：「`err.response.data` を見ればいいんですね！」
+
+**ガネーシャ🐘**：「せや！でもな、`err.response` が `undefined` の時もあるから、`?.` （オプショナルチェーン）を使うんやで」
+
+```javascript
+// ❌ ダメな例（エラーになる可能性がある）
+console.error(err.response.data);
+
+// ✅ 良い例（安全）
+console.error(err.response?.data);
+console.error(err.response?.status);
+```
+
+---
+
+#### 🎯 Laravel が返すエラーの種類を完全マスター
+
+**ガネーシャ🐘**：「Laravel はな、エラーの種類によって違うデータを返してくれるんや。全部覚えよう！」
+
+---
+
+##### 1️⃣ 404エラー（Not Found）
+
+**いつ起きる？**
+- 存在しないタスクIDを指定した時
+- 存在しないURLにアクセスした時
+
+**試してみよう：**
+
+```javascript
+// わざと存在しないIDを指定
+const response = await axios.get('/api/tasks/99999');
+```
+
+**Console に表示される内容：**
+
+```javascript
+📊 err.response: {
+    status: 404,
+    statusText: "Not Found",
+    data: {
+        success: false,
+        message: "タスクが見つかりません",  // ← Laravel からの日本語メッセージ
+        request_id: "req_abc123",
+        status_code: 404
+    }
+}
+```
+
+**確認コード：**
+
+```javascript
+catch (err) {
+    if (err.response?.status === 404) {
+        console.error("🔍 404エラー: リソースが見つかりません");
+        console.error("💬 Laravel のメッセージ:", err.response.data.message);
+        console.error("🆔 リクエストID:", err.response.data.request_id);
+        console.error("📍 確認: 指定したIDは存在しますか？");
+    }
+}
+```
+
+---
+
+##### 2️⃣ 422エラー（Validation Error）
+
+**いつ起きる？**
+- タイトルを空欄にして送信した時
+- 文字数制限を超えた時
+- 必須項目が入力されていない時
+
+**試してみよう：**
+
+```javascript
+// わざとタイトルを空にして送信
+const response = await axios.post('/api/projects/1/tasks', {
+    title: '',  // 空欄！
+    description: 'あいうえお'.repeat(100)  // 長すぎる！
+});
+```
+
+**Console に表示される内容：**
+
+```javascript
+📊 err.response: {
+    status: 422,
+    statusText: "Unprocessable Entity",
+    data: {
+        success: false,
+        message: "バリデーションエラー",
+        errors: {  // ← フィールドごとのエラー詳細
+            title: [
+                "タイトルは必須です"
+            ],
+            description: [
+                "説明は255文字以内で入力してください"
+            ]
+        },
+        request_id: "req_def456",
+        status_code: 422
+    }
+}
+```
+
+**確認コード：**
+
+```javascript
+catch (err) {
+    if (err.response?.status === 422) {
+        console.error("📝 バリデーションエラー");
+        console.error("⚠️ エラー詳細:", err.response.data.errors);
+        
+        // フィールドごとに表示
+        Object.entries(err.response.data.errors).forEach(([field, messages]) => {
+            console.error(`  ❌ ${field}:`, messages.join(", "));
+        });
+        
+        // テーブル形式で見やすく表示
+        console.table(err.response.data.errors);
+    }
+}
+```
+
+**Console 出力：**
+
+```
+📝 バリデーションエラー
+⚠️ エラー詳細: {title: Array(1), description: Array(1)}
+  ❌ title: タイトルは必須です
+  ❌ description: 説明は255文字以内で入力してください
+
+┌────────────────┬──────────────────────────────────────────┐
+│ (index)        │ Values                                   │
+├────────────────┼──────────────────────────────────────────┤
+│ title          │ ["タイトルは必須です"]                   │
+│ description    │ ["説明は255文字以内で入力してください"]  │
+└────────────────┴──────────────────────────────────────────┘
+```
+
+**生徒👩‍💻**：「テーブル表示、見やすい！」
+
+**ガネーシャ🐘**：「せやろ！`console.table()` は配列やオブジェクトを見る時の最強ツールや」
+
+---
+
+##### 3️⃣ 401エラー（Unauthorized）
+
+**いつ起きる？**
+- ログインが必要なのにログインしていない時
+- トークンの有効期限が切れた時
+
+**Console に表示される内容：**
+
+```javascript
+📊 err.response: {
+    status: 401,
+    statusText: "Unauthorized",
+    data: {
+        success: false,
+        message: "認証が必要です",
+        request_id: "req_ghi789",
+        status_code: 401
+    }
+}
+```
+
+**確認コード：**
+
+```javascript
+catch (err) {
+    if (err.response?.status === 401) {
+        console.error("🔐 401エラー: 認証が必要です");
+        console.error("💬 Laravel のメッセージ:", err.response.data.message);
+        console.error("📍 確認: ログインしていますか？");
+        console.error("📍 確認: トークンは有効ですか？");
+    }
+}
+```
+
+---
+
+##### 4️⃣ 500エラー（Server Error）
+
+**いつ起きる？**
+- Laravel 側でプログラムエラーが起きた時
+- データベース接続エラーが起きた時
+
+**Console に表示される内容：**
+
+```javascript
+📊 err.response: {
+    status: 500,
+    statusText: "Internal Server Error",
+    data: {
+        success: false,
+        message: "サーバーエラー",  // 本番環境では詳細を隠す
+        request_id: "req_jkl012",
+        status_code: 500
+    }
+}
+```
+
+**確認コード：**
+
+```javascript
+catch (err) {
+    if (err.response?.status === 500) {
+        console.error("💥 500エラー: サーバー内部エラー");
+        console.error("💬 Laravel のメッセージ:", err.response.data.message);
+        console.error("🆔 リクエストID:", err.response.data.request_id);
+        console.error("📍 確認: storage/logs/laravel.log を見てください");
+        console.error("💡 Laravel 側のログで詳細を確認できます");
+    }
+}
+```
+
+**ガネーシャ🐘**：「500 エラーの時はな、**Laravel のログファイル**を見るのが鉄則や！」
+
+```bash
+# Laravel のログを確認
+tail -f storage/logs/laravel.log
+```
+
+---
+
+##### 5️⃣ ネットワークエラー（err.response がない）
+
+**いつ起きる？**
+- Laravel サーバーが起動していない時
+- インターネット接続が切れた時
+- CORS エラーが起きた時
+
+**Console に表示される内容：**
+
+```javascript
+❌ エラーオブジェクト全体: Error: Network Error
+  ├─ message: "Network Error"
+  ├─ request: {...}  // リクエストはある
+  └─ response: undefined  // ← レスポンスがない！
+```
+
+**確認コード：**
+
+```javascript
+catch (err) {
+    if (!err.response) {
+        // レスポンスがない = サーバーに届いていない
+        console.error("🌐 ネットワークエラー");
+        console.error("💬 メッセージ:", err.message);
+        console.error("📍 確認事項:");
+        console.error("  ✓ Laravel サーバーは起動していますか？");
+        console.error("    → ターミナルで 'php artisan serve' を実行");
+        console.error("  ✓ ネットワーク接続は正常ですか？");
+        console.error("  ✓ CORS の設定は正しいですか？");
+    }
+}
+```
+
+---
+
+#### 📋 エラー確認の完全フロー（プロの技）
+
+**ガネーシャ🐘**：「エラーが起きた時は、この順番で確認するんがプロの流儀や」
+
+```javascript
+catch (err) {
+    console.group("❌ エラー詳細分析");
+    
+    // Step 1: エラーの種類を確認
+    if (err.response) {
+        // サーバーからレスポンスが返ってきた
+        console.error("🔴 サーバーエラー（Laravel からレスポンスあり）");
+        console.error("📊 ステータスコード:", err.response.status);
+        console.error("📋 ステータステキスト:", err.response.statusText);
+        console.error("💬 Laravel のメッセージ:", err.response.data.message);
+        console.error("🆔 リクエストID:", err.response.data.request_id);
+        
+        // Step 2: ステータスコード別に詳細確認
+        console.group("💡 エラー別トラブルシューティング");
+        switch (err.response.status) {
+            case 400:
+                console.error("⚠️ 400 Bad Request: リクエストが不正です");
+                console.error("確認: 送信データの形式は正しいですか？");
+                break;
+                
+            case 401:
+                console.error("🔐 401 Unauthorized: 認証が必要です");
+                console.error("確認: ログインしていますか？");
+                console.error("確認: トークンは有効ですか？");
+                break;
+                
+            case 403:
+                console.error("🚫 403 Forbidden: アクセスが拒否されました");
+                console.error("確認: このリソースへのアクセス権限はありますか？");
+                break;
+                
+            case 404:
+                console.error("🔍 404 Not Found: リソースが見つかりません");
+                console.error("確認: URLは正しいですか？");
+                console.error("確認: リソースIDは存在しますか？");
+                break;
+                
+            case 422:
+                console.error("📝 422 Unprocessable Entity: バリデーションエラー");
+                console.error("バリデーションエラー詳細:");
+                if (err.response.data.errors) {
+                    console.table(err.response.data.errors);
+                    Object.entries(err.response.data.errors).forEach(([field, messages]) => {
+                        console.error(`  ❌ ${field}:`, messages.join(", "));
+                    });
+                }
+                break;
+                
+            case 500:
+                console.error("💥 500 Internal Server Error: サーバー内部エラー");
+                console.error("確認: storage/logs/laravel.log を確認してください");
+                break;
+                
+            default:
+                console.error(`❓ ${err.response.status}: その他のエラー`);
+        }
+        console.groupEnd();
+        
+        // Step 3: 完全なレスポンスデータを確認
+        console.group("📦 完全なレスポンスデータ");
+        console.error("Response Data:", err.response.data);
+        console.groupEnd();
+        
+    } else if (err.request) {
+        // リクエストは送信されたが、レスポンスがない
+        console.error("🌐 ネットワークエラー（レスポンスなし）");
+        console.error("💬 メッセージ:", err.message);
+        console.error("📍 トラブルシューティング:");
+        console.error("  1. Laravel サーバーは起動していますか？");
+        console.error("     → ターミナルで 'php artisan serve' を確認");
+        console.error("  2. Vite は起動していますか？");
+        console.error("     → ターミナルで 'npm run dev' を確認");
+        console.error("  3. ネットワーク接続は正常ですか？");
+        console.error("  4. CORS の設定は正しいですか？");
+        
+    } else {
+        // リクエストの設定中にエラーが発生
+        console.error("⚙️ リクエスト設定エラー");
+        console.error("💬 エラーメッセージ:", err.message);
+        console.error("📍 確認: axios の設定を確認してください");
+    }
+    
+    console.groupEnd();
+}
+```
+
+**生徒👩‍💻**：「すごく詳しい！これなら何が起きてるか完全に分かりますね！」
+
+**ガネーシャ🐘**：「せやろ！これが**プロのエラー確認フロー**や。エラーが出ても、もう怖くないやろ？」
+
+**生徒👩‍💻**：「はい！エラーが出るのが楽しみになってきました（笑）」
+
+**ガネーシャ🐘**：「ええ心がけや！エラーは**成長のチャンス**やからな」
 
 ---
 
@@ -698,307 +1122,14 @@ catch (err) {
 
   console.error("📍 エラー発生箇所:", err.stack);
   console.groupEnd();
+
+  handleError(err, "処理に失敗しました");
 }
 ```
 
 **生徒 👩‍💻**：「うわぁ！これならエラーの原因がすぐ分かりますね！」
 
 **ガネーシャ 🐘**：「せやろ！エラーハンドリングは**未来の自分を助ける投資**や。ワシの教え子のベンジャミン・フランクリンくんも『時間こそ金なり』って言うとったけど、デバッグ時間を短縮することは**時間を生み出すこと**なんやで」
-
----
-
-## 🎯 ミッション 3.5：Laravel のエラーを読み解く
-
-**ガネーシャ 🐘**：「ちょっと待てや！エラーが出た時に、Laravel から返ってくるエラーの見方も教えとかなアカンな」
-
-**生徒 👩‍💻**：「Laravel のエラー...？」
-
-**ガネーシャ 🐘**：「せや！お前のプロジェクトでは、バックエンドが Laravel や。Laravel がエラーを返す時には、**決まった形式**でエラー情報を送ってくるんや。これを読めるようになったら、デバッグが 100 倍速くなるで！」
-
----
-
-### 📊 Laravel エラーレスポンスの構造
-
-**ガネーシャ 🐘**：「まず、Laravel が返すエラーの構造を見てみよう」
-
-```javascript
-// ❌ エラー時のレスポンス構造
-{
-  "success": false,
-  "message": "タスクが見つかりません",
-  "request_id": "req_65a1b2c3d4e5f",
-  "status_code": 404
-}
-```
-
-**生徒 👩‍💻**：「なるほど！success が false でエラーって分かるんですね」
-
-**ガネーシャ 🐘**：「せや！そして message にエラーの内容が書かれとる。さらに request_id があるから、バックエンドのログと紐付けられるんや」
-
----
-
-### 📝 実践：Laravel エラーを console で確認する
-
-```javascript
-catch (err) {
-  console.group("❌ Laravel エラー詳細");
-
-  // Axios のエラーオブジェクトを確認
-  console.error("🔍 エラーオブジェクト全体:", err);
-
-  if (err.response) {
-    // Laravel からレスポンスが返ってきた場合
-    console.error("📊 HTTP ステータスコード:", err.response.status);
-    console.error("📦 Laravel レスポンス:", err.response.data);
-
-    // Laravel の標準レスポンス形式を確認
-    const laravelError = err.response.data;
-    console.error("✅ success:", laravelError.success);  // false
-    console.error("💬 message:", laravelError.message);  // エラーメッセージ
-    console.error("🆔 request_id:", laravelError.request_id);  // リクエストID
-    console.error("📊 status_code:", laravelError.status_code);  // ステータスコード
-
-    // バリデーションエラーの場合
-    if (laravelError.errors) {
-      console.error("📝 バリデーションエラー:");
-      console.table(laravelError.errors);
-    }
-  } else if (err.request) {
-    // Laravel に到達できなかった（ネットワークエラー）
-    console.error("🌐 Laravel に接続できませんでした");
-    console.error("確認事項:");
-    console.error("  - php artisan serve は起動していますか？");
-    console.error("  - ポート番号は合っていますか？");
-  }
-
-  console.groupEnd();
-}
-```
-
----
-
-### 🎯 Laravel エラーの種類と対処法
-
-**ガネーシャ 🐘**：「Laravel が返すエラーには、いくつか種類があるんや。それぞれ見ていこか」
-
-#### 1️⃣ 404 エラー（Not Found）
-
-```
-Console に表示される内容：
-
-❌ Laravel エラー詳細
-  📊 HTTP ステータスコード: 404
-  📦 Laravel レスポンス:
-    {
-      "success": false,
-      "message": "タスクが見つかりません",
-      "request_id": "req_xxxxx",
-      "status_code": 404
-    }
-```
-
-**原因：**
-
--   リソース（タスク、プロジェクトなど）が存在しない
--   URL が間違っている
--   すでに削除されている
-
-**対処法：**
-
-```javascript
-// ID が正しいか確認
-console.log("📍 リクエスト URL:", `/api/tasks/${taskId}`);
-console.log("📝 taskId の値:", taskId); // undefined や null じゃないか？
-```
-
----
-
-#### 2️⃣ 422 エラー（Validation Error）
-
-```
-Console に表示される内容：
-
-❌ Laravel エラー詳細
-  📊 HTTP ステータスコード: 422
-  📦 Laravel レスポンス:
-    {
-      "success": false,
-      "message": "バリデーションエラー",
-      "errors": {
-        "title": ["タイトルは必須です"],
-        "description": ["説明は255文字以内で入力してください"]
-      },
-      "request_id": "req_xxxxx",
-      "status_code": 422
-    }
-```
-
-**原因：**
-
--   必須フィールドが空
--   文字数制限オーバー
--   不正な形式（メールアドレス、日付など）
-
-**対処法：**
-
-```javascript
-// 送信データを確認
-console.log("📤 送信データ:", formData);
-console.table(formData); // テーブル形式で見やすく
-
-// バリデーションエラーを確認
-if (err.response?.data?.errors) {
-    console.error("📝 バリデーションエラー詳細:");
-    Object.entries(err.response.data.errors).forEach(([field, messages]) => {
-        console.error(`  ❌ ${field}:`, messages.join(", "));
-    });
-}
-```
-
----
-
-#### 3️⃣ 500 エラー（Server Error）
-
-```
-Console に表示される内容：
-
-❌ Laravel エラー詳細
-  📊 HTTP ステータスコード: 500
-  📦 Laravel レスポンス:
-    {
-      "success": false,
-      "message": "サーバーエラー",
-      "request_id": "req_xxxxx",
-      "status_code": 500
-    }
-```
-
-**原因：**
-
--   Laravel のコードにバグがある
--   データベース接続エラー
--   予期しない例外が発生
-
-**対処法：**
-
-```javascript
-// request_id をメモする
-console.error("🆔 リクエストID:", err.response.data.request_id);
-console.error("👉 このIDで Laravel のログを確認してください");
-console.error("   ログファイル: storage/logs/laravel.log");
-```
-
-**ターミナルで Laravel のログを確認：**
-
-```bash
-# Laravel のログを見る
-tail -f storage/logs/laravel.log
-
-# または、特定のリクエストIDで検索
-grep "req_xxxxx" storage/logs/laravel.log
-```
-
----
-
-#### 4️⃣ 401 エラー（Unauthorized）
-
-```
-Console に表示される内容：
-
-❌ Laravel エラー詳細
-  📊 HTTP ステータスコード: 401
-  📦 Laravel レスポンス:
-    {
-      "success": false,
-      "message": "認証が必要です",
-      "request_id": "req_xxxxx",
-      "status_code": 401
-    }
-```
-
-**原因：**
-
--   ログインしていない
--   トークンの有効期限切れ
--   トークンが不正
-
-**対処法：**
-
-```javascript
-// 認証状態を確認
-console.log("🔐 認証状態を確認:");
-console.log("  - ログインしていますか？");
-console.log("  - トークンは有効ですか？");
-
-// ログインページにリダイレクト
-router.push({ name: "login" });
-```
-
----
-
-### 🔍 実践例：Laravel エラーを完全に理解する
-
-**ガネーシャ 🐘**：「実際にエラーを発生させて、確認してみよう！」
-
-```javascript
-// 存在しないタスクを取得（404 エラー）
-const fetchTask = async () => {
-    console.group("🔍 タスク取得テスト");
-
-    try {
-        const taskId = 99999; // 存在しないID
-        console.log("📡 リクエスト:", `/api/tasks/${taskId}`);
-
-        const response = await axios.get(`/api/tasks/${taskId}`);
-        console.log("✅ 成功:", response.data);
-    } catch (err) {
-        console.error("❌ エラー発生！");
-        console.error("📊 ステータス:", err.response?.status);
-        console.error("💬 Laravel メッセージ:", err.response?.data?.message);
-        console.error("🆔 リクエストID:", err.response?.data?.request_id);
-        console.error("📦 完全なレスポンス:", err.response?.data);
-    }
-
-    console.groupEnd();
-};
-```
-
-**Console に表示される内容：**
-
-```
-🔍 タスク取得テスト
-  📡 リクエスト: /api/tasks/99999
-  ❌ エラー発生！
-  📊 ステータス: 404
-  💬 Laravel メッセージ: タスクが見つかりません
-  🆔 リクエストID: req_65a1b2c3d4e5f
-  📦 完全なレスポンス: {
-    success: false,
-    message: "タスクが見つかりません",
-    request_id: "req_65a1b2c3d4e5f",
-    status_code: 404
-  }
-```
-
-**生徒 👩‍💻**：「わぁ！Laravel のエラーがこんなに詳しく分かるんですね！」
-
-**ガネーシャ 🐘**：「せやろ！これが**フロントとバックエンドの連携の極意**や。エラーの構造を理解しとけば、問題解決が超速くなるで！」
-
----
-
-### 📋 Laravel エラー対処法チートシート
-
-| ステータス | 意味             | よくある原因         | 確認すべきこと                    |
-| :--------: | :--------------- | :------------------- | :-------------------------------- |
-|  **404**   | Not Found        | リソースが存在しない | ID が正しいか、URL が合っているか |
-|  **422**   | Validation Error | 入力値が不正         | 送信データ、バリデーションルール  |
-|  **500**   | Server Error     | Laravel でエラー     | Laravel のログ（laravel.log）     |
-|  **401**   | Unauthorized     | 認証エラー           | ログイン状態、トークンの有効期限  |
-|  **403**   | Forbidden        | 権限不足             | アクセス権限、ロール              |
-
----
-
-**ガネーシャ 🐘**：「これで Laravel のエラーも怖くないな！さぁ、次は Network タブも使いこなしていくで！」
 
 ---
 
