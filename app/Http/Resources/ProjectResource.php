@@ -20,6 +20,7 @@ class ProjectResource extends JsonResource
             'is_archived' => $this->is_archived,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'tasks' =>TaskResource::collection($this->tasks),
         ];
     }
 }

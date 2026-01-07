@@ -7,7 +7,11 @@ use Illuminate\Http\Request;
 
 class MembershipController extends Controller
 {
-    public function index()
+    public function post()
+    {
+        abort(501, 'Not Implemented');
+    }
+    public function delete()
     {
         abort(501, 'Not Implemented');
     }
