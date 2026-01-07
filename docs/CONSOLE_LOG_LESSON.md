@@ -830,33 +830,72 @@ catch (err) {
 **いつ起きる？**
 
 -   タイトルを空欄にして送信した時
--   文字数制限を超えた時
+-   タイトルが255文字を超えた時
 -   必須項目が入力されていない時
 
-**試してみよう：**
+**ガネーシャ 🐘**：「実際のプロジェクトのバリデーションルールを見てみよう」
+
+#### 💡 バリデーションルール（TaskRequest.php）
+
+```php
+public function rules(): array
+{
+    return [
+        'title' => 'required|string|max:255',  // 必須、文字列、最大255文字
+        'description' => 'nullable|string',    // 任意、文字列（長さ制限なし）
+        'status' => 'nullable',                // 任意
+    ];
+}
+```
+
+**生徒 👩‍💻**：「`description`には長さ制限がないんですね！」
+
+**ガネーシャ 🐘**：「せや！だから、エラーを出すには`title`を攻めるんや」
+
+**試してみよう（エラーを発生させるコード）：**
 
 ```javascript
-// わざとタイトルを空にして送信
+// ❌ パターン1：タイトルを空にして送信
 const response = await axios.post("/api/projects/1/tasks", {
-    title: "", // 空欄！
-    description: "あいうえお".repeat(100), // 長すぎる！
+    title: "",  // 空欄！
+    description: "これはサンプルです",
+});
+
+// ❌ パターン2：タイトルを256文字以上にする
+const response = await axios.post("/api/projects/1/tasks", {
+    title: "あ".repeat(256),  // 256文字！（255文字がmax）
+    description: "これはサンプルです",
 });
 ```
 
-**Console に表示される内容：**
+**Console に表示される内容（タイトル空欄の場合）：**
 
 ```javascript
 📊 err.response: {
     status: 422,
     statusText: "Unprocessable Entity",
     data: {
-        message: "The title field is required. (and 1 more error)",
+        message: "The title field is required.",
         errors: {  // ← フィールドごとのエラー詳細
             title: [
                 "The title field is required."
-            ],
-            description: [
-                "The description field must not be greater than 255 characters."
+            ]
+        }
+    }
+}
+```
+
+**Console に表示される内容（タイトル256文字の場合）：**
+
+```javascript
+📊 err.response: {
+    status: 422,
+    statusText: "Unprocessable Entity",
+    data: {
+        message: "The title field must not be greater than 255 characters.",
+        errors: {
+            title: [
+                "The title field must not be greater than 255 characters."
             ]
         }
     }
@@ -869,6 +908,7 @@ const response = await axios.post("/api/projects/1/tasks", {
 catch (err) {
     if (err.response?.status === 422) {
         console.error("📝 バリデーションエラー");
+        console.error("💬 メッセージ:", err.response.data.message);
         console.error("⚠️ エラー詳細:", err.response.data.errors);
 
         // フィールドごとに表示
@@ -882,20 +922,34 @@ catch (err) {
 }
 ```
 
-**Console 出力：**
+**Console 出力（タイトル空欄の場合）：**
 
 ```
 📝 バリデーションエラー
-⚠️ エラー詳細: {title: Array(1), description: Array(1)}
+💬 メッセージ: The title field is required.
+⚠️ エラー詳細: {title: Array(1)}
   ❌ title: The title field is required.
-  ❌ description: The description field must not be greater than 255 characters.
 
-┌────────────────┬───────────────────────────────────────────────────────────┐
-│ (index)        │ Values                                                    │
-├────────────────┼───────────────────────────────────────────────────────────┤
-│ title          │ ["The title field is required."]                          │
-│ description    │ ["The description field must not be greater than 255..."] │
-└────────────────┴───────────────────────────────────────────────────────────┘
+┌─────────┬──────────────────────────────────────┐
+│ (index) │ Values                               │
+├─────────┼──────────────────────────────────────┤
+│ title   │ ["The title field is required."]     │
+└─────────┴──────────────────────────────────────┘
+```
+
+**Console 出力（タイトル256文字の場合）：**
+
+```
+📝 バリデーションエラー
+💬 メッセージ: The title field must not be greater than 255 characters.
+⚠️ エラー詳細: {title: Array(1)}
+  ❌ title: The title field must not be greater than 255 characters.
+
+┌─────────┬──────────────────────────────────────────────────────────────┐
+│ (index) │ Values                                                       │
+├─────────┼──────────────────────────────────────────────────────────────┤
+│ title   │ ["The title field must not be greater than 255 characters."] │
+└─────────┴──────────────────────────────────────────────────────────────┘
 ```
 
 **生徒 👩‍💻**：「テーブル表示、見やすい！」
@@ -1366,7 +1420,9 @@ const createTask = async () => {
             console.table(err.response.data.errors);
         }
 
-        toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
     } finally {
         creatingTask.value = false;
         console.log("🏁 タスク作成処理終了");
@@ -1391,34 +1447,84 @@ const createTask = async () => {
 
 ### 📊 Laravel のレスポンス構造
 
-```javascript
-// ✅ 成功時のレスポンス
-{
-  success: true,
-  message: "タスクを作成しました",
-  data: {
-    id: 1,
-    title: "サンプルタスク",
-    description: "説明文",
-    status: "todo",
-    project: { ... },
-    created_by_user: { ... }
-  }
-}
+**ガネーシャ 🐘**：「このプロジェクトではな、タスク作成時に**カスタムレスポンス**を返しとるんや」
 
-// ❌ エラー時のレスポンス（バリデーションエラーの例）
+**生徒 👩‍💻**：「カスタムレスポンス...ですか？」
+
+**ガネーシャ 🐘**：「せや！Laravel側で`additional(['message' => 'タスクを作成しました'])`って追加しとるんや。実際のコードを見てみよう」
+
+#### 💡 Laravel側のコード（TaskController.php）
+
+```php
+public function store(TaskRequest $request, Project $project): JsonResponse
 {
-  message: "The title field is required. (and 1 more error)",
-  errors: {
-    title: ["The title field is required."],
-    description: ["The description field must not be greater than 255 characters."]
+    try {
+        $task = $this->taskService->createTask(
+            $request->validated(),
+            $project,
+            $request->user()
+        );
+
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを作成しました'])  // ← messageを追加
+            ->response()
+            ->setStatusCode(201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => $e->getMessage(),
+        ], 403);
+    }
+}
+```
+
+#### ✅ 成功時のレスポンス構造
+
+```javascript
+// axios のレスポンス全体
+{
+  status: 201,                    // HTTPステータスコード（Created）
+  statusText: "Created",
+  data: {                         // ← Laravel から返ってきた JSON
+    data: {                       // ← TaskResource が自動的に data でラップ
+      id: 9,
+      project_id: 1,
+      title: "y",
+      description: null,
+      status: "todo",
+      created_by: 1,
+      created_by_user: { ... },
+      project: { ... },
+      created_at: "...",
+      updated_at: "..."
+    },
+    message: "タスクを作成しました"  // ← additional() で追加されたメッセージ
+  },
+  headers: { ... },
+  config: { ... }
+}
+```
+
+**ガネーシャ 🐘**：「見てみ？`data.data`（TaskResourceのデータ）と`data.message`（カスタムメッセージ）の両方が返ってきとるやろ」
+
+#### ❌ エラー時のレスポンス（バリデーションエラーの例）
+
+**ガネーシャ 🐘**：「次はエラー時や。バリデーションエラーは**422ステータス**で返ってくるんや」
+
+```javascript
+// バリデーションエラー（422）のレスポンス
+{
+  status: 422,
+  statusText: "Unprocessable Entity",
+  data: {
+    message: "The title field is required.",  // エラーサマリー
+    errors: {                                 // フィールド別の詳細エラー
+      title: ["The title field is required."]
+    }
   }
 }
 ```
 
-**ガネーシャ 🐘**：「この構造を理解しとけば、どこにどんなデータがあるか分かるやろ？」
-
-**生徒 👩‍💻**：「なるほど！成功時は `data` プロパティにデータが入ってて、エラー時（404 や 500）は `exception` と `trace` が、バリデーションエラー時（422）は `errors` プロパティが入ってるんですね」
+**生徒 👩‍💻**：「なるほど！成功時は `data.data` と `data.message` があって、エラー時（422）は `data.errors` プロパティが入ってるんですね」
 
 **ガネーシャ 🐘**：「さすガネーシャの生徒や！飲み込みが早いな！」
 
