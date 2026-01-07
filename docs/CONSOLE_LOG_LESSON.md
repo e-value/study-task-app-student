@@ -657,9 +657,9 @@ const fetchTask = async () => {
 
 **成功時と エラー時の違い：**
 
-| 状態         | レスポンス構造                            | 特徴                                |
-| :----------- | :---------------------------------------- | :---------------------------------- |
-| **成功時**   | `{data: {id: 1, ...}}`                    | TaskResource が整形したデータ       |
+| 状態         | レスポンス構造                            | 特徴                                      |
+| :----------- | :---------------------------------------- | :---------------------------------------- |
+| **成功時**   | `{data: {id: 1, ...}}`                    | TaskResource が整形したデータ             |
 | **エラー時** | `{message: "...", exception: "...", ...}` | Laravel のエラー情報（詳細な trace 付き） |
 
 **生徒 👩‍💻**：「エラーレスポンスの方が情報が多いですね」
@@ -755,13 +755,14 @@ catch (err) {
       ├─ headers: {...}
       │
       └─ data: {...}  // ⭐⭐ Laravel が返したデータ
-          ├─ success: false
-          ├─ message: "タスクが見つかりません"
-          ├─ request_id: "req_abc123"
-          └─ status_code: 404
+          ├─ message: "No query results for model [App\\Models\\Task] 9999"
+          ├─ exception: "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"
+          ├─ file: "/var/www/html/vendor/laravel/framework/src/Illuminate/..."
+          ├─ line: 668
+          └─ trace: [{...}, {...}, ...]  // スタックトレース
 ```
 
-**ガネーシャ 🐘**：「この中で、特に重要なのが **`err.response.data`** や！ここに Laravel からのメッセージが入っとるんや」
+**ガネーシャ 🐘**：「この中で、特に重要なのが **`err.response.data`** や！ここに Laravel からのエラー情報が入っとるんや」
 
 **生徒 👩‍💻**：「`err.response.data` を見ればいいんですね！」
 
@@ -805,10 +806,11 @@ const response = await axios.get("/api/tasks/99999");
     status: 404,
     statusText: "Not Found",
     data: {
-        success: false,
-        message: "タスクが見つかりません",  // ← Laravel からの日本語メッセージ
-        request_id: "req_abc123",
-        status_code: 404
+        message: "No query results for model [App\\Models\\Task] 9999",
+        exception: "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException",
+        file: "/var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+        line: 668,
+        trace: [{...}, {...}, ...]
     }
 }
 ```
@@ -820,7 +822,7 @@ catch (err) {
     if (err.response?.status === 404) {
         console.error("🔍 404エラー: リソースが見つかりません");
         console.error("💬 Laravel のメッセージ:", err.response.data.message);
-        console.error("🆔 リクエストID:", err.response.data.request_id);
+        console.error("📝 例外クラス:", err.response.data.exception);
         console.error("📍 確認: 指定したIDは存在しますか？");
     }
 }
@@ -853,18 +855,15 @@ const response = await axios.post("/api/projects/1/tasks", {
     status: 422,
     statusText: "Unprocessable Entity",
     data: {
-        success: false,
-        message: "バリデーションエラー",
+        message: "The title field is required. (and 1 more error)",
         errors: {  // ← フィールドごとのエラー詳細
             title: [
-                "タイトルは必須です"
+                "The title field is required."
             ],
             description: [
-                "説明は255文字以内で入力してください"
+                "The description field must not be greater than 255 characters."
             ]
-        },
-        request_id: "req_def456",
-        status_code: 422
+        }
     }
 }
 ```
@@ -893,15 +892,15 @@ catch (err) {
 ```
 📝 バリデーションエラー
 ⚠️ エラー詳細: {title: Array(1), description: Array(1)}
-  ❌ title: タイトルは必須です
-  ❌ description: 説明は255文字以内で入力してください
+  ❌ title: The title field is required.
+  ❌ description: The description field must not be greater than 255 characters.
 
-┌────────────────┬──────────────────────────────────────────┐
-│ (index)        │ Values                                   │
-├────────────────┼──────────────────────────────────────────┤
-│ title          │ ["タイトルは必須です"]                   │
-│ description    │ ["説明は255文字以内で入力してください"]  │
-└────────────────┴──────────────────────────────────────────┘
+┌────────────────┬───────────────────────────────────────────────────────────┐
+│ (index)        │ Values                                                    │
+├────────────────┼───────────────────────────────────────────────────────────┤
+│ title          │ ["The title field is required."]                          │
+│ description    │ ["The description field must not be greater than 255..."] │
+└────────────────┴───────────────────────────────────────────────────────────┘
 ```
 
 **生徒 👩‍💻**：「テーブル表示、見やすい！」
@@ -924,10 +923,7 @@ catch (err) {
     status: 401,
     statusText: "Unauthorized",
     data: {
-        success: false,
-        message: "認証が必要です",
-        request_id: "req_ghi789",
-        status_code: 401
+        message: "Unauthenticated."
     }
 }
 ```
@@ -961,10 +957,11 @@ catch (err) {
     status: 500,
     statusText: "Internal Server Error",
     data: {
-        success: false,
-        message: "サーバーエラー",  // 本番環境では詳細を隠す
-        request_id: "req_jkl012",
-        status_code: 500
+        message: "Server Error",
+        exception: "ErrorException",
+        file: "/var/www/html/app/Services/TaskService.php",
+        line: 42,
+        trace: [{...}, {...}, ...]
     }
 }
 ```
@@ -975,8 +972,9 @@ catch (err) {
 catch (err) {
     if (err.response?.status === 500) {
         console.error("💥 500エラー: サーバー内部エラー");
-        console.error("💬 Laravel のメッセージ:", err.response.data.message);
-        console.error("🆔 リクエストID:", err.response.data.request_id);
+        console.error("💬 エラーメッセージ:", err.response.data.message);
+        console.error("📝 例外クラス:", err.response.data.exception);
+        console.error("📁 エラー発生ファイル:", err.response.data.file);
         console.error("📍 確認: storage/logs/laravel.log を見てください");
         console.error("💡 Laravel 側のログで詳細を確認できます");
     }
@@ -1043,7 +1041,7 @@ catch (err) {
         console.error("📊 ステータスコード:", err.response.status);
         console.error("📋 ステータステキスト:", err.response.statusText);
         console.error("💬 Laravel のメッセージ:", err.response.data.message);
-        console.error("🆔 リクエストID:", err.response.data.request_id);
+        console.error("📝 例外クラス:", err.response.data.exception);
 
         // Step 2: ステータスコード別に詳細確認
         console.group("💡 エラー別トラブルシューティング");
@@ -1406,22 +1404,19 @@ const handleTaskCreate = async () => {
   }
 }
 
-// ❌ エラー時のレスポンス
+// ❌ エラー時のレスポンス（バリデーションエラーの例）
 {
-  success: false,
-  message: "タスクの作成に失敗しました",
+  message: "The title field is required. (and 1 more error)",
   errors: {
-    title: ["タイトルは必須です"],
-    description: ["説明は255文字以内で入力してください"]
-  },
-  request_id: "req_xxxxx",
-  status_code: 422
+    title: ["The title field is required."],
+    description: ["The description field must not be greater than 255 characters."]
+  }
 }
 ```
 
 **ガネーシャ 🐘**：「この構造を理解しとけば、どこにどんなデータがあるか分かるやろ？」
 
-**生徒 👩‍💻**：「なるほど！成功時は `data` プロパティにデータが入ってて、エラー時は `errors` プロパティにバリデーションエラーが入ってるんですね」
+**生徒 👩‍💻**：「なるほど！成功時は `data` プロパティにデータが入ってて、エラー時（404や500）は `exception` と `trace` が、バリデーションエラー時（422）は `errors` プロパティが入ってるんですね」
 
 **ガネーシャ 🐘**：「さすガネーシャの生徒や！飲み込みが早いな！」
 
@@ -1435,17 +1430,15 @@ console.group("📦 レスポンス詳細分析");
 
 console.log("🔍 レスポンス全体:", response);
 
-// 第1階層
+// 第1階層（axios レスポンス）
 console.log("📊 HTTPステータス:", response.status); // 200, 201, 400, 404, 500 など
 console.log("📋 HTTPステータステキスト:", response.statusText); // "OK", "Created" など
 
-// 第2階層（response.data）
+// 第2階層（response.data - Laravel からの JSON）
 console.log("📦 data プロパティ:", response.data);
-console.log("✅ success:", response.data.success);
-console.log("💬 message:", response.data.message);
 
-// 第3階層（response.data.data）
-console.log("📝 実際のデータ:", response.data.data);
+// 第3階層（response.data.data - TaskResource のデータ）
+console.log("📝 実際のタスクデータ:", response.data.data);
 
 // オブジェクトの詳細表示
 if (response.data.data) {
@@ -1534,7 +1527,7 @@ catch (err) {
     console.error("🔴 サーバーエラー");
     console.error("📊 ステータスコード:", err.response.status);
     console.error("💬 メッセージ:", err.response.data.message);
-    console.error("🆔 リクエストID:", err.response.data.request_id);
+    console.error("📝 例外クラス:", err.response.data.exception);
 
     // ステータスコード別の詳細
     switch (err.response.status) {
