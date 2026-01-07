@@ -108,8 +108,6 @@ const fetchTask = async () => {
     console.error("📍 エラー発生箇所:");
     console.error(err.stack);
     
-    handleError(err, "タスクの読み込みに失敗しました");
-    
   } finally {
     loading.value = false;
     console.timeEnd("⏱️ タスク取得時間");
@@ -184,10 +182,8 @@ const saveChanges = async () => {
     } else {
       console.error("📊 HTTPステータス:", err.response?.status);
       console.error("💬 エラーメッセージ:", err.response?.data?.message);
+      toast.error("タスクの更新に失敗しました");
     }
-    
-    handleError(err, "タスクの更新に失敗しました");
-    toast.error(error.value);
     
   } finally {
     saving.value = false;
@@ -224,9 +220,7 @@ const startTask = async () => {
     console.error("❌ ステータス変更失敗");
     console.error("🔍 エラー:", err);
     console.error("💬 エラーメッセージ:", err.response?.data?.message);
-    
-    handleError(err, "タスクの開始に失敗しました");
-    toast.error(error.value);
+    toast.error("タスクの開始に失敗しました");
   } finally {
     console.log("🏁 処理終了");
     console.groupEnd();
@@ -253,9 +247,7 @@ const completeTask = async () => {
     console.error("❌ ステータス変更失敗");
     console.error("🔍 エラー:", err);
     console.error("💬 エラーメッセージ:", err.response?.data?.message);
-    
-    handleError(err, "タスクの完了に失敗しました");
-    toast.error(error.value);
+    toast.error("タスクの完了に失敗しました");
   } finally {
     console.log("🏁 処理終了");
     console.groupEnd();
@@ -304,9 +296,7 @@ const deleteTask = async () => {
     console.error("🔍 エラー:", err);
     console.error("📊 HTTPステータス:", err.response?.status);
     console.error("💬 エラーメッセージ:", err.response?.data?.message);
-    
-    handleError(err, "タスクの削除に失敗しました");
-    toast.error(error.value);
+    toast.error("タスクの削除に失敗しました");
     deleting.value = false;
   } finally {
     console.log("🏁 処理終了");
@@ -489,11 +479,16 @@ const fetchTasks = async () => {
 
 ## 3. エラーハンドリングの強化
 
-### 📂 ファイル: `resources/js/composables/useApiError.js`
+### 📂 参考：プロジェクトで使われている `useApiError.js`
 
-**既存のエラーハンドリングをさらに強化します。**
+**💡 注意：このプロジェクトには `useApiError.js` という composable が用意されていますが、まずは生の `console.error` を使って、エラーの構造を理解することが大切です。**
+
+以下は参考として、プロジェクトで実際に使われているエラーハンドリングの例です。
 
 ```javascript
+// これは参考コードです。まずは上記の例のように、
+// 生の console.error でエラーを確認する練習をしましょう。
+
 const handleError = (err, defaultMessage = "エラーが発生しました") => {
   // 開発環境でのみ詳細ログを出力
   if (import.meta.env.VITE_APP_DEBUG) {
@@ -787,7 +782,6 @@ const fetchTask = async () => {
     
   } catch (err) {
     logApiError(requestId, err);
-    handleError(err, "タスクの読み込みに失敗しました");
   } finally {
     loading.value = false;
   }
