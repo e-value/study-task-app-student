@@ -31,7 +31,7 @@ const fetchTask = async () => {
   try {
     loading.value = true;
     clearError();
-    const response = await axios.get(`/api/tasks/${taskId}`);
+    const response = await axios.get(`/api/tasks/99999`);
     // TaskResourceは直接dataを返すか、dataプロパティを持つ
     task.value = response.data.data || response.data;
   } catch (err) {
