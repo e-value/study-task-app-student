@@ -51,34 +51,32 @@ Route::get('/projects/{project}', [ProjectController::class, 'show']);
 // プロジェクトの更新
 Route::patch('/projects/{project}', [ProjectController::class, 'update']);
 // プロジェクトの削除
-Route::delete('/projects/{project}', [ProjectController::class, 'delete']);
-
-
-// 当初MemberControllerとTaskControllerでの設計でしたが、Projectを足してみました。
+Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
 
 // プロジェクトのメンバー追加
 Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store']);
 // プロジェクトのメンバーを削除
-Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'delete']);
+Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'destroy']);
 
 // プロジェクトのタスク一覧取得
-Route::get('/projects/{project}/tasks', [ProjectTaskController::class, 'index']);
+Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);
 // プロジェクトにタスク作成
-Route::post('/projects/{project}/tasks', [ProjectTaskController::class, 'store']);
+Route::post('/projects/{project}/tasks', [TaskController::class, 'store']);
+
 // プロジェクトのタスク詳細取得
 Route::get('/projects/{project}/tasks/{task}', [ProjectTaskController::class, 'show']);
 // プロジェクトのタスクを更新
 Route::patch('/projects/{project}/tasks/{task}', [ProjectTaskController::class, 'update']);
 // プロジェクトのタスクを削除
-Route::delete('/projects/{project}/tasks/{task}', [ProjectTaskController::class, 'delete']);
+Route::delete('/projects/{project}/tasks/{task}', [ProjectTaskController::class, 'destroy']);
 
-// プロジェクトのタスクを開始(上のProjectTaskControllerと一緒にするのかしないのか迷いましたが、とりあえず分けました)
+// プロジェクトのタスクを開始
 Route::patch('/projects/{project}/tasks/{task}/start', [ProjectTaskStatusController::class, 'start']); 
 // プロジェクトのタスクを完了
 Route::patch('/projects/{project}/tasks/{task}/complete', [ProjectTaskStatusController::class, 'complete']);
 
 
-// 自分のタスク一覧取得（自分が所属しているプロジェクトの全タスク） (謎)
-Route::get('/projects/{project}/tasks/my-tasks', [MyTaskController::class, 'index']); 
+Route::get('/my-tasks/tasks', [MyTaskController::class, 'index']); // 自分のタスク一覧
+
 
 });

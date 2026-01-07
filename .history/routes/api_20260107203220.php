@@ -51,7 +51,7 @@ Route::get('/projects/{project}', [ProjectController::class, 'show']);
 // プロジェクトの更新
 Route::patch('/projects/{project}', [ProjectController::class, 'update']);
 // プロジェクトの削除
-Route::delete('/projects/{project}', [ProjectController::class, 'delete']);
+Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
 
 
 // 当初MemberControllerとTaskControllerでの設計でしたが、Projectを足してみました。
@@ -59,7 +59,7 @@ Route::delete('/projects/{project}', [ProjectController::class, 'delete']);
 // プロジェクトのメンバー追加
 Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store']);
 // プロジェクトのメンバーを削除
-Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'delete']);
+Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'destroy']);
 
 // プロジェクトのタスク一覧取得
 Route::get('/projects/{project}/tasks', [ProjectTaskController::class, 'index']);
@@ -70,7 +70,7 @@ Route::get('/projects/{project}/tasks/{task}', [ProjectTaskController::class, 's
 // プロジェクトのタスクを更新
 Route::patch('/projects/{project}/tasks/{task}', [ProjectTaskController::class, 'update']);
 // プロジェクトのタスクを削除
-Route::delete('/projects/{project}/tasks/{task}', [ProjectTaskController::class, 'delete']);
+Route::delete('/projects/{project}/tasks/{task}', [ProjectTaskController::class, 'destroy']);
 
 // プロジェクトのタスクを開始(上のProjectTaskControllerと一緒にするのかしないのか迷いましたが、とりあえず分けました)
 Route::patch('/projects/{project}/tasks/{task}/start', [ProjectTaskStatusController::class, 'start']); 
