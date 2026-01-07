@@ -8,7 +8,8 @@ use App\Models\Task;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+
 
 class TaskController extends ApiController
 {
@@ -17,15 +18,16 @@ class TaskController extends ApiController
      */
     public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
+        // 自分がプロジェクトのメンバーかチェック
+        $currentUserId = Auth::user()->id;
+        $isProjectMember = $project->users()
+            ->where('users.id', $currentUserId)
             ->exists();
 
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
+        // メンバーでなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if (!$isProjectMember) {
+            abort(403, 'このプロジェクトにアクセスする権限がありません');
         }
 
         $tasks = $project->tasks()
@@ -37,41 +39,41 @@ class TaskController extends ApiController
     }
 
     /**
-     * タスク作成
+     * タスクを作成
      */
-    public function store(Request $request, Project $project): JsonResponse
+    public function store(Request $request, Project $project): TaskResource|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
+        // 自分がプロジェクトのメンバーかチェック
+        $userId = Auth::user()->id;
+        $isProjectMember = $project->users()
+            ->where('users.id', $userId)
             ->exists();
 
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
+        // メンバーでなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if (!$isProjectMember) {
+            abort(403, 'このプロジェクトにアクセスする権限がありません');
         }
 
-        $validator = Validator::make($request->all(), [
+
+        // バリデーションを記載
+        $validated = $request->validate([
+            'project_id' => 'required|integer ',
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:255',
+            'status' => 'nullable|string|max:255',
+
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
         $task = Task::create([
-            'project_id' => $project->id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => 'todo',
+            'project_id' => $validated['project_id'],
+            'title'       => $validated['title'],
+            'description' => $validated['description'],
+            'status' => $validated['status'],
             'created_by' => $request->user()->id,
         ]);
 
+        // タスクを読み込み（N+1問題を防ぐため）
         $task->load('createdBy');
 
         return (new TaskResource($task))
@@ -85,75 +87,85 @@ class TaskController extends ApiController
      */
     public function show(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $project = $task->project;
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
+        // 自分がプロジェクトのメンバーかチェック
+
+        $currentUserId = Auth::user()->id;
+        $project = $task->project();
+        $isProjectMember = $project->users()
+            ->where('users.id', $currentUserId)
             ->exists();
 
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
+        // メンバーでなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if (!$isProjectMember) {
+            abort(403, 'このプロジェクトにアクセスする権限がありません');
         }
 
+        // タスクを読み込み（N+1問題を防ぐため）
         $task->load(['createdBy', 'project']);
 
         return new TaskResource($task);
     }
 
     /**
-     * タスク更新
+     * タスクを更新
      */
     public function update(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $project = $task->project;
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
+        // 自分がプロジェクトのメンバーかチェック
+
+        $currentUserId = Auth::user()->id;
+        $project = $task->project();
+        $isProjectMember = $project->users()
+            ->where('users.id', $currentUserId)
             ->exists();
 
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
+
+        // メンバーでなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if (!$isProjectMember) {
+            abort(403, 'このプロジェクトにアクセスする権限がありません');
         }
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'sometimes|in:todo,doing,done',
+        // statusが“doneは更新不可（409）”を追加
+        // エラーコード: 409, エラーメッジ: doneは更新不可です
+        if ($task->status = 'done') {
+            abort(409, 'doneは更新不可です');
+        }
+
+        // バリデーションを記載
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'status' => 'nullable|string|max:255',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
 
         $task->update($request->only(['title', 'description', 'status']));
-        $task->load('createdBy');
+
+        // タスクを読み込み（N+1問題を防ぐため）
+        $task->load(['createdBy', 'project']);
 
         return (new TaskResource($task))
             ->additional(['message' => 'タスクを更新しました']);
     }
 
     /**
-     * タスク削除
+     * タスクを削除
      */
     public function destroy(Request $request, Task $task): JsonResponse
     {
-        // 自分が所属しているかチェック
-        $project = $task->project;
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
+        // 自分がプロジェクトのメンバーかチェック
+        $currentUserId = Auth::user()->id;
+        $project = $task->project();
+        $isProjectMember = $project->users()
+            ->where('users.id', $currentUserId)
             ->exists();
 
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
+        // メンバーでなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if (!$isProjectMember) {
+            abort(403, 'このプロジェクトにアクセスする権限がありません');
         }
 
         $task->delete();
@@ -164,62 +176,71 @@ class TaskController extends ApiController
     }
 
     /**
-     * タスクを開始（todo → doing）
+     * タスクを開始（status: todo → doing）
      */
     public function start(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $project = $task->project;
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
+        // 自分がプロジェクトのメンバーかチェック
+
+        $currentUserId = Auth::user()->id;
+        $project = $task->project();
+        $isProjectMember = $project->users()
+            ->where('users.id', $currentUserId)
             ->exists();
 
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
+        // メンバーでなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+
+        if (!$isProjectMember) {
+            abort(403, 'このプロジェクトにアクセスする権限がありません');
         }
 
-        // 状態チェック
-        if ($task->status !== 'todo') {
-            return response()->json([
-                'message' => '未着手のタスクのみ開始できます',
-            ], 409);
-        }
+        // ステータスがtodoでなければエラーを返す
+        // エラーコード: 409, エラーメッセージ: 未着手のタスクのみ開始できます
 
+        if (!$task->status = 'todo') {
+            abort(409, '未着手のタスクのみ開始できます');
+        }
+        // タスクを開始
         $task->update(['status' => 'doing']);
-        $task->load('createdBy');
 
-        return new TaskResource($task);
+        // タスクを読み込み（N+1問題を防ぐため）
+        $task->load(['createdBy', 'project']);
+
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを開始しました']);
     }
 
     /**
-     * タスクを完了（doing → done）
+     * タスクを完了（status: doing → done）
      */
     public function complete(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // 自分が所属しているかチェック
-        $project = $task->project;
-        $isMember = $project->users()
-            ->where('users.id', $request->user()->id)
+        // 自分がプロジェクトのメンバーかチェック
+        $currentUserId = Auth::user()->id;
+        $project = $task->project();
+        $isProjectMember = $project->users()
+            ->where('users.id', $currentUserId)
             ->exists();
 
-        if (!$isMember) {
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
+        // メンバーでなければエラーを返す
+        // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if (!$isProjectMember) {
+            abort(403, 'このプロジェクトにアクセスする権限がありません');
         }
 
-        // 状態チェック
-        if ($task->status !== 'doing') {
-            return response()->json([
-                'message' => '作業中のタスクのみ完了できます',
-            ], 409);
+        // ステータスがdoingでなければエラーを返す
+        // エラーコード: 409, エラーメッセージ: 作業中のタスクのみ完了できます
+        if (!$task->status = 'doing') {
+            abort(409, '作業中のタスクのみ完了できます');
         }
-
+        // タスクを完了
         $task->update(['status' => 'done']);
-        $task->load('createdBy');
 
-        return new TaskResource($task);
+        // タスクを読み込み（N+1問題を防ぐため）
+        $task->load(['createdBy', 'project']);
+
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを完了しました']);
     }
 }

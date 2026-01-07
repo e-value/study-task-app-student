@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\ProjectMemberController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
-use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,16 +13,12 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 // 認証が必要なAPI
 Route::middleware(['auth:sanctum'])->group(function () {
-    // Users
-    Route::get('/users', [UserController::class, 'index']);
-    Route::get('/users/dropdown', [UserController::class, 'dropdown']);
-
     // Projects
-    Route::get('/projects', [ProjectController::class, 'index']);
-    Route::post('/projects', [ProjectController::class, 'store']);
-    Route::get('/projects/{project}', [ProjectController::class, 'show']);
-    Route::put('/projects/{project}', [ProjectController::class, 'update']);
-    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+    Route::get('/projects', [ProjectController::class, 'index']);           // プロジェクト一覧取得
+    Route::post('/projects', [ProjectController::class, 'store']);          // プロジェクト作成
+    Route::get('/projects/{project}', [ProjectController::class, 'show']);  // プロジェクト詳細取得
+    Route::put('/projects/{project}', [ProjectController::class, 'update']); // プロジェクト更新
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']); // プロジェクト削除
 
     // Tasks
     Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);
@@ -36,6 +31,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Members
     Route::get('/projects/{project}/members', [ProjectMemberController::class, 'index']);
-    Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store']);
+    Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store']); // プロジェクト内のメンバー追加
     Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'destroy']);
 });
