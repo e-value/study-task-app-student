@@ -94,13 +94,15 @@ console.log("名前:", name, "年齢:", age); // → 名前: 太郎 年齢: 25
 
 **ガネーシャ 🐘**：「それが**虫眼鏡の本体**や！これを開かんことには始まらへんで」
 
-#### 🔑 デベロッパーツールの開き方（これだけ覚えればOK！）
+#### 🔑 デベロッパーツールの開き方（これだけ覚えれば OK！）
 
 **Mac の場合：**
-- **`Cmd + Option + I`** を同時に押す
+
+-   **`Cmd + Option + I`** を同時に押す
 
 **どのパソコンでも使える万能な方法：**
-- ページ上で**右クリック** → **「検証」** をクリック
+
+-   ページ上で**右クリック** → **「検証」** をクリック
 
 ```
 ┌─────────────────────────────────┐
@@ -114,7 +116,7 @@ console.log("名前:", name, "年齢:", age); // → 名前: 太郎 年齢: 25
 └─────────────────────────────────┘
 ```
 
-**ガネーシャ 🐘**：「一回覚えたら、あとはずっとこの方法でOKや！毎回説明せんからな」
+**ガネーシャ 🐘**：「一回覚えたら、あとはずっとこの方法で OK や！毎回説明せんからな」
 
 **生徒 👩‍💻**：「開きました！なんかいっぱいタブがありますね...」
 
@@ -213,13 +215,17 @@ const fetchTask = async () => {
 
 #### 🚀 サーバーを起動する
 
-```bash
-# ターミナル1: Laravel サーバー
-php artisan serve
+**ガネーシャ 🐘**：「このプロジェクトは **Laravel Sail** を使っとるから、起動方法がちょっと特別やで」
 
-# ターミナル2: Vite（フロントエンド）
+```bash
+# ターミナルで実行（Sail環境の起動）
+./vendor/bin/sail up -d
+
+# Vite（フロントエンド）を起動
 npm run dev
 ```
+
+**ガネーシャ 🐘**：「Sail は Docker を使って Laravel を動かす仕組みや。`sail up -d` で Laravel サーバーが起動するで」
 
 #### 🌐 ブラウザで確認
 
@@ -232,27 +238,27 @@ npm run dev
 🚀 fetchTask が呼ばれたで！
 📍 タスクID: 1
 📡 APIリクエストを送信するで： /api/tasks/1
-✅ APIレスポンス成功！ ▶︎ Object {...}  ← ここをクリックできる！
-📦 response.data の中身： ▶︎ Object {...}
-📝 取得したタスク： ▶︎ Object {...}
+✅ APIレスポンス成功！ ▶︎ {data: {•••}, status: 200, statusText: 'OK', headers: AxiosHeaders, config: {•••}, •••}
+📦 response.data の中身： ▶︎ {data: {•••}}
+📝 取得したタスク： ▶︎ {id: 1, project_id: 1, title: '...', status: 'todo', •••}
 🏁 fetchTask 終了！
 ```
 
 **ガネーシャ 🐘**：「せやろ！これが**プログラムの中が見える瞬間**や！成功した時の流れが全部見えとるな」
 
-**生徒 👩‍💻**：「でも、`Object {...}` って表示されていて、中身がよく分かりません...」
+**生徒 👩‍💻**：「あれ？`Object {...}` じゃなくて、`{data: {•••}, status: 200, ...}` って表示されてます。最初から一部が見えてますね」
 
-**ガネーシャ 🐘**：「ええところに気づいたな！それを今から教えるで」
+**ガネーシャ 🐘**：「おお、ええところに気づいたな！Console はな、**親切に一部のプロパティを最初から見せてくれる**んや。でも `{•••}` って部分はまだ隠れとるやろ？そこを開いていくんや」
 
 ---
 
 ### 📝 手順 3.5：コンソールでオブジェクトの中身を見る魔法
 
-**生徒 👩‍💻**：「`Object {...}` って何ですか？中身が見えません...」
+**生徒 👩‍💻**：「`{data: {•••}, status: 200, ...}` の `{•••}` の部分って何ですか？中身が見えません...」
 
-**ガネーシャ 🐘**：「おお、ええ質問や！これはな、**JavaScript のオブジェクト（データの塊）**なんや」
+**ガネーシャ 🐘**：「おお、ええ質問や！これはな、**JavaScript のオブジェクト（データの塊）**の**要約表示**なんや」
 
-#### 💡 `Object {...}` とは？
+#### 💡 オブジェクトと `{•••}` 表示について
 
 **ガネーシャ 🐘**：「まず、**Object（オブジェクト）**ってのはな、**データを入れる箱**や。例えば：」
 
@@ -261,56 +267,61 @@ npm run dev
 const user = {
     name: "太郎",
     age: 25,
-    email: "taro@example.com"
+    email: "taro@example.com",
 };
 ```
 
-**ガネーシャ 🐘**：「Console は親切にな、『オブジェクトがあるで～』って教えてくれとるんや。でも、**中身は最初は隠れとる**んや。なんでか分かるか？」
+**ガネーシャ 🐘**：「Console はな、オブジェクトが大きすぎると全部表示したら見づらいやろ？だから、**一部のプロパティを表示して、残りは `{•••}` で要約**してくれとるんや」
 
-**生徒 👩‍💻**：「なんでですか？」
+```
+例：
+✅ APIレスポンス成功！ ▶︎ {data: {•••}, status: 200, statusText: 'OK', ...}
+                        ↑          ↑
+                    最初から見える  隠れてる部分
+```
 
-**ガネーシャ 🐘**：「オブジェクトの中身がめっちゃ大きかったら、Console が情報で溢れかえってまうやろ？だから最初は『Object {...}』って**要約して表示**してくれとるんや。これが Console の優しさや」
+**生徒 👩‍💻**：「なるほど！じゃあ、`{•••}` の中を見るにはどうすればいいんですか？」
 
 #### 🎯 オブジェクトを展開する方法（超重要！）
 
-**ガネーシャ 🐘**：「さぁ、ここからが本番や！Console に表示されとる `Object {...}` の**左側に小さな▶︎マーク**があるはずや。これをクリックするんや！」
+**ガネーシャ 🐘**：「さぁ、ここからが本番や！Console に表示されとる行の**左側に小さな ▶︎ マーク**があるはずや。これをクリックするんや！」
 
-**Console 画面（クリック前）：**
+**Console 画面（実際の表示）：**
 
 ```
-✅ APIレスポンス成功！ ▶︎ Object {...}
+✅ APIレスポンス成功！ ▶︎ {data: {•••}, status: 200, statusText: 'OK', headers: AxiosHeaders, config: {•••}, •••}
                        ↑
                    この三角をクリック！
 ```
 
 **生徒 👩‍💻**：「あ！小さな三角がありました！クリックします」
 
-**ガネーシャ 🐘**：「よっしゃ！▶︎ をクリックしたら、▼ に変わって中身が見えるで！」
+**ガネーシャ 🐘**：「よっしゃ！▶︎ をクリックしたら、▼ に変わって**全部の中身**が見えるで！」
 
-**▶︎ をクリックすると → ▼ に変わって中身が展開される：**
+**▶︎ をクリックすると → ▼ に変わって全体が展開される：**
 
 ```
-✅ APIレスポンス成功！ ▼ Object
-  ├─ config: ▶︎ {transitional: {...}, adapter: [...], ...}
-  ├─ data: ▶︎ Object         ← これもクリックできる！
-  ├─ headers: ▶︎ {...}
-  ├─ request: ▶︎ XMLHttpRequest {...}
-  ├─ status: 200            ← 数値はそのまま表示
-  └─ statusText: "OK"       ← 文字列もそのまま表示
+✅ APIレスポンス成功！ ▼ {data: {•••}, status: 200, statusText: 'OK', ...}
+  config: ▶︎ {transitional: {•••}, adapter: [...], ...}
+  data: ▶︎ {data: {•••}}         ← これもクリックできる！
+  headers: ▶︎ AxiosHeaders {•••}
+  request: ▶︎ XMLHttpRequest {•••}
+  status: 200                   ← 数値はそのまま表示
+  statusText: "OK"              ← 文字列もそのまま表示
 ```
 
-**生徒 👩‍💻**：「わぁ！中身が見えました！でも、`data: ▶︎ Object` もまたObjectって書いてあります...」
+**生徒 👩‍💻**：「わぁ！全部の項目が見えました！でも、`data: ▶︎ {data: {•••}}` ってまた `{•••}` がありますね...」
 
 **ガネーシャ 🐘**：「せやろ！**オブジェクトの中にオブジェクトが入っとる**んや！これを**入れ子構造（ネスト）**って言うんや。箱の中に箱が入っとる感じやな」
 
 ```
-📦 大きな箱（Object）
+📦 axios のレスポンス（大きな箱）
   ├─ 📝 status: 200（数値）
   ├─ 📝 statusText: "OK"（文字列）
-  └─ 📦 data:（また箱！）
-       ├─ 📝 success: true
-       ├─ 📝 message: "..."
-       └─ 📦 data:（さらに箱！）
+  ├─ 📦 data:（また箱！）← Laravel からのデータ
+  │    └─ 📦 data:（さらに箱！）← 実際のタスクデータ
+  ├─ 📦 headers:（ヘッダー情報）
+  └─ 📦 config:（設定情報）
 ```
 
 **ガネーシャ 🐘**：「だから、**▶︎ を何回もクリックして、階層を深く掘っていく**んや。これが Console の基本テクニックや！」
@@ -319,12 +330,12 @@ const user = {
 
 **ガネーシャ 🐘**：「Console の記号の意味を整理しとこうや」
 
-| 記号 | 意味 | 状態 |
-|:---|:---|:---|
-| **▶︎** | 右向き三角 | 閉じた状態（中身が隠れてる） |
-| **▼** | 下向き三角 | 開いた状態（中身が見えてる） |
-| **{...}** | 波カッコに点々 | オブジェクトの要約表示 |
-| **[...]** | 角カッコに点々 | 配列の要約表示 |
+| 記号      | 意味           | 状態                         |
+| :-------- | :------------- | :--------------------------- |
+| **▶︎**    | 右向き三角     | 閉じた状態（中身が隠れてる） |
+| **▼**     | 下向き三角     | 開いた状態（中身が見えてる） |
+| **{...}** | 波カッコに点々 | オブジェクトの要約表示       |
+| **[...]** | 角カッコに点々 | 配列の要約表示               |
 
 **生徒 👩‍💻**：「なるほど！じゃあ、`data` の中も開いてみます！」
 
@@ -332,17 +343,15 @@ const user = {
 
 #### 📖 実際に階層を開いていく
 
-**ステップ1：最初の`data`を開く**
+**ステップ 1：最初の `data` を開く**
 
-**`data: ▶︎ Object` をクリックすると：**
+**`data: ▶︎ {data: {•••}}` をクリックすると：**
 
 ```
-✅ APIレスポンス成功！ ▼ Object
+✅ APIレスポンス成功！ ▼ {data: {•••}, status: 200, ...}
   config: ▶︎ {...}
-  data: ▼ Object              ← 今ここを開いた！
-    success: true             ← Laravel からの成功フラグ
-    message: "タスクを取得しました"  ← Laravel からのメッセージ
-    data: ▶︎ Object          ← え！また Object がある！
+  data: ▼ {data: {•••}}       ← 今ここを開いた！
+    data: ▶︎ {id: 1, project_id: 1, title: '...', •••}  ← え！また data がある！
   headers: ▶︎ {...}
   request: ▶︎ XMLHttpRequest {...}
   status: 200
@@ -353,34 +362,63 @@ const user = {
 
 **ガネーシャ 🐘**：「ええところに気づいたな！これが **response.data.data** って二重になってる理由や」
 
+#### 💡 なぜ data.data になるのか？
+
+**ガネーシャ 🐘**：「これはな、**Laravel の API Resource** の仕組みなんや」
+
 ```
 🎁 axios のレスポンス全体
-  └─ 📦 data（axios が用意した箱）
-       └─ 📦 data（Laravel が用意した箱）
-            └─ 💎 実際のタスクデータ
+  └─ 📦 data（axios が response.data に格納）
+       └─ 📦 data（Laravel の TaskResource が data でラップ）
+            └─ 💎 実際のタスクデータ（id, title, status など）
 ```
 
-**ガネーシャ 🐘**：「axios は `response.data` にサーバーからのデータを入れる。Laravel はそのデータの中に `data` っていう名前でタスク情報を入れる。だから `response.data.data` になるんや」
+**Laravel 側のコード（参考）：**
+
+```php
+// app/Http/Controllers/Api/TaskController.php
+public function show(Task $task) {
+    return new TaskResource($task);  // ← TaskResource で返す
+}
+
+// TaskResource は自動的に {data: {...}} でラップされる
+```
+
+**実際の JSON レスポンス：**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "project_id": 1,
+    "title": "サンプルタスク",
+    "status": "todo",
+    ...
+  }
+}
+```
+
+**ガネーシャ 🐘**：「axios は `response.data` にサーバーからの JSON を入れる。Laravel の TaskResource はデータを `{data: {...}}` でラップする。だから `response.data.data` で実際のタスクにアクセスできるんや」
 
 **生徒 👩‍💻**：「なるほど！じゃあ、内側の `data` も開いてみます！」
 
-**ステップ2：内側の`data`を開く**
+**ステップ 2：内側の `data` を開く（実際のタスクデータ）**
 
-**`data: ▶︎ Object` （内側）をクリックすると：**
+**`data: ▶︎ {id: 1, project_id: 1, ...}` をクリックすると：**
 
 ```
-✅ APIレスポンス成功！ ▼ Object
+✅ APIレスポンス成功！ ▼ {data: {•••}, status: 200, ...}
   config: ▶︎ {...}
-  data: ▼ Object
-    success: true
-    message: "タスクを取得しました"
-    data: ▼ Object            ← ついに最深部が開いた！
-      id: 1                   ← タスクID
-      title: "サンプルタスク"  ← タスクのタイトル
-      description: "これはサンプルのタスクです"
-      status: "todo"          ← ステータス（todo/doing/done）
-      created_by_user: ▶︎ Object   ← 作成者情報（これも開ける！）
-      project: ▶︎ Object            ← プロジェクト情報（これも開ける！）
+  data: ▼ {data: {•••}}
+    data: ▼ {id: 1, project_id: 1, title: '...', •••}  ← ついに最深部が開いた！
+      id: 1                         ← タスクID
+      project_id: 1                 ← プロジェクトID
+      title: "サンプルタスク"        ← タスクのタイトル
+      description: "これはサンプル"   ← 説明
+      status: "todo"                ← ステータス（todo/doing/done）
+      created_by: 1                 ← 作成者ID
+      created_by_user: ▶︎ {id: 1, name: '...', •••}  ← 作成者情報（これも開ける！）
+      project: ▶︎ {id: 1, name: '...', •••}          ← プロジェクト情報（これも開ける！）
       created_at: "2024-01-01T00:00:00.000000Z"
       updated_at: "2024-01-01T00:00:00.000000Z"
   headers: ▶︎ {...}
@@ -391,42 +429,44 @@ const user = {
 
 **生徒 👩‍💻**：「わぁ！タスクの詳細が全部見えました！」
 
-**ガネーシャ 🐘**：「せやろ！これが**オブジェクトの展開**や！」
+**ガネーシャ 🐘**：「せやろ！これが**オブジェクトの展開**や！**Laravel の TaskResource** が返したタスクの全データが見えとるやろ」
 
-#### 🎯 さらに深く！ネストしたObjectも開ける
+#### 🎯 さらに深く！ネストした Object も開ける
 
-**生徒 👩‍💻**：「`created_by_user: ▶︎ Object` ってのもありますね。これも開けますか？」
+**生徒 👩‍💻**：「`created_by_user: ▶︎ {id: 1, name: '...', •••}` ってのもありますね。これも開けますか？」
 
 **ガネーシャ 🐘**：「もちろんや！何階層でも開けるで！」
 
-**`created_by_user: ▶︎ Object` をクリック：**
+**`created_by_user: ▶︎ {id: 1, name: '...', •••}` をクリック：**
 
 ```
-data: ▼ Object
+data: ▼ {id: 1, project_id: 1, title: '...', •••}
   id: 1
+  project_id: 1
   title: "サンプルタスク"
-  created_by_user: ▼ Object    ← 開いた！
+  created_by_user: ▼ {id: 1, name: '山田太郎', email: 'taro@example.com'}  ← 開いた！
     id: 1                      ← ユーザーID
     name: "山田太郎"            ← ユーザー名
     email: "taro@example.com"  ← メールアドレス
-  project: ▶︎ Object
+  project: ▶︎ {id: 1, name: '...', •••}
+  status: "todo"
   ...
 ```
 
-**生徒 👩‍💻**：「すごい！どんどん深く見ていけるんですね！」
+**生徒 👩‍💻**：「すごい！どんどん深く見ていけるんですね！これも **UserResource** で整形されたデータなんですか？」
 
-**ガネーシャ 🐘**：「せや！**▶︎ を見つけたらクリック、▶︎ を見つけたらクリック**。これを繰り返すのが Console マスターへの第一歩や！」
+**ガネーシャ 🐘**：「せや！TaskResource の中で `new UserResource($this->createdBy)` って呼んでるから、ユーザー情報もきれいに整形されとるんや。**▶︎ を見つけたらクリック、▶︎ を見つけたらクリック**。これを繰り返すのが Console マスターへの第一歩や！」
 
 #### 📝 オブジェクト展開のコツまとめ
 
 **ガネーシャ 🐘**：「ここまでのコツをまとめるで」
 
-| やること | 説明 |
-|:---|:---|
-| **1. `Object {...}` を見つける** | オブジェクトの要約表示 |
-| **2. 左の▶︎をクリック** | 中身が展開されて▼になる |
-| **3. さらに▶︎があればクリック** | 何階層でも開ける！ |
-| **4. ▼をクリック** | 閉じて▶︎に戻る |
+| やること                             | 説明                                    |
+| :----------------------------------- | :-------------------------------------- |
+| **1. `{•••}` や `{...}` を見つける** | オブジェクトの要約表示（中身が隠れてる） |
+| **2. 左の ▶︎ をクリック**            | 全ての中身が展開されて ▼ になる         |
+| **3. さらに ▶︎ があればクリック**    | 何階層でも開ける！                      |
+| **4. ▼ をクリック**                  | 閉じて ▶︎ に戻る                        |
 
 **生徒 👩‍💻**：「これなら API から返ってきたデータの中身が全部確認できますね！」
 
@@ -438,22 +478,25 @@ data: ▼ Object
 
 **ガネーシャ 🐘**：「今見たデータはな、Laravel の API が返してくれとるんや。構造を整理してみよう」
 
-#### 📊 axios レスポンスの全体構造
+#### 📊 axios レスポンスの全体構造（実際の形）
 
 ```javascript
 // axios のレスポンス全体
 {
     status: 200,           // HTTP ステータスコード
     statusText: "OK",      // ステータステキスト
-    data: {                // ← Laravel から返ってきたデータ
-        success: true,              // 成功フラグ
-        message: "タスクを取得しました",  // Laravel からのメッセージ
-        data: {                     // 実際のタスクデータ
+    data: {                // ← Laravel から返ってきた JSON
+        data: {            // ← TaskResource が自動的に data でラップ
             id: 1,
+            project_id: 1,
             title: "サンプルタスク",
             description: "...",
             status: "todo",
-            // ...
+            created_by: 1,
+            created_by_user: {...},  // UserResource
+            project: {...},          // ProjectResource
+            created_at: "...",
+            updated_at: "..."
         }
     },
     headers: {...},        // レスポンスヘッダー
@@ -462,45 +505,47 @@ data: ▼ Object
 }
 ```
 
-**ガネーシャ 🐘**：「`response.data.data` って二重になってるのは、**axios の response.data** と **Laravel の data** が重なってるからやな」
+**ガネーシャ 🐘**：「`response.data.data` って二重になってるのは、**axios の response.data** と **Laravel の Resource が自動的に付ける data** が重なってるからやな」
 
 **生徒 👩‍💻**：「なるほど！Laravel のどこでこの形式を作ってるんですか？」
 
 **ガネーシャ 🐘**：「ええ質問や！Laravel 側のコードを見てみよう」
 
-#### 💡 Laravel 側のコード（参考）
+#### 💡 Laravel 側のコード（実際のプロジェクト）
 
 ```php
 // app/Http/Controllers/Api/TaskController.php
 
-public function show(Task $task)
+public function show(Request $request, Task $task): TaskResource|JsonResponse
 {
-    // TaskResource で整形して返す
-    return new TaskResource($task);
+    try {
+        $task = $this->taskService->getTask($task, $request->user());
+        return new TaskResource($task);  // ← これが自動的に {data: {...}} でラップされる
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => $e->getMessage(),
+        ], 403);
+    }
 }
+```
 
+```php
 // app/Http/Resources/TaskResource.php
-public function toArray($request)
+
+public function toArray(Request $request): array
 {
     return [
         'id' => $this->id,
+        'project_id' => $this->project_id,
         'title' => $this->title,
         'description' => $this->description,
         'status' => $this->status,
-        'created_by_user' => new UserResource($this->createdBy),
-        'project' => new ProjectResource($this->project),
-        // ...
+        'created_by' => $this->created_by,
+        'created_by_user' => new UserResource($this->whenLoaded('createdBy')),
+        'project' => new ProjectResource($this->whenLoaded('project')),
+        'created_at' => $this->created_at,
+        'updated_at' => $this->updated_at,
     ];
-}
-
-// app/Http/Responses/ApiResponse.php
-public function success($message, $data = null, $statusCode = 200)
-{
-    return response()->json([
-        'success' => true,
-        'message' => $message,
-        'data' => $data,  // ← ここに TaskResource のデータが入る
-    ], $statusCode);
 }
 ```
 
@@ -508,30 +553,33 @@ public function success($message, $data = null, $statusCode = 200)
 
 ```json
 {
-    "success": true,
-    "message": "タスクを取得しました",
     "data": {
         "id": 1,
+        "project_id": 1,
         "title": "サンプルタスク",
         "description": "これはサンプルのタスクです",
         "status": "todo",
+        "created_by": 1,
         "created_by_user": {
             "id": 1,
-            "name": "山田太郎"
+            "name": "山田太郎",
+            "email": "taro@example.com"
         },
         "project": {
             "id": 1,
             "name": "サンプルプロジェクト"
-        }
+        },
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
     }
 }
 ```
 
-**ガネーシャ 🐘**：「Laravel は **ApiResponse と Resource クラス**を使って、データを統一した形式で返してくれとるんや。これでフロントエンド側が扱いやすくなるんやな」
+**ガネーシャ 🐘**：「Laravel の **API Resource（JsonResource）** はな、**自動的に `data` でラップ**してくれるんや。これは Laravel の仕様なんや」
 
-**生徒 👩‍💻**：「なるほど！じゃあ、いつも `success` と `message` と `data` が返ってくるんですね」
+**生徒 👩‍💻**：「なるほど！だから `new TaskResource($task)` って返すだけで、`{data: {...}}` の形式になるんですね」
 
-**ガネーシャ 🐘**：「せや！これが**API 設計の統一**や。どのエンドポイントを叩いても同じ形式で返ってくるから、フロントエンド側のコードが書きやすくなるんや」
+**ガネーシャ 🐘**：「せや！これが**Laravel API Resource** の便利なところや。統一された形式でデータを返してくれるから、フロントエンド側が扱いやすいんやな」
 
 ---
 
@@ -585,97 +633,80 @@ const fetchTask = async () => {
 **`📊 エラーレスポンス: ▶︎ Object` をクリックすると：**
 
 ```
-📊 エラーレスポンス: ▼ Object
+📊 エラーレスポンス: ▼ {status: 404, statusText: "Not Found", data: {•••}, ...}
   status: 404
   statusText: "Not Found"
-  data: ▼ Object
-    success: false           ← 成功時は true だったのが false に
-    message: "タスクが見つかりません"  ← Laravel からのエラーメッセージ
-    request_id: "req_abc123"
-    status_code: 404
+  data: ▼ {message: '...', exception: '...', file: '...', ...}
+    message: "No query results for model [App\\Models\\Task] 99999"  ← Laravel のエラーメッセージ
+    exception: "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"
+    file: "/var/www/html/vendor/laravel/framework/src/Illuminate/..."
+    line: 419
+    trace: ▶︎ [...]  ← スタックトレース
   headers: ▶︎ {...}
   config: ▶︎ {...}
   request: ▶︎ XMLHttpRequest {...}
 ```
 
-**生徒 👩‍💻**：「成功時と違って、`success: false` で、`message` にエラーメッセージが入ってるんですね！」
+**生徒 👩‍💻**：「あれ？成功時と構造が全然違いますね...`data: {data: {...}}` じゃないです」
 
-**ガネーシャ 🐘**：「さすガネーシャの生徒や！飲み込みが早いな！成功でもエラーでも同じ構造で返ってくるから、フロントエンドでの処理がしやすいんや」
+**ガネーシャ 🐘**：「おお、ええところに気づいたな！これはな、**Laravel のデフォルトエラーレスポンス**なんや」
 
----
+#### 💡 なぜエラー時の構造が違うのか？
 
-### 📝 手順 4.5：デフォルトの Laravel エラーとカスタムエラーハンドリングの違い
-
-**ガネーシャ 🐘**：「ここで大事なことを教えるで。実はな、このプロジェクトでは **`bootstrap/app.php` で API エラーハンドラーをコメントアウト**してあるんや」
+**ガネーシャ 🐘**：「実はな、このプロジェクトでは **`bootstrap/app.php` でカスタムエラーハンドラーをコメントアウト**してあるんや」
 
 **生徒 👩‍💻**：「コメントアウト...？なぜですか？」
 
-**ガネーシャ 🐘**：「それはな、**Laravel のデフォルトのエラーレスポンス**を見てもらうためや。勉強用にわざとそうしとるんや」
+**ガネーシャ 🐘**：「勉強のためや！**Laravel のデフォルトのエラー**を見ることで、何が起きてるか理解できるようになるんや」
 
-#### 📝 現在の `bootstrap/app.php` の状態
+**成功時と エラー時の違い：**
+
+| 状態 | レスポンス構造 | 理由 |
+|:---|:---|:---|
+| **成功時** | `{data: {id: 1, ...}}` | TaskResource が返される |
+| **エラー時** | `{message: "...", exception: "...", ...}` | Laravel のデフォルトエラー |
+
+**ガネーシャ 🐘**：「エラー時は Resource を通らずに、Laravel が直接エラーレスポンスを返すから、構造が違うんや」
+
+---
+
+### 📝 手順 4.5：カスタムエラーハンドラーについて知ろう
+
+**ガネーシャ 🐘**：「今見たデフォルトエラーはな、詳しすぎて分かりにくいやろ？だから実際のプロジェクトでは **カスタムエラーハンドラー** を使うんや」
+
+**生徒 👩‍💻**：「カスタムエラーハンドラー...？」
+
+**ガネーシャ 🐘**：「せや。このプロジェクトには `ApiExceptionHandler` ってクラスがあって、それを使えばもっと分かりやすいエラーレスポンスになるんや。でも今は**勉強用にコメントアウト**してあるんや」
+
+#### 📝 現在の状態（`bootstrap/app.php`）
 
 ```php
-// bootstrap/app.php
-
-->withExceptions(function (Exceptions $exceptions): void {
-    // Sentry統合（研修用に必要に応じてコメントアウト）
-    // Integration::handles($exceptions);
-
-    // API例外ハンドラーを登録（研修用にコメントアウト中）
-    // $apiHandler = new ApiExceptionHandler();
-    // $exceptions->render(function (\Throwable $e, Request $request) use ($apiHandler) {
-    //     return $apiHandler->handle($e, $request);
-    // });
-})->create();
+// 研修用にコメントアウト中（Laravel のデフォルトエラーが表示される）
+// $apiHandler = new ApiExceptionHandler();
+// $exceptions->render(function (\Throwable $e, Request $request) use ($apiHandler) {
+//     return $apiHandler->handle($e, $request);
+// });
 ```
 
 **ガネーシャ 🐘**：「**コメントアウトされてる = Laravel のデフォルトエラーが表示される**んや」
 
-#### 🔍 Laravel のデフォルトエラーレスポンス
+#### 📋 デフォルトエラーとカスタムエラーの違い
 
-**コメントアウト中（デフォルト）の場合：**
+| 項目           | デフォルトエラー（現在）                  | カスタムエラー（コメント解除時）   |
+| :------------- | :---------------------------------------- | :--------------------------------- |
+| **message**    | "No query results for model..."           | "タスクが見つかりません"           |
+| **構造**       | exception, file, line, trace など詳細情報 | success, message, request_id など  |
+| **分かりやすさ** | 開発者向け（詳細すぎる）                  | ユーザー向け（シンプル）           |
 
-```json
-{
-    "message": "No query results for model [App\\Models\\Task] 99999",
-    "exception": "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException",
-    "file": "/path/to/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
-    "line": 419,
-    "trace": [
-        // 長いスタックトレース...
-    ]
-}
-```
+**生徒 👩‍💻**：「カスタムエラーの方が分かりやすそうですね」
 
-**カスタムハンドラー有効時（コメント解除）の場合：**
+**ガネーシャ 🐘**：「せや！でもな、**デフォルトエラーも大事**なんや。エラーの trace を見れば、どのファイルのどの行でエラーが起きたか分かるから、デバッグに役立つんや」
 
-```json
-{
-    "success": false,
-    "message": "タスクが見つかりません",
-    "request_id": "req_abc123",
-    "status_code": 404
-}
-```
+#### 💡 学習のポイント
 
-**生徒 👩‍💻**：「デフォルトは詳しすぎて、逆に分かりにくいですね...」
+**ガネーシャ 🐘**：「今は勉強中やから、デフォルトエラーを見て**エラーの構造を理解する**のが大事や。将来、カスタムエラーハンドラーを作る時に役立つで！」
 
-**ガネーシャ 🐘**：「せやねん！だから実際のプロジェクトでは、カスタムエラーハンドラーを作って、**統一された分かりやすい形式**で返すんや。でも今は勉強中やから、デフォルトも見ておくんが大事やで」
-
-#### 📋 成功時とエラー時の比較（カスタムハンドラー有効時）
-
-| 項目           | 成功時（200）            | エラー時（404）          |
-| :------------- | :----------------------- | :----------------------- |
-| **success**    | `true`                   | `false`                  |
-| **message**    | "タスクを取得しました"   | "タスクが見つかりません" |
-| **data**       | タスクのデータ（Object） | `null` または なし       |
-| **status**     | 200                      | 404                      |
-| **statusText** | "OK"                     | "Not Found"              |
-| **request_id** | なし                     | "req_abc123"             |
-
-**ガネーシャ 🐘**：「これで**成功した時**と**失敗した時**の両方の流れが見えるようになったな！」
-
-**生徒 👩‍💻**：「はい！コンソールでオブジェクトを展開すれば、全部の中身が確認できるんですね」
+**生徒 👩‍💻**：「なるほど！Console で ▶︎ をクリックすれば、エラーの詳細も全部確認できますね」
 
 **ガネーシャ 🐘**：「せや！**▶︎ をクリックして展開する**のを忘れんようにな。これができれば、デバッグが 100 倍楽になるで」
 
@@ -701,18 +732,18 @@ const response = await axios.get(`/api/tasks/${taskId}`);
 
 **ガネーシャ 🐘**：「ここまでで学んだことを整理しとこうや」
 
-| やったこと               | 何が分かったか              | 使うツール                      |
-| :----------------------- | :-------------------------- | :------------------------------ |
-| **Console タブを開く**   | デベロッパーツールの使い方  | `F12` または `Cmd + Option + I` |
-| **console.log で確認**   | 処理の流れを追跡            | `console.log()`                 |
-| **▶︎ をクリック**        | オブジェクトの中身を展開    | Console の展開機能              |
-| **Laravel のレスポンス** | 統一された形式で返ってくる  | `{success, message, data}`      |
-| **ApiResource**          | Laravel がデータを整形      | `TaskResource::class`           |
-| **response()->json()**   | JSON 形式でレスポンス       | `ApiResponse クラス`            |
-| **成功時の確認**         | status: 200, success: true  | Console で確認                  |
-| **エラー時の確認**       | status: 404, success: false | Console で確認                  |
-| **デフォルトエラー**     | Laravel のそのままのエラー  | `app.php` コメントアウト中      |
-| **カスタムエラー**       | 統一された分かりやすい形式  | `ApiExceptionHandler`           |
+| やったこと                 | 何が分かったか                            | 使うツール / 仕組み             |
+| :------------------------- | :---------------------------------------- | :------------------------------ |
+| **Console タブを開く**     | デベロッパーツールの使い方                | `Cmd + Option + I` または右クリック |
+| **console.log で確認**     | 処理の流れを追跡                          | `console.log()`                 |
+| **▶︎ をクリック**          | `{•••}` の中身を展開して全部見る          | Console の展開機能              |
+| **Laravel のレスポンス**   | `{data: {...}}` の形式で返ってくる        | TaskResource（JsonResource）    |
+| **response.data.data**     | 二重の data になる理由を理解              | axios + Laravel の仕様          |
+| **成功時の確認**           | `{data: {id: 1, ...}}` の構造             | Console で展開して確認          |
+| **エラー時の確認**         | `{message: "...", exception: "..."}` の構造 | Laravel デフォルトエラー        |
+| **デフォルトエラー**       | 詳細な trace 付きエラー（現在の状態）     | `app.php` コメントアウト中      |
+| **カスタムエラー**         | シンプルで分かりやすい形式                | `ApiExceptionHandler`（未使用）  |
+| **Sail環境**               | Docker で Laravel を動かす                | `./vendor/bin/sail up -d`       |
 
 **生徒 👩‍💻**：「Console の使い方が分かってきました！」
 
