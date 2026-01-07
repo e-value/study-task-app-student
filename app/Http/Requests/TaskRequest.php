@@ -3,18 +3,19 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ProjectRequest extends FormRequest
+class TaskRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        // ログインユーザーであればプロジェクトを作成できる
-        return $this->user() !== null;
+       // ログインユーザーであればタスクを作成できる
+       return $this->user() !== null;
     }
 
     /**
@@ -22,16 +23,17 @@ class ProjectRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(Request $request): array
     {
         return [
-            'name' => 'sometimes|required|string|max:255',
-            'is_archived' => 'sometimes|boolean',
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'sometimes|in:todo,doing,done',
         ];
     }
 
 
-    	/**
+        	/**
 	 * Handle a failed validation attempt.
 	 *
 	 * @param Illuminate\Contracts\Validation\Validator $validator
