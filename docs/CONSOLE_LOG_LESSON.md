@@ -149,21 +149,16 @@ const fetchTask = async () => {
         const response = await axios.get(`/api/tasks/${taskId}`);
         task.value = response.data.data || response.data;
     } catch (err) {
-        // 後で詳しく学ぶ handleError
-        handleError(err, "タスクの読み込みに失敗しました");
+        alert("タスクの読み込みに失敗しました");
     } finally {
         loading.value = false;
     }
 };
 ```
 
-**ガネーシャ 🐘**：「このコードにな、console.log を仕込むんや！でもな、まずは**handleError を使わずに**、生のエラーを確認する方法を教えたるわ」
+**ガネーシャ 🐘**：「このコードにな、console.log を仕込んで、**処理の流れとデータの中身を確認できるようにする**んや！」
 
-**生徒 👩‍💻**：「handleError って何ですか？」
-
-**ガネーシャ 🐘**：「それはな、このプロジェクトで用意されとる便利な関数や。でも最初は**生の console.log でエラーを見る練習**が大事なんや。料理でいうたら、インスタント使う前に基本の出汁の取り方を学ぶようなもんやな」
-
-**追加後のコード（handleError なしバージョン）：**
+**追加後のコード：**
 
 ```javascript
 const fetchTask = async () => {
@@ -1335,16 +1330,18 @@ console.timeEnd("⏱️ API呼び出し時間");
 **生徒 👩‍💻**：「ありました！`handleTaskCreate` 関数ですね」
 
 ```javascript
-const handleTaskCreate = async () => {
+const createTask = async () => {
     console.group("📝 タスク作成処理開始");
-    console.log("📤 送信するデータ:", taskForm.value);
+    console.log("📤 送信するデータ:", newTask.value);
     console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
     console.log("🕒 送信時刻:", new Date().toLocaleTimeString());
 
     try {
+        creatingTask.value = true;
+
         const response = await axios.post(
             `/api/projects/${projectId}/tasks`,
-            taskForm.value
+            newTask.value
         );
 
         console.log("✅ 作成成功！");
@@ -1353,7 +1350,9 @@ const handleTaskCreate = async () => {
         console.log("📝 レスポンスデータ:", response.data);
         console.log("🆕 作成されたタスク:", response.data.data);
 
-        // 成功処理...
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
     } catch (err) {
         console.error("❌ 作成失敗！");
         console.error("🔍 エラーオブジェクト:", err);
@@ -1366,7 +1365,10 @@ const handleTaskCreate = async () => {
             console.error("⚠️ バリデーションエラー:", err.response.data.errors);
             console.table(err.response.data.errors);
         }
+
+        toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
     } finally {
+        creatingTask.value = false;
         console.log("🏁 タスク作成処理終了");
         console.groupEnd();
     }
@@ -1416,7 +1418,7 @@ const handleTaskCreate = async () => {
 
 **ガネーシャ 🐘**：「この構造を理解しとけば、どこにどんなデータがあるか分かるやろ？」
 
-**生徒 👩‍💻**：「なるほど！成功時は `data` プロパティにデータが入ってて、エラー時（404や500）は `exception` と `trace` が、バリデーションエラー時（422）は `errors` プロパティが入ってるんですね」
+**生徒 👩‍💻**：「なるほど！成功時は `data` プロパティにデータが入ってて、エラー時（404 や 500）は `exception` と `trace` が、バリデーションエラー時（422）は `errors` プロパティが入ってるんですね」
 
 **ガネーシャ 🐘**：「さすガネーシャの生徒や！飲み込みが早いな！」
 
@@ -1456,63 +1458,15 @@ console.groupEnd();
 
 ## 🎯 ミッション 3：エラーを徹底的に追跡する
 
-**ガネーシャ 🐘**：「お前のプロジェクトには既に `useApiError.js` っちゅう優秀なエラーハンドリングがあるんやけど、これをもっと活用してみるで」
+**ガネーシャ 🐘**：「エラーが起きた時にな、**どんな情報を確認すればいいか**を教えるで！」
 
-**生徒 👩‍💻**：「useApiError.js ですか？」
+**生徒 👩‍💻**：「はい！お願いします！」
 
-**ガネーシャ 🐘**：「せや。このファイル、見てみ」
-
-開くファイル：`resources/js/composables/useApiError.js`
-
-```javascript
-// 39-52行目
-if (import.meta.env.APP_DEBUG) {
-    console.group("🚨 API Error");
-    console.error("Error:", err);
-    if (err.response) {
-        console.error("Status:", err.response.status);
-        console.error("Data:", err.response.data);
-        console.error("URL:", err.config?.url);
-    } else {
-        console.error("Network Error:", err.message);
-    }
-    console.groupEnd();
-}
-```
-
-**生徒 👩‍💻**：「あ、`import.meta.env.APP_DEBUG` が `true` の時だけログを出すんですね！」
-
-**ガネーシャ 🐘**：「せや！これが**環境に応じた出し分け**や。開発中はログを出して、本番環境では出さへんようにする。これはセキュリティにも繋がるんや」
+**ガネーシャ 🐘**：「エラー時にはな、この順番で情報を確認していくんや」
 
 ---
 
-### 📝 .env ファイルで APP_DEBUG を切り替える
-
-**ガネーシャ 🐘**：「お前のプロジェクトの `.env` ファイルを見てみ」
-
-開くファイル：`.env`（プロジェクトルートにある）
-
-```bash
-# 開発中はこれを true に
-VITE_APP_DEBUG=true
-
-# 本番環境ではこれを false に
-# VITE_APP_DEBUG=false
-```
-
-**生徒 👩‍💻**：「あ、`VITE_APP_DEBUG` って書いてあります！」
-
-**ガネーシャ 🐘**：「せや！Vite（ビルドツール）を使っとるから `VITE_` プレフィックスが必要なんや。これを `true` にするとログが出て、`false` にするとログが出なくなる」
-
-| 環境             | APP_DEBUG |  ログ出力   | 用途                     |
-| :--------------- | :-------: | :---------: | :----------------------- |
-| 開発環境         |  `true`   |   ✅ 出す   | デバッグ作業             |
-| ステージング環境 |  `false`  | ❌ 出さない | 本番に近い環境でのテスト |
-| 本番環境         |  `false`  | ❌ 出さない | セキュリティ対策         |
-
----
-
-### 📝 実装：より詳細なエラーログ
+### 📝 実装：詳細なエラーログ
 
 **ガネーシャ 🐘**：「せっかくやから、エラーの時にもっと詳しい情報を出すようにしてみよう」
 
@@ -1574,7 +1528,8 @@ catch (err) {
   console.error("📍 エラー発生箇所:", err.stack);
   console.groupEnd();
 
-  handleError(err, "処理に失敗しました");
+  // ユーザーにもエラーを表示
+  alert("処理に失敗しました");
 }
 ```
 
@@ -1745,149 +1700,7 @@ const fetchTask = async (taskId) => {
 
 ---
 
-# 第 5 章：実践演習問題
-
-**ガネーシャ 🐘**：「さぁ、ここまで学んだことを実際に手を動かして試すで！」
-
-**生徒 👩‍💻**：「はい！やってみます！」
-
----
-
-## 🎯 演習 1：タスク一覧取得のログを追加する
-
-### 問題
-
-`resources/js/Pages/Projects/Show.vue` のタスク一覧取得処理に、以下のログを追加してください：
-
-1. 処理開始のログ
-2. リクエスト URL のログ
-3. 取得したタスクの件数
-4. 取得したタスクのリスト（テーブル形式）
-5. 処理時間の計測
-
-### ヒント
-
-```javascript
-const fetchTasks = async () => {
-    // ここにログを追加してみよう！
-    // console.time, console.log, console.table を使ってね
-
-    try {
-        const response = await axios.get(`/api/projects/${projectId}/tasks`);
-        // ...
-    } catch (err) {
-        // ...
-    } finally {
-        // ...
-    }
-};
-```
-
----
-
-## 🎯 演習 2：バリデーションエラーを見やすく表示する
-
-### 問題
-
-タスク作成時にバリデーションエラーが発生した場合、エラー内容をコンソールに**テーブル形式**で表示してください。
-
-### 例
-
-```
-タイトルを空欄にしてタスクを作成
-↓
-コンソールに以下のように表示される：
-
-❌ バリデーションエラー
-┌──────────────┬────────────────────────────────┐
-│   フィールド   │          エラー内容              │
-├──────────────┼────────────────────────────────┤
-│    title     │ タイトルは必須です               │
-│ description  │ 説明は255文字以内で入力してください │
-└──────────────┴────────────────────────────────┘
-```
-
-### ヒント
-
-```javascript
-if (err.response?.status === 422) {
-    // バリデーションエラーの場合
-    // console.table を使ってみよう！
-}
-```
-
----
-
-## 🎯 演習 3：API レスポンス時間を計測する
-
-### 問題
-
-全ての API 通信の実行時間を計測し、以下の条件で警告を出してください：
-
--   200ms 以下：正常（緑色のログ）
--   200ms〜500ms：注意（黄色のログ）
--   500ms 以上：遅い（赤色のログ）
-
-### ヒント
-
-```javascript
-console.time("API通信");
-const response = await axios.get("/api/tasks");
-console.timeEnd("API通信");
-
-// 時間を取得するには...
-const startTime = performance.now();
-// ... 処理 ...
-const endTime = performance.now();
-const duration = endTime - startTime;
-
-if (duration < 200) {
-    console.log(`✅ 速い: ${duration}ms`);
-} else if (duration < 500) {
-    console.warn(`⚠️ 少し遅い: ${duration}ms`);
-} else {
-    console.error(`❌ 遅い: ${duration}ms`);
-}
-```
-
----
-
-## 🎯 演習 4：エラー発生時のスクリーンショットを取る
-
-### 問題
-
-デベロッパーツールの Console タブと Network タブを開いた状態で、以下のエラーを**意図的に発生させて**、スクリーンショットを撮ってください：
-
-1. 404 エラー（存在しないタスクを取得）
-2. 422 エラー（バリデーションエラー）
-3. 500 エラー（サーバーエラー）
-4. ネットワークエラー（サーバーを停止させる）
-
-### 実行方法
-
-```javascript
-// 404 エラーを発生させる
-const response = await axios.get("/api/tasks/99999");
-
-// 422 エラーを発生させる
-const response = await axios.post("/api/projects/1/tasks", {
-    title: "", // 空欄にする
-    description: "",
-});
-
-// 500 エラーを発生させる
-// routes/api.php の /api/test エンドポイントを使う
-const response = await axios.get("/api/test");
-
-// ネットワークエラーを発生させる
-// ターミナルで php artisan serve を停止してからリクエスト
-```
-
-**ガネーシャ 🐘**：「各エラーの時に、Console と Network でどんな情報が表示されるか確認するんやで！」
-
----
-
-# 第 6 章：実務で使える console.log のベストプラクティス
+# 第 5 章：実務で使える console.log のベストプラクティス
 
 **ガネーシャ 🐘**：「最後に、実務で使える console.log の**黄金ルール**を教えるで」
 
@@ -1989,25 +1802,7 @@ console.timeEnd("⏱️ データ取得"); // ⏱️ データ取得: 245.123ms
 
 ---
 
-### 8️⃣ 本番環境ではログを出さない
-
-```javascript
-// ✅ 良い例
-if (import.meta.env.DEV) {
-    console.log("🔧 開発環境でのみ表示されるログ");
-}
-
-// または
-if (import.meta.env.VITE_APP_DEBUG) {
-    console.log("🔧 デバッグモードでのみ表示されるログ");
-}
-```
-
-**理由**：セキュリティとパフォーマンスのため。
-
----
-
-### 9️⃣ ログは処理の「前」「後」「エラー」に分ける
+### 8️⃣ ログは処理の「前」「後」「エラー」に分ける
 
 ```javascript
 // ✅ 良い例
@@ -2024,7 +1819,7 @@ try {
 
 ---
 
-### 🔟 ログは「削除」ではなく「コメントアウト」する
+### 9️⃣ ログは「削除」ではなく「コメントアウト」する
 
 ```javascript
 // ✅ 良い例
