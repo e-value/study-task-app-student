@@ -854,63 +854,138 @@ public function rules(): array
 
 **試してみよう（エラーを発生させるコード）：**
 
-**ガネーシャ 🐘**：「実際に試すには、**ブラウザのConsoleタブで直接APIリクエストを送る**んや！」
+**ガネーシャ 🐘**：「実際に試すには、**`createTask` 関数の中身を一時的に書き換える**んや！」
 
 **生徒 👩‍💻**：「え？フォームから送信するんじゃないんですか？」
 
-**ガネーシャ 🐘**：「フォームには`required`属性があって、ブラウザが先にチェックしてまうからな。空欄で送信しようとすると『このフィールドを入力してください』って出て、APIまで届かへんのや」
+**ガネーシャ 🐘**：「フォームには`required`属性があって、ブラウザが先にチェックしてまうからな。空欄で送信しようとすると『このフィールドを入力してください』って出て、API まで届かへんのや」
 
-**生徒 👩‍💻**：「あ！だからConsoleから直接送るんですね！」
+**生徒 👩‍💻**：「なるほど！じゃあどうすればいいんですか？」
 
-**ガネーシャ 🐘**：「せや！以下の手順でやってみよう」
+**ガネーシャ 🐘**：「簡単や！コードの中で**送信データを強制的に書き換える**んや。以下の手順でやってみよう」
 
-#### 🎯 Consoleから直接APIリクエストを送る方法
+#### 🎯 コード内でエラーを発生させる方法
 
 **手順：**
 
-1. ブラウザでプロジェクト詳細ページを開く（例：`http://localhost/projects/1`）
-2. デベロッパーツールの**Consoleタブ**を開く
-3. 以下のコードを**Consoleに直接貼り付けて Enter を押す**
+1. `resources/js/Pages/Projects/Show.vue` を開く
+2. `createTask` 関数を探す（135行目あたり）
+3. **一時的に**以下のように書き換える
+
+**❌ パターン1：タイトルを空にして送信**
 
 ```javascript
-// ❌ パターン1：タイトルを空にして送信
-axios.post("/api/projects/1/tasks", {
-    title: "",  // 空欄！
-    description: "これはサンプルです",
-})
-.then(response => {
-    console.log("✅ 成功:", response.data);
-})
-.catch(err => {
-    console.error("❌ エラー発生！");
-    console.error("📊 ステータス:", err.response?.status);
-    console.error("💬 メッセージ:", err.response?.data?.message);
-    console.error("📋 エラー詳細:", err.response?.data?.errors);
-    console.table(err.response?.data?.errors);
-});
+const createTask = async () => {
+    console.group("📝 タスク作成処理開始");
+    
+    // ❌ ここを一時的に変更！（元の newTask.value を使わない）
+    const testData = {
+        title: "",  // ← わざと空にする！
+        description: "これはテストです",
+    };
+    
+    console.log("📤 送信するデータ:", testData);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
+    try {
+        creatingTask.value = true;
+
+        // newTask.value ではなく testData を送信
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            testData  // ← ここを変更！
+        );
+
+        console.log("✅ 作成成功！");
+        console.log("📦 レスポンス全体:", response);
+        // ... 以下同じ
+    } catch (err) {
+        console.error("❌ 作成失敗！");
+        console.error("📊 HTTPステータス:", err.response?.status);
+        console.error("💬 メッセージ:", err.response?.data?.message);
+        console.error("📋 エラー詳細:", err.response?.data?.errors);
+        
+        if (err.response?.data?.errors) {
+            console.table(err.response.data.errors);
+        }
+        
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+        console.log("🏁 タスク作成処理終了");
+        console.groupEnd();
+    }
+};
 ```
+
+**❌ パターン2：タイトルを256文字以上にする**
 
 ```javascript
-// ❌ パターン2：タイトルを256文字以上にする
-axios.post("/api/projects/1/tasks", {
-    title: "あ".repeat(256),  // 256文字！（255文字がmax）
-    description: "これはサンプルです",
-})
-.then(response => {
-    console.log("✅ 成功:", response.data);
-})
-.catch(err => {
-    console.error("❌ エラー発生！");
-    console.error("📊 ステータス:", err.response?.status);
-    console.error("💬 メッセージ:", err.response?.data?.message);
-    console.error("📋 エラー詳細:", err.response?.data?.errors);
-    console.table(err.response?.data?.errors);
-});
+const createTask = async () => {
+    console.group("📝 タスク作成処理開始");
+    
+    // ❌ ここを一時的に変更！
+    const testData = {
+        title: "あ".repeat(256),  // ← 256文字！（maxは255）
+        description: "これはテストです",
+    };
+    
+    console.log("📤 送信するデータ:", testData);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
+    try {
+        creatingTask.value = true;
+
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            testData  // ← ここを変更！
+        );
+
+        console.log("✅ 作成成功！");
+        // ... 以下同じ
+    } catch (err) {
+        console.error("❌ 作成失敗！");
+        console.error("📊 HTTPステータス:", err.response?.status);
+        console.error("💬 メッセージ:", err.response?.data?.message);
+        console.error("📋 エラー詳細:", err.response?.data?.errors);
+        
+        if (err.response?.data?.errors) {
+            console.table(err.response.data.errors);
+        }
+        
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+        console.log("🏁 タスク作成処理終了");
+        console.groupEnd();
+    }
+};
 ```
 
-**ガネーシャ 🐘**：「このコードをConsoleに貼り付けて実行すると、フロントエンドのバリデーションをバイパスして、直接APIにリクエストが送られるんや！」
+**手順4：実行して確認**
 
-**生徒 👩‍💻**：「なるほど！これなら確実に422エラーが見れますね！」
+1. コードを保存（`Cmd + S` または `Ctrl + S`）
+2. ブラウザでプロジェクト詳細ページを開く
+3. タスク作成フォームで「作成」ボタンをクリック
+4. Console タブでエラーログを確認！
+
+**ガネーシャ 🐘**：「この方法なら、フォームの`required`属性に関係なく、強制的にエラーデータを送信できるんや！」
+
+**生徒 👩‍💻**：「なるほど！コード内で送信データを変えちゃうんですね。これなら確実に 422 エラーが見れますね！」
+
+**ガネーシャ 🐘**：「せや！ただし**確認が終わったら必ず元に戻す**んやで！」
+
+```javascript
+// ✅ 元に戻す（正しいコード）
+const response = await axios.post(
+    `/api/projects/${projectId}/tasks`,
+    newTask.value  // ← 元に戻す！
+);
+```
 
 ---
 
