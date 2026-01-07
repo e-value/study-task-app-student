@@ -8,6 +8,9 @@ use App\Http\Responses\ApiResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Exceptions\ConflictException;
 use Throwable;
 
 class ApiExceptionHandler
@@ -39,8 +42,11 @@ class ApiExceptionHandler
         // 例外タイプに応じて処理を振り分け
         return match (true) {
             $exception instanceof NotFoundHttpException => $this->handleNotFound($requestId),
+            $exception instanceof ModelNotFoundException => $this->handleNotFound($requestId, $exception->getMessage()),
             $exception instanceof ValidationException => $this->handleValidation($exception, $requestId),
             $exception instanceof AuthenticationException => $this->handleAuthentication($requestId),
+            $exception instanceof AuthorizationException => $this->handleForbidden($exception, $requestId),
+            $exception instanceof ConflictException => $this->handleConflict($exception, $requestId),
             default => $this->handleServerError($exception, $request, $requestId),
         };
     }
@@ -48,9 +54,32 @@ class ApiExceptionHandler
     /**
      * 404エラー
      */
-    private function handleNotFound(string $requestId): JsonResponse
+    private function handleNotFound(string $requestId, ?string $message = null): JsonResponse
     {
-        return $this->response->notFound(requestId: $requestId);
+        return $this->response->notFound($message ?? '指定されたデータが見つかりません', $requestId);
+    }
+
+    /**
+     * 権限エラー（403）
+     * Laravel標準のAuthorizationExceptionを処理
+     */
+    private function handleForbidden(AuthorizationException $exception, string $requestId): JsonResponse
+    {
+        return $this->response->forbidden($exception->getMessage(), $requestId);
+    }
+
+    /**
+     * 競合エラー（409）
+     * カスタム例外（Laravel標準にないため）
+     */
+    private function handleConflict(ConflictException $exception, string $requestId): JsonResponse
+    {
+        // 409 Conflictのレスポンスを返す
+        return response()->json([
+            'success' => false,
+            'message' => $exception->getMessage(),
+            'request_id' => $requestId,
+        ], 409);
     }
 
     /**
