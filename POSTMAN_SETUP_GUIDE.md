@@ -1,5 +1,22 @@
 # 📮 Postman 導入＆API テスト完全ガイド
 
+## 🌿 ブランチの準備
+
+このガイドを使用する前に、適切なブランチに切り替えてください。
+
+```bash
+git checkout main
+git pull origin main
+
+git fetch origin lesson5-1
+git checkout lesson5-1
+git pull origin lesson5-1
+```
+
+> **💡 Tip**: すでに `lesson5-1` ブランチにいる場合は、この手順をスキップできます。
+
+---
+
 ## 📋 目次
 
 0. [事前準備（開発環境のセットアップ）](#0-事前準備開発環境のセットアップ)
