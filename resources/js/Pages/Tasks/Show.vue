@@ -28,16 +28,34 @@ const form = ref({
 });
 
 const fetchTask = async () => {
+  console.log("🚀 fetchTask が呼ばれたで！");
+  console.log("📍 タスクID:", taskId);
+
   try {
     loading.value = true;
-    clearError();
-    const response = await axios.get(`/api/tasks/99999`);
-    // TaskResourceは直接dataを返すか、dataプロパティを持つ
+
+    console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskId}`);
+
+    const response = await axios.get(`/api/tasks/${taskId}`);
+
+    console.log("✅ APIレスポンス成功！", response);
+    console.log("📦 response.data の中身：", response.data);
+    console.log("📝 取得したタスク：", response.data.data);
+
     task.value = response.data.data || response.data;
   } catch (err) {
-    handleError(err, "タスクの読み込みに失敗しました");
+    // ❌ ここが重要！生のエラーをそのまま確認する
+    console.error("❌ エラーが発生したで！");
+    console.error("🔍 エラーオブジェクト全体:", err);
+    console.error("📊 エラーレスポンス:", err.response);
+    console.error("📋 ステータスコード:", err.response?.status);
+    console.error("💬 エラーデータ:", err.response?.data);
+
+    // 画面にもエラーを表示（ユーザー向け）
+    alert("タスクの読み込みに失敗しました");
   } finally {
     loading.value = false;
+    console.log("🏁 fetchTask 終了！");
   }
 };
 
