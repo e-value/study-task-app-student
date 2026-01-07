@@ -869,21 +869,21 @@ public function rules(): array
 **手順：**
 
 1. `resources/js/Pages/Projects/Show.vue` を開く
-2. `createTask` 関数を探す（135行目あたり）
+2. `createTask` 関数を探す（135 行目あたり）
 3. **一時的に**以下のように書き換える
 
-**❌ パターン1：タイトルを空にして送信**
+**❌ パターン 1：タイトルを空にして送信**
 
 ```javascript
 const createTask = async () => {
     console.group("📝 タスク作成処理開始");
-    
+
     // ❌ ここを一時的に変更！（元の newTask.value を使わない）
     const testData = {
-        title: "",  // ← わざと空にする！
+        title: "", // ← わざと空にする！
         description: "これはテストです",
     };
-    
+
     console.log("📤 送信するデータ:", testData);
     console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
 
@@ -893,7 +893,7 @@ const createTask = async () => {
         // newTask.value ではなく testData を送信
         const response = await axios.post(
             `/api/projects/${projectId}/tasks`,
-            testData  // ← ここを変更！
+            testData // ← ここを変更！
         );
 
         console.log("✅ 作成成功！");
@@ -904,11 +904,11 @@ const createTask = async () => {
         console.error("📊 HTTPステータス:", err.response?.status);
         console.error("💬 メッセージ:", err.response?.data?.message);
         console.error("📋 エラー詳細:", err.response?.data?.errors);
-        
+
         if (err.response?.data?.errors) {
             console.table(err.response.data.errors);
         }
-        
+
         toast.error(
             err.response?.data?.message || "タスクの作成に失敗しました"
         );
@@ -920,18 +920,18 @@ const createTask = async () => {
 };
 ```
 
-**❌ パターン2：タイトルを256文字以上にする**
+**❌ パターン 2：タイトルを 256 文字以上にする**
 
 ```javascript
 const createTask = async () => {
     console.group("📝 タスク作成処理開始");
-    
+
     // ❌ ここを一時的に変更！
     const testData = {
-        title: "あ".repeat(256),  // ← 256文字！（maxは255）
+        title: "あ".repeat(256), // ← 256文字！（maxは255）
         description: "これはテストです",
     };
-    
+
     console.log("📤 送信するデータ:", testData);
     console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
 
@@ -940,7 +940,7 @@ const createTask = async () => {
 
         const response = await axios.post(
             `/api/projects/${projectId}/tasks`,
-            testData  // ← ここを変更！
+            testData // ← ここを変更！
         );
 
         console.log("✅ 作成成功！");
@@ -950,11 +950,11 @@ const createTask = async () => {
         console.error("📊 HTTPステータス:", err.response?.status);
         console.error("💬 メッセージ:", err.response?.data?.message);
         console.error("📋 エラー詳細:", err.response?.data?.errors);
-        
+
         if (err.response?.data?.errors) {
             console.table(err.response.data.errors);
         }
-        
+
         toast.error(
             err.response?.data?.message || "タスクの作成に失敗しました"
         );
@@ -966,7 +966,7 @@ const createTask = async () => {
 };
 ```
 
-**手順4：実行して確認**
+**手順 4：実行して確認**
 
 1. コードを保存（`Cmd + S` または `Ctrl + S`）
 2. ブラウザでプロジェクト詳細ページを開く
@@ -983,7 +983,7 @@ const createTask = async () => {
 // ✅ 元に戻す（正しいコード）
 const response = await axios.post(
     `/api/projects/${projectId}/tasks`,
-    newTask.value  // ← 元に戻す！
+    newTask.value // ← 元に戻す！
 );
 ```
 
@@ -1502,7 +1502,7 @@ console.timeEnd("⏱️ API呼び出し時間");
 
 **ガネーシャ 🐘**：「このファイルの中にタスク作成処理があるはずや。探してみ」
 
-**生徒 👩‍💻**：「ありました！`handleTaskCreate` 関数ですね」
+**生徒 👩‍💻**：「ありました！`createTask` 関数ですね」
 
 ```javascript
 const createTask = async () => {
