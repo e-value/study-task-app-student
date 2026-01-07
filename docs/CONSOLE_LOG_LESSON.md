@@ -4,6 +4,23 @@
 
 ---
 
+## 🌿 ブランチの準備
+
+この講座を進める前に、適切なブランチに切り替えてください。
+
+```bash
+git checkout main
+git pull origin main
+
+git fetch origin lesson5-1
+git checkout lesson5-1
+git pull origin lesson5-1
+```
+
+> **💡 Tip**: すでに `lesson5-1` ブランチにいる場合は、この手順をスキップできます。
+
+---
+
 ## 📚 この講座で学べること
 
 ✅ `console.log()` の基本から応用まで  
