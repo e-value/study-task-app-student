@@ -854,19 +854,65 @@ public function rules(): array
 
 **試してみよう（エラーを発生させるコード）：**
 
+**ガネーシャ 🐘**：「実際に試すには、**ブラウザのConsoleタブで直接APIリクエストを送る**んや！」
+
+**生徒 👩‍💻**：「え？フォームから送信するんじゃないんですか？」
+
+**ガネーシャ 🐘**：「フォームには`required`属性があって、ブラウザが先にチェックしてまうからな。空欄で送信しようとすると『このフィールドを入力してください』って出て、APIまで届かへんのや」
+
+**生徒 👩‍💻**：「あ！だからConsoleから直接送るんですね！」
+
+**ガネーシャ 🐘**：「せや！以下の手順でやってみよう」
+
+#### 🎯 Consoleから直接APIリクエストを送る方法
+
+**手順：**
+
+1. ブラウザでプロジェクト詳細ページを開く（例：`http://localhost/projects/1`）
+2. デベロッパーツールの**Consoleタブ**を開く
+3. 以下のコードを**Consoleに直接貼り付けて Enter を押す**
+
 ```javascript
 // ❌ パターン1：タイトルを空にして送信
-const response = await axios.post("/api/projects/1/tasks", {
-    title: "", // 空欄！
+axios.post("/api/projects/1/tasks", {
+    title: "",  // 空欄！
     description: "これはサンプルです",
-});
-
-// ❌ パターン2：タイトルを256文字以上にする
-const response = await axios.post("/api/projects/1/tasks", {
-    title: "あ".repeat(256), // 256文字！（255文字がmax）
-    description: "これはサンプルです",
+})
+.then(response => {
+    console.log("✅ 成功:", response.data);
+})
+.catch(err => {
+    console.error("❌ エラー発生！");
+    console.error("📊 ステータス:", err.response?.status);
+    console.error("💬 メッセージ:", err.response?.data?.message);
+    console.error("📋 エラー詳細:", err.response?.data?.errors);
+    console.table(err.response?.data?.errors);
 });
 ```
+
+```javascript
+// ❌ パターン2：タイトルを256文字以上にする
+axios.post("/api/projects/1/tasks", {
+    title: "あ".repeat(256),  // 256文字！（255文字がmax）
+    description: "これはサンプルです",
+})
+.then(response => {
+    console.log("✅ 成功:", response.data);
+})
+.catch(err => {
+    console.error("❌ エラー発生！");
+    console.error("📊 ステータス:", err.response?.status);
+    console.error("💬 メッセージ:", err.response?.data?.message);
+    console.error("📋 エラー詳細:", err.response?.data?.errors);
+    console.table(err.response?.data?.errors);
+});
+```
+
+**ガネーシャ 🐘**：「このコードをConsoleに貼り付けて実行すると、フロントエンドのバリデーションをバイパスして、直接APIにリクエストが送られるんや！」
+
+**生徒 👩‍💻**：「なるほど！これなら確実に422エラーが見れますね！」
+
+---
 
 **Console に表示される内容（タイトル空欄の場合）：**
 
