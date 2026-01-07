@@ -182,7 +182,7 @@ const fetchTask = async () => {
         console.error("📊 エラーレスポンス:", err.response);
         console.error("📋 ステータスコード:", err.response?.status);
         console.error("💬 エラーデータ:", err.response?.data);
-        
+
         // 画面にもエラーを表示（ユーザー向け）
         alert("タスクの読み込みに失敗しました");
     } finally {
@@ -202,74 +202,466 @@ const fetchTask = async () => {
 
 ---
 
-### 📝 手順 3：ブラウザで確認してみよう
+### 📝 手順 2.5：コンソールタブの開き方をマスターしよう
 
-**ガネーシャ 🐘**：「コードを保存したら、ブラウザでタスク詳細ページを開いてみ。デベロッパーツールの Console タブも開いといてな」
+**ガネーシャ 🐘**：「コードを書く前に、まずコンソールタブの開き方を確認しとこうや」
 
-1. ターミナルで開発サーバーを起動：`npm run dev`
-2. ブラウザで `http://localhost/tasks/1` にアクセス
-3. デベロッパーツールの Console タブを確認
+**生徒 👩‍💻**：「はい！」
+
+#### 🎯 コンソールタブを開く方法
+
+**Mac の場合：**
+
+-   キーボードショートカット：**`Cmd + Option + I`**
+-   または：**右クリック → 「検証」**
+
+**全てのブラウザ共通：**
+
+-   ページ上で**右クリック → 「検証」または「開発者ツール」**
+
+#### 📺 実際にやってみよう
+
+**ガネーシャ 🐘**：「ほな、実際にブラウザでタスク詳細ページを開いて、デベロッパーツールを表示してみ」
+
+1. ブラウザで `http://localhost:5173/tasks/1` にアクセス
+2. **`F12`**（Windows）または **`Cmd + Option + I`**（Mac）を押す
+3. 画面の下部または右側にデベロッパーツールが表示される
+
+```
+┌──────────────────────────────────────────┐
+│ あなたのアプリ画面                         │
+│ （タスク詳細ページ）                       │
+├──────────────────────────────────────────┤
+│ Elements  Console  Sources  Network      │ ← このタブバー
+│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│                                          │
+│ > _                                      │ ← Console タブの中身
+│                                          │
+└──────────────────────────────────────────┘
+```
+
+**ガネーシャ 🐘**：「上部のタブバーの中から **「Console」** をクリックするんやで」
+
+**生徒 👩‍💻**：「開きました！でも何も表示されていません...」
+
+**ガネーシャ 🐘**：「せや、まだコードを保存してないからな。次に進むで！」
+
+---
+
+### 📝 手順 3：成功パターンを確認しよう（まずはこれ！）
+
+**ガネーシャ 🐘**：「コードを保存したら、ブラウザでタスク詳細ページを開いてみ。まずは**成功するパターン**から見てみよう」
+
+#### 🚀 サーバーを起動する
+
+```bash
+# ターミナル1: Laravel サーバー
+php artisan serve
+
+# ターミナル2: Vite（フロントエンド）
+npm run dev
+```
+
+#### 🌐 ブラウザで確認
+
+1. ブラウザで `http://localhost:5173/tasks/1` にアクセス
+2. すでに開いている Console タブを確認（開いていなければ `F12` で開く）
 
 **生徒 👩‍💻**：「わぁ！コンソールにログがいっぱい出ました！」
 
 ```
 🚀 fetchTask が呼ばれたで！
-📡 APIリクエストを送信するで： /api/tasks/99999
-❌ エラーが発生したで！ Error: Request failed with status code 404
-🔍 エラーの詳細： {status: 404, data: {...}}
+📍 タスクID: 1
+📡 APIリクエストを送信するで： /api/tasks/1
+✅ APIレスポンス成功！ ▶︎ Object {...}  ← ここをクリックできる！
+📦 response.data の中身： ▶︎ Object {...}
+📝 取得したタスク： ▶︎ Object {...}
 🏁 fetchTask 終了！
 ```
 
-**ガネーシャ 🐘**：「せやろ！これが**プログラムの中が見える瞬間**や！今、`/api/tasks/99999` っていう存在せんタスクを取得しようとしたから 404 エラーになっとるな」
+**ガネーシャ 🐘**：「せやろ！これが**プログラムの中が見える瞬間**や！成功した時の流れが全部見えとるな」
 
-**生徒 👩‍💻**：「なるほど！じゃあ、存在するタスク ID に変えたらどうなりますか？」
+**生徒 👩‍💻**：「でも、`Object {...}` って表示されていて、中身がよく分かりません...」
 
-**ガネーシャ 🐘**：「ええ質問や！試してみようや」
+**ガネーシャ 🐘**：「ええところに気づいたな！それを今から教えるで」
 
 ---
 
-### 📝 手順 4：成功パターンも確認してみよう
+### 📝 手順 3.5：コンソールでオブジェクトの中身を見る魔法
 
-**コードを修正（34 行目）：**
+**ガネーシャ 🐘**：「Console に `Object {...}` って表示されとる時は、その左側に **▶︎** のマークがあるやろ？これをクリックするんや」
 
-```javascript
-// 変更前
-const response = await axios.get(`/api/tasks/99999`);
+#### 🎯 オブジェクトを展開する（超重要！）
 
-// 変更後（存在するタスクIDに変更）
-const response = await axios.get(`/api/tasks/${taskId}`);
+**Console 画面（クリック前）：**
+
+```
+✅ APIレスポンス成功！ ▶︎ Object
+                       ↑
+                   ここをクリック！
 ```
 
-**ガネーシャ 🐘**：「ほな、もう一回ブラウザをリロードしてみ」
+**▶︎ をクリックすると → ▼ に変わって中身が見える：**
 
-**生徒 👩‍💻**：「あ！今度は成功のログが出ました！」
+```
+✅ APIレスポンス成功！ ▼ Object
+  config: ▶︎ {transitional: {...}, adapter: [...], ...}
+  data: ▶︎ Object         ← ここもクリックできる！
+  headers: ▶︎ {...}
+  request: ▶︎ XMLHttpRequest {...}
+  status: 200            ← 数値はそのまま表示
+  statusText: "OK"       ← 文字列もそのまま表示
+```
+
+**ガネーシャ 🐘**：「**▶︎ は閉じた状態**、**▼ は開いた状態**や。さらに `data` の中も開いてみよう」
+
+**`data: ▶︎ Object` をクリックすると：**
+
+```
+✅ APIレスポンス成功！ ▼ Object
+  config: ▶︎ {...}
+  data: ▼ Object
+    success: true
+    message: "タスクを取得しました"  ← Laravel からのメッセージ
+    data: ▶︎ Object                ← さらに中にデータがある！
+  headers: ▶︎ {...}
+  request: ▶︎ XMLHttpRequest {...}
+  status: 200
+  statusText: "OK"
+```
+
+**生徒 👩‍💻**：「あ！`data` の中に、また `data` がありますね」
+
+**ガネーシャ 🐘**：「せや！これが Laravel の API の構造や。さらに奥の `data` も開いてみよう」
+
+**`data: ▶︎ Object` （内側）をクリックすると：**
+
+```
+✅ APIレスポンス成功！ ▼ Object
+  config: ▶︎ {...}
+  data: ▼ Object
+    success: true
+    message: "タスクを取得しました"
+    data: ▼ Object
+      id: 1
+      title: "サンプルタスク"
+      description: "これはサンプルのタスクです"
+      status: "todo"
+      created_by_user: ▶︎ Object   ← これも開ける
+      project: ▶︎ Object            ← これも開ける
+      created_at: "2024-01-01T00:00:00.000000Z"
+      updated_at: "2024-01-01T00:00:00.000000Z"
+  headers: ▶︎ {...}
+  request: ▶︎ XMLHttpRequest {...}
+  status: 200
+  statusText: "OK"
+```
+
+**生徒 👩‍💻**：「わぁ！全部の中身が見えました！」
+
+**ガネーシャ 🐘**：「せや！**▶︎ をクリックして階層を開いていく**のが Console を使いこなす第一歩や。これを**オブジェクトの展開**っていうんや」
+
+---
+
+### 📝 手順 3.6：Laravel から返ってきたデータの構造を理解しよう
+
+**ガネーシャ 🐘**：「今見たデータはな、Laravel の API が返してくれとるんや。構造を整理してみよう」
+
+#### 📊 axios レスポンスの全体構造
+
+```javascript
+// axios のレスポンス全体
+{
+    status: 200,           // HTTP ステータスコード
+    statusText: "OK",      // ステータステキスト
+    data: {                // ← Laravel から返ってきたデータ
+        success: true,              // 成功フラグ
+        message: "タスクを取得しました",  // Laravel からのメッセージ
+        data: {                     // 実際のタスクデータ
+            id: 1,
+            title: "サンプルタスク",
+            description: "...",
+            status: "todo",
+            // ...
+        }
+    },
+    headers: {...},        // レスポンスヘッダー
+    config: {...},         // リクエスト設定
+    request: {...}         // リクエストオブジェクト
+}
+```
+
+**ガネーシャ 🐘**：「`response.data.data` って二重になってるのは、**axios の response.data** と **Laravel の data** が重なってるからやな」
+
+**生徒 👩‍💻**：「なるほど！Laravel のどこでこの形式を作ってるんですか？」
+
+**ガネーシャ 🐘**：「ええ質問や！Laravel 側のコードを見てみよう」
+
+#### 💡 Laravel 側のコード（参考）
+
+```php
+// app/Http/Controllers/Api/TaskController.php
+
+public function show(Task $task)
+{
+    // TaskResource で整形して返す
+    return new TaskResource($task);
+}
+
+// app/Http/Resources/TaskResource.php
+public function toArray($request)
+{
+    return [
+        'id' => $this->id,
+        'title' => $this->title,
+        'description' => $this->description,
+        'status' => $this->status,
+        'created_by_user' => new UserResource($this->createdBy),
+        'project' => new ProjectResource($this->project),
+        // ...
+    ];
+}
+
+// app/Http/Responses/ApiResponse.php
+public function success($message, $data = null, $statusCode = 200)
+{
+    return response()->json([
+        'success' => true,
+        'message' => $message,
+        'data' => $data,  // ← ここに TaskResource のデータが入る
+    ], $statusCode);
+}
+```
+
+**Laravel が返す JSON（最終形）：**
+
+```json
+{
+    "success": true,
+    "message": "タスクを取得しました",
+    "data": {
+        "id": 1,
+        "title": "サンプルタスク",
+        "description": "これはサンプルのタスクです",
+        "status": "todo",
+        "created_by_user": {
+            "id": 1,
+            "name": "山田太郎"
+        },
+        "project": {
+            "id": 1,
+            "name": "サンプルプロジェクト"
+        }
+    }
+}
+```
+
+**ガネーシャ 🐘**：「Laravel は **ApiResponse と Resource クラス**を使って、データを統一した形式で返してくれとるんや。これでフロントエンド側が扱いやすくなるんやな」
+
+**生徒 👩‍💻**：「なるほど！じゃあ、いつも `success` と `message` と `data` が返ってくるんですね」
+
+**ガネーシャ 🐘**：「せや！これが**API 設計の統一**や。どのエンドポイントを叩いても同じ形式で返ってくるから、フロントエンド側のコードが書きやすくなるんや」
+
+---
+
+### 📝 手順 4：エラーパターンも試してみよう（わざとエラーを起こす！）
+
+**ガネーシャ 🐘**：「成功パターンが分かったところで、次はエラーの時を見てみよう。わざとエラーを起こすで！」
+
+**生徒 👩‍💻**：「わざと...ですか？」
+
+**ガネーシャ 🐘**：「せや！エラーを理解するには、エラーを起こして確認するのが一番や。ワシの教え子のエジソンくんも『失敗は成功の母』って言うとったで」
+
+#### 🎯 わざとエラーを起こす
+
+**コードを一時的に変更：**
+
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
+    console.log("📍 タスクID:", taskId);
+
+    try {
+        loading.value = true;
+
+        // わざと存在しないIDを指定してエラーを起こす
+        console.log("📡 APIリクエストを送信するで：", `/api/tasks/99999`);
+        const response = await axios.get(`/api/tasks/99999`);  // ← ここを変更
+
+        // ...以下同じ
+```
+
+**ガネーシャ 🐘**：「コードを保存して、ブラウザをリロード（`F5` または `Cmd + R`）してみ」
+
+**Console に表示される内容：**
 
 ```
 🚀 fetchTask が呼ばれたで！
-📡 APIリクエストを送信するで： /api/tasks/1
-✅ APIレスポンス成功！ {data: {...}, status: 200, ...}
-📦 response.data の中身： {data: {id: 1, title: "サンプルタスク", ...}}
-📝 取得したタスク： {id: 1, title: "サンプルタスク", ...}
+📍 タスクID: 1
+📡 APIリクエストを送信するで： /api/tasks/99999
+❌ エラーが発生したで！
+🔍 エラーオブジェクト全体: ▶︎ Error: Request failed with status code 404
+📊 エラーレスポンス: ▶︎ Object
+📋 ステータスコード: 404
+💬 エラーデータ: ▶︎ Object
 🏁 fetchTask 終了！
 ```
 
-**ガネーシャ 🐘**：「さすガネーシャや！これで**成功した時**と**失敗した時**の両方の流れが見えるようになったな！」
+**生徒 👩‍💻**：「エラーのログが出ました！今度は赤く表示されてますね」
+
+**ガネーシャ 🐘**：「せや！`console.error()` で出力したログは赤く表示されるんや。エラーレスポンスの中身も ▶︎ をクリックして見てみよう」
+
+**`📊 エラーレスポンス: ▶︎ Object` をクリックすると：**
+
+```
+📊 エラーレスポンス: ▼ Object
+  status: 404
+  statusText: "Not Found"
+  data: ▼ Object
+    success: false           ← 成功時は true だったのが false に
+    message: "タスクが見つかりません"  ← Laravel からのエラーメッセージ
+    request_id: "req_abc123"
+    status_code: 404
+  headers: ▶︎ {...}
+  config: ▶︎ {...}
+  request: ▶︎ XMLHttpRequest {...}
+```
+
+**生徒 👩‍💻**：「成功時と違って、`success: false` で、`message` にエラーメッセージが入ってるんですね！」
+
+**ガネーシャ 🐘**：「さすガネーシャの生徒や！飲み込みが早いな！成功でもエラーでも同じ構造で返ってくるから、フロントエンドでの処理がしやすいんや」
 
 ---
 
-### 📝 手順5：Laravel のエラーを完全理解する（超重要！）
+### 📝 手順 4.5：デフォルトの Laravel エラーとカスタムエラーハンドリングの違い
+
+**ガネーシャ 🐘**：「ここで大事なことを教えるで。実はな、このプロジェクトでは **`bootstrap/app.php` で API エラーハンドラーをコメントアウト**してあるんや」
+
+**生徒 👩‍💻**：「コメントアウト...？なぜですか？」
+
+**ガネーシャ 🐘**：「それはな、**Laravel のデフォルトのエラーレスポンス**を見てもらうためや。勉強用にわざとそうしとるんや」
+
+#### 📝 現在の `bootstrap/app.php` の状態
+
+```php
+// bootstrap/app.php
+
+->withExceptions(function (Exceptions $exceptions): void {
+    // Sentry統合（研修用に必要に応じてコメントアウト）
+    // Integration::handles($exceptions);
+
+    // API例外ハンドラーを登録（研修用にコメントアウト中）
+    // $apiHandler = new ApiExceptionHandler();
+    // $exceptions->render(function (\Throwable $e, Request $request) use ($apiHandler) {
+    //     return $apiHandler->handle($e, $request);
+    // });
+})->create();
+```
+
+**ガネーシャ 🐘**：「**コメントアウトされてる = Laravel のデフォルトエラーが表示される**んや」
+
+#### 🔍 Laravel のデフォルトエラーレスポンス
+
+**コメントアウト中（デフォルト）の場合：**
+
+```json
+{
+    "message": "No query results for model [App\\Models\\Task] 99999",
+    "exception": "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException",
+    "file": "/path/to/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+    "line": 419,
+    "trace": [
+        // 長いスタックトレース...
+    ]
+}
+```
+
+**カスタムハンドラー有効時（コメント解除）の場合：**
+
+```json
+{
+    "success": false,
+    "message": "タスクが見つかりません",
+    "request_id": "req_abc123",
+    "status_code": 404
+}
+```
+
+**生徒 👩‍💻**：「デフォルトは詳しすぎて、逆に分かりにくいですね...」
+
+**ガネーシャ 🐘**：「せやねん！だから実際のプロジェクトでは、カスタムエラーハンドラーを作って、**統一された分かりやすい形式**で返すんや。でも今は勉強中やから、デフォルトも見ておくんが大事やで」
+
+#### 📋 成功時とエラー時の比較（カスタムハンドラー有効時）
+
+| 項目           | 成功時（200）            | エラー時（404）          |
+| :------------- | :----------------------- | :----------------------- |
+| **success**    | `true`                   | `false`                  |
+| **message**    | "タスクを取得しました"   | "タスクが見つかりません" |
+| **data**       | タスクのデータ（Object） | `null` または なし       |
+| **status**     | 200                      | 404                      |
+| **statusText** | "OK"                     | "Not Found"              |
+| **request_id** | なし                     | "req_abc123"             |
+
+**ガネーシャ 🐘**：「これで**成功した時**と**失敗した時**の両方の流れが見えるようになったな！」
+
+**生徒 👩‍💻**：「はい！コンソールでオブジェクトを展開すれば、全部の中身が確認できるんですね」
+
+**ガネーシャ 🐘**：「せや！**▶︎ をクリックして展開する**のを忘れんようにな。これができれば、デバッグが 100 倍楽になるで」
+
+#### 📝 コードを元に戻そう
+
+**ガネーシャ 🐘**：「エラーの確認ができたら、コードを元に戻しておこうや」
+
+```javascript
+// 変更したコード
+const response = await axios.get(`/api/tasks/99999`);
+
+// 元に戻す（正しいコード）
+const response = await axios.get(`/api/tasks/${taskId}`);
+```
+
+**ガネーシャ 🐘**：「保存してリロードしたら、また成功のログが出るはずや」
+
+**生徒 👩‍💻**：「はい！元に戻りました」
+
+---
+
+## 🎯 ポイント整理（ここまでのまとめ）
+
+**ガネーシャ 🐘**：「ここまでで学んだことを整理しとこうや」
+
+| やったこと               | 何が分かったか              | 使うツール                      |
+| :----------------------- | :-------------------------- | :------------------------------ |
+| **Console タブを開く**   | デベロッパーツールの使い方  | `F12` または `Cmd + Option + I` |
+| **console.log で確認**   | 処理の流れを追跡            | `console.log()`                 |
+| **▶︎ をクリック**        | オブジェクトの中身を展開    | Console の展開機能              |
+| **Laravel のレスポンス** | 統一された形式で返ってくる  | `{success, message, data}`      |
+| **ApiResource**          | Laravel がデータを整形      | `TaskResource::class`           |
+| **response()->json()**   | JSON 形式でレスポンス       | `ApiResponse クラス`            |
+| **成功時の確認**         | status: 200, success: true  | Console で確認                  |
+| **エラー時の確認**       | status: 404, success: false | Console で確認                  |
+| **デフォルトエラー**     | Laravel のそのままのエラー  | `app.php` コメントアウト中      |
+| **カスタムエラー**       | 統一された分かりやすい形式  | `ApiExceptionHandler`           |
+
+**生徒 👩‍💻**：「Console の使い方が分かってきました！」
+
+**ガネーシャ 🐘**：「ええ調子や！次はもっと詳しくエラーの種類を学んでいくで」
+
+---
+
+### 📝 手順 5：Laravel のエラーを完全理解する（超重要！）
 
 **ガネーシャ 🐘**：「ここからが本番や！エラーが出た時に、**何が起きてるか理解できる**ようになるで」
 
-**生徒👩‍💻**：「エラーって難しそう...」
+**生徒 👩‍💻**：「エラーって難しそう...」
 
-**ガネーシャ🐘**：「怖ないで！エラーはな、**プログラムからの手紙**なんや。『ここがおかしいで！』って優しく教えてくれとるんや」
+**ガネーシャ 🐘**：「怖ないで！エラーはな、**プログラムからの手紙**なんや。『ここがおかしいで！』って優しく教えてくれとるんや」
 
 ---
 
 #### 📊 エラーオブジェクトの構造を完全理解
 
-**ガネーシャ🐘**：「エラーが起きた時、axios は `err` っていうオブジェクトを返すんや。まずはこいつの構造を見てみよう」
+**ガネーシャ 🐘**：「エラーが起きた時、axios は `err` っていうオブジェクトを返すんや。まずはこいつの構造を見てみよう」
 
 **Console で確認する方法：**
 
@@ -281,7 +673,7 @@ catch (err) {
 }
 ```
 
-**Console に表示される内容（404エラーの場合）：**
+**Console に表示される内容（404 エラーの場合）：**
 
 ```
 ❌ エラーオブジェクト全体: Error: Request failed with status code 404
@@ -308,11 +700,11 @@ catch (err) {
           └─ status_code: 404
 ```
 
-**ガネーシャ🐘**：「この中で、特に重要なのが **`err.response.data`** や！ここに Laravel からのメッセージが入っとるんや」
+**ガネーシャ 🐘**：「この中で、特に重要なのが **`err.response.data`** や！ここに Laravel からのメッセージが入っとるんや」
 
-**生徒👩‍💻**：「`err.response.data` を見ればいいんですね！」
+**生徒 👩‍💻**：「`err.response.data` を見ればいいんですね！」
 
-**ガネーシャ🐘**：「せや！でもな、`err.response` が `undefined` の時もあるから、`?.` （オプショナルチェーン）を使うんやで」
+**ガネーシャ 🐘**：「せや！でもな、`err.response` が `undefined` の時もあるから、`?.` （オプショナルチェーン）を使うんやで」
 
 ```javascript
 // ❌ ダメな例（エラーになる可能性がある）
@@ -327,21 +719,22 @@ console.error(err.response?.status);
 
 #### 🎯 Laravel が返すエラーの種類を完全マスター
 
-**ガネーシャ🐘**：「Laravel はな、エラーの種類によって違うデータを返してくれるんや。全部覚えよう！」
+**ガネーシャ 🐘**：「Laravel はな、エラーの種類によって違うデータを返してくれるんや。全部覚えよう！」
 
 ---
 
-##### 1️⃣ 404エラー（Not Found）
+##### 1️⃣ 404 エラー（Not Found）
 
 **いつ起きる？**
-- 存在しないタスクIDを指定した時
-- 存在しないURLにアクセスした時
+
+-   存在しないタスク ID を指定した時
+-   存在しない URL にアクセスした時
 
 **試してみよう：**
 
 ```javascript
 // わざと存在しないIDを指定
-const response = await axios.get('/api/tasks/99999');
+const response = await axios.get("/api/tasks/99999");
 ```
 
 **Console に表示される内容：**
@@ -374,20 +767,21 @@ catch (err) {
 
 ---
 
-##### 2️⃣ 422エラー（Validation Error）
+##### 2️⃣ 422 エラー（Validation Error）
 
 **いつ起きる？**
-- タイトルを空欄にして送信した時
-- 文字数制限を超えた時
-- 必須項目が入力されていない時
+
+-   タイトルを空欄にして送信した時
+-   文字数制限を超えた時
+-   必須項目が入力されていない時
 
 **試してみよう：**
 
 ```javascript
 // わざとタイトルを空にして送信
-const response = await axios.post('/api/projects/1/tasks', {
-    title: '',  // 空欄！
-    description: 'あいうえお'.repeat(100)  // 長すぎる！
+const response = await axios.post("/api/projects/1/tasks", {
+    title: "", // 空欄！
+    description: "あいうえお".repeat(100), // 長すぎる！
 });
 ```
 
@@ -421,12 +815,12 @@ catch (err) {
     if (err.response?.status === 422) {
         console.error("📝 バリデーションエラー");
         console.error("⚠️ エラー詳細:", err.response.data.errors);
-        
+
         // フィールドごとに表示
         Object.entries(err.response.data.errors).forEach(([field, messages]) => {
             console.error(`  ❌ ${field}:`, messages.join(", "));
         });
-        
+
         // テーブル形式で見やすく表示
         console.table(err.response.data.errors);
     }
@@ -449,17 +843,18 @@ catch (err) {
 └────────────────┴──────────────────────────────────────────┘
 ```
 
-**生徒👩‍💻**：「テーブル表示、見やすい！」
+**生徒 👩‍💻**：「テーブル表示、見やすい！」
 
-**ガネーシャ🐘**：「せやろ！`console.table()` は配列やオブジェクトを見る時の最強ツールや」
+**ガネーシャ 🐘**：「せやろ！`console.table()` は配列やオブジェクトを見る時の最強ツールや」
 
 ---
 
-##### 3️⃣ 401エラー（Unauthorized）
+##### 3️⃣ 401 エラー（Unauthorized）
 
 **いつ起きる？**
-- ログインが必要なのにログインしていない時
-- トークンの有効期限が切れた時
+
+-   ログインが必要なのにログインしていない時
+-   トークンの有効期限が切れた時
 
 **Console に表示される内容：**
 
@@ -491,11 +886,12 @@ catch (err) {
 
 ---
 
-##### 4️⃣ 500エラー（Server Error）
+##### 4️⃣ 500 エラー（Server Error）
 
 **いつ起きる？**
-- Laravel 側でプログラムエラーが起きた時
-- データベース接続エラーが起きた時
+
+-   Laravel 側でプログラムエラーが起きた時
+-   データベース接続エラーが起きた時
 
 **Console に表示される内容：**
 
@@ -526,7 +922,7 @@ catch (err) {
 }
 ```
 
-**ガネーシャ🐘**：「500 エラーの時はな、**Laravel のログファイル**を見るのが鉄則や！」
+**ガネーシャ 🐘**：「500 エラーの時はな、**Laravel のログファイル**を見るのが鉄則や！」
 
 ```bash
 # Laravel のログを確認
@@ -538,9 +934,10 @@ tail -f storage/logs/laravel.log
 ##### 5️⃣ ネットワークエラー（err.response がない）
 
 **いつ起きる？**
-- Laravel サーバーが起動していない時
-- インターネット接続が切れた時
-- CORS エラーが起きた時
+
+-   Laravel サーバーが起動していない時
+-   インターネット接続が切れた時
+-   CORS エラーが起きた時
 
 **Console に表示される内容：**
 
@@ -572,12 +969,12 @@ catch (err) {
 
 #### 📋 エラー確認の完全フロー（プロの技）
 
-**ガネーシャ🐘**：「エラーが起きた時は、この順番で確認するんがプロの流儀や」
+**ガネーシャ 🐘**：「エラーが起きた時は、この順番で確認するんがプロの流儀や」
 
 ```javascript
 catch (err) {
     console.group("❌ エラー詳細分析");
-    
+
     // Step 1: エラーの種類を確認
     if (err.response) {
         // サーバーからレスポンスが返ってきた
@@ -586,7 +983,7 @@ catch (err) {
         console.error("📋 ステータステキスト:", err.response.statusText);
         console.error("💬 Laravel のメッセージ:", err.response.data.message);
         console.error("🆔 リクエストID:", err.response.data.request_id);
-        
+
         // Step 2: ステータスコード別に詳細確認
         console.group("💡 エラー別トラブルシューティング");
         switch (err.response.status) {
@@ -594,24 +991,24 @@ catch (err) {
                 console.error("⚠️ 400 Bad Request: リクエストが不正です");
                 console.error("確認: 送信データの形式は正しいですか？");
                 break;
-                
+
             case 401:
                 console.error("🔐 401 Unauthorized: 認証が必要です");
                 console.error("確認: ログインしていますか？");
                 console.error("確認: トークンは有効ですか？");
                 break;
-                
+
             case 403:
                 console.error("🚫 403 Forbidden: アクセスが拒否されました");
                 console.error("確認: このリソースへのアクセス権限はありますか？");
                 break;
-                
+
             case 404:
                 console.error("🔍 404 Not Found: リソースが見つかりません");
                 console.error("確認: URLは正しいですか？");
                 console.error("確認: リソースIDは存在しますか？");
                 break;
-                
+
             case 422:
                 console.error("📝 422 Unprocessable Entity: バリデーションエラー");
                 console.error("バリデーションエラー詳細:");
@@ -622,22 +1019,22 @@ catch (err) {
                     });
                 }
                 break;
-                
+
             case 500:
                 console.error("💥 500 Internal Server Error: サーバー内部エラー");
                 console.error("確認: storage/logs/laravel.log を確認してください");
                 break;
-                
+
             default:
                 console.error(`❓ ${err.response.status}: その他のエラー`);
         }
         console.groupEnd();
-        
+
         // Step 3: 完全なレスポンスデータを確認
         console.group("📦 完全なレスポンスデータ");
         console.error("Response Data:", err.response.data);
         console.groupEnd();
-        
+
     } else if (err.request) {
         // リクエストは送信されたが、レスポンスがない
         console.error("🌐 ネットワークエラー（レスポンスなし）");
@@ -649,25 +1046,25 @@ catch (err) {
         console.error("     → ターミナルで 'npm run dev' を確認");
         console.error("  3. ネットワーク接続は正常ですか？");
         console.error("  4. CORS の設定は正しいですか？");
-        
+
     } else {
         // リクエストの設定中にエラーが発生
         console.error("⚙️ リクエスト設定エラー");
         console.error("💬 エラーメッセージ:", err.message);
         console.error("📍 確認: axios の設定を確認してください");
     }
-    
+
     console.groupEnd();
 }
 ```
 
-**生徒👩‍💻**：「すごく詳しい！これなら何が起きてるか完全に分かりますね！」
+**生徒 👩‍💻**：「すごく詳しい！これなら何が起きてるか完全に分かりますね！」
 
-**ガネーシャ🐘**：「せやろ！これが**プロのエラー確認フロー**や。エラーが出ても、もう怖くないやろ？」
+**ガネーシャ 🐘**：「せやろ！これが**プロのエラー確認フロー**や。エラーが出ても、もう怖くないやろ？」
 
-**生徒👩‍💻**：「はい！エラーが出るのが楽しみになってきました（笑）」
+**生徒 👩‍💻**：「はい！エラーが出るのが楽しみになってきました（笑）」
 
-**ガネーシャ🐘**：「ええ心がけや！エラーは**成長のチャンス**やからな」
+**ガネーシャ 🐘**：「ええ心がけや！エラーは**成長のチャンス**やからな」
 
 ---
 
