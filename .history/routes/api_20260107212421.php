@@ -11,7 +11,6 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// 確認済み
 // 認証が必要なAPI
 Route::middleware(['auth:sanctum'])->group(function () {
     // Projects

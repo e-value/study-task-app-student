@@ -11,7 +11,8 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// 確認済み
+// 私の作成したものと比較して確認済みです。
+// 違った部分→コントローラーの命名やHTTPメソッドの名前
 // 認証が必要なAPI
 Route::middleware(['auth:sanctum'])->group(function () {
     // Projects

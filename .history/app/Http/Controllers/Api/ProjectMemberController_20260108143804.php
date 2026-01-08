@@ -53,7 +53,7 @@ class ProjectMemberController extends ApiController
             ], 403);
         }
 
-// ーーーーーーーーー点線内調べても難しかったのでAIに聞きました。
+// ーーーーーーーーー点線内難しかったので調べた上でAIに聞きました。
         // バリデーション
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',

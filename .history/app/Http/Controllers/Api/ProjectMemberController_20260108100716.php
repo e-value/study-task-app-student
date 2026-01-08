@@ -7,7 +7,6 @@ use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Auth;
 
 class ProjectMemberController extends ApiController
 {
@@ -17,18 +16,16 @@ class ProjectMemberController extends ApiController
     public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
-        $user = Auth::user();
+        if ($project_id == $user->$project_id){
+            return 
+        }
         // メンバーでなければエラーを返す
         // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
-        if (!$user->projects()->where('project_id', $project->id)->exists()){ 
-        return response()->json([
-            'message' => 'このプロジェクトにアクセスする権限がありません',
-        ], 403);
-        }
         // メンバー一覧の取得
         $members = $project->users()
             ->withPivot('id', 'role')
             ->get();
+
         return ProjectMemberResource::collection($members);
     }
 
@@ -38,49 +35,22 @@ class ProjectMemberController extends ApiController
     public function store(Request $request, Project $project): JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
-        $user = Auth::user();
 
-        // メンバー情報の取得(追記)
-        $membership = $user->projects()
-        ->where('project_id', $project->id)
-        ->first();
-        
+
         // メンバーでないかつ、owner/adminでない場合はエラーを返す
         // エラーコード: 403, エラーメッセージ: メンバーを追加する権限がありません
-        if (!$membership || !in_array($membership->pivot->role, ['project_owner', 'project_admin'])) {
-            return response()->json([
-                'message' => 'メンバーを追加する権限がありません',
-            ], 403);
-        }
 
-// ーーーーーーーーー点線内調べても難しかったのでAIに聞きました。
         // バリデーション
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'role' => 'nullable|in:project_owner,project_admin,project_member',
-        ]);        
         // デフォルトロール設定
         $role = $validated['role'] ?? 'project_member';
 
         // 既にメンバーかチェック（users()リレーションを使用）
-        $existingMember = $project->users()
-            ->where('users.id', $validated['user_id'])
-            ->exists();
+
         // 既にメンバーならエラーを返す
-        if ($existingMember) {
-            return response()->json([
-                'message' => 'このユーザーは既にプロジェクトのメンバーです',
-            ], 409);
-        }
+
         // 自分自身を追加しようとしていないかチェック
         // 自分自身を追加しようとしていればエラーを返す
         // エラーコード: 409, エラーメッセージ: あなたは既にこのプロジェクトのメンバーです
-        $user = Auth::user();
-        if ($user->id === (int)$validated['user_id']) {
-            return response()->json([
-                'message' => 'あなたは既にこのプロジェクトのメンバーです',
-            ], 409);
-        }
 
         // メンバーシップ作成（users()リレーションのattach()を使用）
         $project->users()->attach($validated['user_id'], [
@@ -95,8 +65,6 @@ class ProjectMemberController extends ApiController
             'membership' => new ProjectMemberResource($user),
         ], 201);
     }
-// ーーーーーーーーー
-
 
     /**
      * プロジェクトからメンバーを削除（users()リレーションを使用）
@@ -104,14 +72,9 @@ class ProjectMemberController extends ApiController
     public function destroy(Request $request, Project $project, $userId): JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
-        $user = Auth::user();
+
         // メンバーでなければエラーを返す
         // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
-        if (!$user->projects()->where('project_id', $project->id)->exists()){ 
-            return response()->json([
-                'message' => 'このプロジェクトにアクセスする権限がありません',
-            ], 403);
-            }
 
         // 削除対象のユーザーを取得
         $targetUser = $project->users()
@@ -120,23 +83,12 @@ class ProjectMemberController extends ApiController
 
         // 削除対象のユーザーが存在しない場合はエラーを返す
         // エラーコード: 404, エラーメッセージ: ユーザーはこのプロジェクトのメンバーではありません。
-        if (!$targetUser) {
-            return response()->json([
-                'message' => 'ユーザーはこのプロジェクトのメンバーではありません',
-            ], 404);
-        }
+
         // 自分がowner/adminかチェック（users()リレーションを使用）
-        $membership = $user->projects()
-            ->where('project_id', $project->id)
-            ->first();
+
 
         // メンバーでないかつ、owner / adminでない場合はエラーを返す
         // エラーコード: 403, エラーメッセージ: メンバーを削除する権限がありません（オーナーまたは管理者のみ）
-        if (!$membership || !in_array($membership->pivot->role, ['project_owner', 'project_admin'])) {
-            return response()->json([
-                'message' => 'メンバーを削除する権限がありません（オーナーまたは管理者のみ）',
-            ], 403);
-        }
 
         // Owner維持チェック（Owner削除後に0人になる場合は不可）
         if ($targetUser->pivot->role === 'project_owner') {
