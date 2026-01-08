@@ -4,6 +4,23 @@
 
 ---
 
+## 🌿 ブランチの準備
+
+この講座を進める前に、適切なブランチに切り替えてください。
+
+```bash
+git checkout main
+git pull origin main
+
+git fetch origin lesson5-1
+git checkout lesson5-1
+git pull origin lesson5-1
+```
+
+> **💡 Tip**: すでに `lesson5-1` ブランチにいる場合は、この手順をスキップできます。
+
+---
+
 ## 📚 この講座で学べること
 
 ✅ `console.log()` の基本から応用まで  
@@ -13,13 +30,81 @@
 
 ---
 
-# 第 1 章：まずは基礎から！console.log って何や？
+# 第 1 章：問題発生！何が起きているか分からない...
 
-## 🐘 ガネーシャ登場
+## 😱 プロローグ：見えない問題
 
-**ガネーシャ 🐘**：「おう、自分！今日はワシがフロントエンド開発の極意を教えたるで！」
+**生徒 👩‍💻**：「ガネーシャ先生！タスク詳細ページを開いたら、エラーメッセージが出るんです...『タスクの読み込みに失敗しました』って」
 
-**生徒 👩‍💻**：「ガネーシャ先生、console.log って何ですか？」
+**ガネーシャ 🐘**：「ほう？それでどうしたんや？」
+
+**生徒 👩‍💻**：「コードを見てみたんですけど、どこが間違っているのか全然分からなくて...」
+
+**ガネーシャ 🐘**：「コードを見せてみ」
+
+---
+
+## 🔍 現状確認：何も見えていない状態
+
+開くファイル：`resources/js/Pages/Tasks/Show.vue`
+
+**現在のコード（30 行目あたり）：**
+
+```javascript
+const fetchTask = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
+```
+
+**生徒 👩‍💻**：「このコードで API を呼んでいるんですけど、エラーが出るんです...」
+
+**ガネーシャ 🐘**：「ふむふむ。コードをパッと見た感じは問題なさそうやな」
+
+**生徒 👩‍💻**：「そうなんです...でも、何が原因なのか分からなくて...」
+
+**ガネーシャ 🐘**：「そら分からへんやろ！**このコードからは何の情報も得られへん**からな」
+
+**生徒 👩‍💻**：「え？どういうことですか？」
+
+**ガネーシャ 🐘**：「例えばや：」
+
+```
+❓ 謎だらけの状態
+├─ fetchTask は本当に呼ばれているのか？
+├─ taskId の値は正しいのか？
+├─ API リクエストは送信されたのか？
+├─ レスポンスは返ってきたのか？
+├─ どんなエラーが起きているのか？
+└─ エラーの詳細情報は？
+```
+
+**生徒 👩‍💻**：「た、確かに...何も分かりませんね...😰」
+
+**ガネーシャ 🐘**：「これが**デバッグ情報がない**状態や。目隠しして料理してるようなもんやな！」
+
+---
+
+## 💡 解決策：console.log で「見える化」する！
+
+**ガネーシャ 🐘**：「ほな、今から**プログラムの中を覗き見する魔法**を教えたるわ！」
+
+**生徒 👩‍💻**：「魔法...ですか？」
+
+**ガネーシャ 🐘**：「せや！その名も**console.log**や！」
+
+---
+
+## 🐘 console.log って何や？
+
+**生徒 👩‍💻**：「console.log...って何ですか？」
 
 **ガネーシャ 🐘**：「ええ質問やな！console.log はな、**プログラムの中が見える魔法の虫眼鏡**や！プログラムは普通、何を考えてるか見えへん。でもな、console.log を使うとな、『あ、今この変数にはこんな値が入ってるんやな』って分かるんや」
 
@@ -36,13 +121,19 @@
 └ 盛り付けを見る          └ エラーの原因を特定
 ```
 
-**生徒 👩‍💻**：「なるほど！でも、どうやって使うんですか？」
+**生徒 👩‍💻**：「なるほど！味見して確認するんですね！」
 
-**ガネーシャ 🐘**：「まぁまぁ、焦るなや。まずは基本から教えたるわ」
+**ガネーシャ 🐘**：「せや！ワシの教え子のエジソンくんもな、『天才は 1%のひらめきと 99%の汗』って言うとったけど、プログラミングもな、**1%のコードと 99%のデバッグ**や！console.log を制する者がデバッグを制するんや！」
+
+**生徒 👩‍💻**：「エジソンってガネーシャ先生の教え子なんですか！？」
+
+**ガネーシャ 🐘**：「せやで！あ、いや...まぁそういう設定や（小声）。さ、基本から教えたるわ！」
 
 ---
 
 ## 📖 console.log の基本文法
+
+**ガネーシャ 🐘**：「ほな、まずは基本的な使い方を教えるで」
 
 ### ✅ 最もシンプルな使い方
 
@@ -72,27 +163,19 @@ const age = 25;
 console.log("名前:", name, "年齢:", age); // → 名前: 太郎 年齢: 25
 ```
 
----
+**生徒 👩‍💻**：「シンプルですね！これなら私にもできそうです！」
 
-**ガネーシャ 🐘**：「ワシの教え子のエジソンくんもな、『天才は 1%のひらめきと 99%の汗』って言うとったけど、プログラミングもな、**1%のコードと 99%のデバッグ**や！console.log を制する者がデバッグを制するんや！」
-
-**生徒 👩‍💻**：「エジソンってガネーシャ先生の教え子なんですか！？」
-
-**ガネーシャ 🐘**：「せやで！あ、いや...まぁそういう設定や（小声）。さ、次いこか！」
+**ガネーシャ 🐘**：「せやろ？ほな、さっそく実際のコードで試してみよか！」
 
 ---
 
 # 第 2 章：実践！このプロジェクトで試してみよう
 
-## 🎯 ミッション 1：基本の console.log を試す
-
-**ガネーシャ 🐘**：「さぁ、ここからが本番や！お前のプロジェクトの実際のコードで console.log を使ってみるで！」
+## 🎯 ミッション 1：デベロッパーツールを開いて準備する
 
 ### 📝 手順 1：ブラウザのデベロッパーツールを開く
 
-**生徒 👩‍💻**：「デベロッパーツール...？」
-
-**ガネーシャ 🐘**：「それが**虫眼鏡の本体**や！これを開かんことには始まらへんで」
+**ガネーシャ 🐘**：「まずはな、**虫眼鏡の本体**を開かなアカン」
 
 #### 🔑 デベロッパーツールの開き方（これだけ覚えれば OK！）
 
@@ -134,7 +217,7 @@ console.log("名前:", name, "年齢:", age); // → 名前: 太郎 年齢: 25
 
 ---
 
-### 📝 手順 2：実際の Vue ファイルに console.log を追加してみよう
+### 📝 手順 2：実際に console.log を追加してみよう
 
 **ガネーシャ 🐘**：「ほな、お前のプロジェクトの `Show.vue` ファイルを開いてみ。タスク詳細ページのコードや」
 
@@ -149,112 +232,256 @@ const fetchTask = async () => {
         const response = await axios.get(`/api/tasks/${taskId}`);
         task.value = response.data.data || response.data;
     } catch (err) {
-        // 後で詳しく学ぶ handleError
-        handleError(err, "タスクの読み込みに失敗しました");
+        toast.error("タスクの読み込みに失敗しました");
     } finally {
         loading.value = false;
     }
 };
 ```
 
-**ガネーシャ 🐘**：「このコードにな、console.log を仕込むんや！でもな、まずは**handleError を使わずに**、生のエラーを確認する方法を教えたるわ」
+**ガネーシャ 🐘**：「このコードにな、console.log を仕込んで、**処理の流れとデータの中身を確認できるようにする**んや！まずは**最小限のログから始めよう**」
 
-**生徒 👩‍💻**：「handleError って何ですか？」
+#### 📝 Step 1：まず最小限のログを追加（エラーのみ）
 
-**ガネーシャ 🐘**：「それはな、このプロジェクトで用意されとる便利な関数や。でも最初は**生の console.log でエラーを見る練習**が大事なんや。料理でいうたら、インスタント使う前に基本の出汁の取り方を学ぶようなもんやな」
-
-**追加後のコード（handleError なしバージョン）：**
+**ガネーシャ 🐘**：「まずは基本だけ追加してみよう。今はエラーが出てる状態やから、**エラーのログだけ**追加するで」
 
 ```javascript
 const fetchTask = async () => {
     console.log("🚀 fetchTask が呼ばれたで！");
-    console.log("📍 タスクID:", taskId);
 
     try {
         loading.value = true;
-
-        console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskId}`);
-
         const response = await axios.get(`/api/tasks/${taskId}`);
-
-        console.log("✅ APIレスポンス成功！", response);
-        console.log("📦 response.data の中身：", response.data);
-        console.log("📝 取得したタスク：", response.data.data);
-
         task.value = response.data.data || response.data;
     } catch (err) {
-        // ❌ ここが重要！生のエラーをそのまま確認する
+        console.error("❌ エラー:", err); // ← まずはこれだけ！
+
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
+```
+
+**生徒 👩‍💻**：「保存してブラウザで確認してみます！」
+
+**ガネーシャ 🐘**：「おお！コンソールに何が表示されるか見てみ！」
+
+#### 🔍 Step 1 の結果を確認
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+❌ エラー: ▶︎ AxiosError {message: 'Request failed with status code 500', ...}
+```
+
+**生徒 👩‍💻**：「エラーは出ましたが...`AxiosError`って何ですか？`▶︎`って記号もありますね」
+
+**ガネーシャ 🐘**：「おお、ええところに気づいたな！まず、**Console の記号**の意味を教えるで」
+
+#### 🎯 Console の記号の使い方（超重要！）
+
+**ガネーシャ 🐘**：「Console に表示される記号には意味があるんや」
+
+| 記号      | 意味           | 状態                         |
+| :-------- | :------------- | :--------------------------- |
+| **▶︎**    | 右向き三角     | 閉じた状態（中身が隠れてる） |
+| **▼**     | 下向き三角     | 開いた状態（中身が見えてる） |
+| **{...}** | 波カッコに点々 | オブジェクトの要約表示       |
+| **[...]** | 角カッコに点々 | 配列の要約表示               |
+
+**生徒 👩‍💻**：「`▶︎`をクリックすると中身が見えるんですね！」
+
+**ガネーシャ 🐘**：「せや！**▶︎ をクリック**すると、**▼ に変わって全部の中身が展開**されるんや。やってみ！」
+
+#### 🔍 エラーオブジェクトを展開してみる
+
+**生徒 👩‍💻**：「`▶︎ AxiosError` をクリックしてみます！」
+
+**▶︎ をクリックすると → ▼ に変わる：**
+
+```
+❌ エラー: ▼ AxiosError
+  code: "ERR_BAD_RESPONSE"
+  config: ▶︎ {transitional: {…}, adapter: Array(3), ...}
+  message: "Request failed with status code 500"
+  name: "AxiosError"
+  request: ▶︎ XMLHttpRequest {…}
+  response: ▶︎ {data: {…}, status: 500, statusText: 'Internal Server Error', ...}  ← これが重要！
+  stack: "AxiosError: Request failed with status code 500\n    at ..."
+```
+
+**生徒 👩‍💻**：「わぁ！`▶︎`が`▼`に変わって、中身が全部見えました！」
+
+**ガネーシャ 🐘**：「せやろ！これが**オブジェクトの展開**や。`response: ▶︎ {data: {…}, status: 500, ...}` ってのがあるやろ？これが重要や」
+
+**生徒 👩‍💻**：「はい！`response`にサーバーからの情報が入ってそうですね」
+
+**ガネーシャ 🐘**：「ええ気づきや！`err.response` にサーバーからのレスポンスが入っとるんや」
+
+#### 💡 でも...毎回クリックするのは面倒
+
+**生徒 👩‍💻**：「でも、毎回`err`を展開して、その中の`response`を探すのって大変ですね...」
+
+**ガネーシャ 🐘**：「せやな！**毎回 ▶︎ をクリックして探すのは面倒**やろ？だからな、**最初から見たいものを直接ログに出す**んや！」
+
+**生徒 👩‍💻**：「なるほど！最初から`err.response`を指定すればいいんですね！」
+
+#### 📝 Step 2：err.response を直接ログに出す
+
+**ガネーシャ 🐘**：「せやから、**最初から err.response を指定してログに出す**んや！」
+
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
+
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        console.error("❌ エラー:", err);
+        console.error("📊 エラーレスポンス:", err.response); // ← 追加！
+
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
+```
+
+**生徒 👩‍💻**：「保存して再度確認します！」
+
+#### 🔍 Step 2 の結果を確認
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+❌ エラー: ▶︎ AxiosError {message: 'Request failed with status code 500', ...}
+📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, statusText: 'Internal Server Error', ...}
+```
+
+**生徒 👩‍💻**：「お！今度は`📊 エラーレスポンス`が直接表示されました！これなら探さなくていいですね！」
+
+**ガネーシャ 🐘**：「せやろ！これが**ピンポイントでログを出す**コツや。さらにな、`status`と`data`も直接出してみよう」
+
+#### 📝 Step 3：さらに詳細を追加（エラーの時のみ）
+
+**ガネーシャ 🐘**：「エラーの時の最終形はこんな感じや！**毎回 ▶︎ をクリックするのが面倒やから、最初から全部出しとくんや**」
+
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
+
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+        task.value = response.data.data || response.data;
+    } catch (err) {
         console.error("❌ エラーが発生したで！");
         console.error("🔍 エラーオブジェクト全体:", err);
         console.error("📊 エラーレスポンス:", err.response);
         console.error("📋 ステータスコード:", err.response?.status);
         console.error("💬 エラーデータ:", err.response?.data);
 
-        // 画面にもエラーを表示（ユーザー向け）
-        alert("タスクの読み込みに失敗しました");
+        toast.error("タスクの読み込みに失敗しました");
     } finally {
         loading.value = false;
-        console.log("🏁 fetchTask 終了！");
     }
 };
 ```
 
-**生徒 👩‍💻**：「絵文字を付けてるんですね！」
+**生徒 👩‍💻**：「保存してブラウザで確認してみます！」
 
-**ガネーシャ 🐘**：「せや！絵文字を付けるとな、コンソールがめっちゃ見やすくなるんや。ログが大量にある時でも、絵文字でパッと目的のログが見つかるんやで。これはワシの教え子のスティーブ・ジョブズくんから学んだ『デザインの重要性』や！」
+**Console に表示される内容：**
 
-**生徒 👩‍💻**：「ジョブズも教え子なんですか...（疑惑の目）」
+```
+🚀 fetchTask が呼ばれたで！
+❌ エラーが発生したで！
+🔍 エラーオブジェクト全体: ▶︎ AxiosError {message: 'Request failed with status code 500', ...}
+📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, statusText: 'Internal Server Error', ...}
+📋 ステータスコード: 500
+💬 エラーデータ: ▶︎ {message: '...', exception: '...', file: '...', line: 123, trace: [...]}
+```
 
-**ガネーシャ 🐘**：「（咳払い）ま、まぁええやん！次行くで！」
+**生徒 👩‍💻**：「わぁ！今度はエラーの情報が全部一度に見えます！毎回クリックしなくていいから楽ですね！」
+
+**ガネーシャ 🐘**：「せやろ！**エラーの詳細を最初から全部出す**ことで、デバッグが超楽になるんや」
+
+**生徒 👩‍💻**：「絵文字も付けてるんですね！」
+
+**ガネーシャ 🐘**：「せや！絵文字を付けるとな、コンソールがめっちゃ見やすくなるんや。ログが大量にある時でも、絵文字でパッと目的のログが見つかるんやで」
+
+**生徒 👩‍💻**：「分かりました！じゃあ、エラーの詳細を見てみます」
 
 ---
 
-### 📝 手順 3：成功パターンを確認しよう（まずはこれ！）
+### 📝 手順 3：エラーの原因を特定しよう
 
-**ガネーシャ 🐘**：「コードを保存したら、ブラウザでタスク詳細ページを開いてみ。まずは**成功するパターン**から見てみよう」
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
 
-#### 🚀 サーバーを起動する
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        console.error("❌ エラーが発生したで！");
+        console.error("🔍 エラーオブジェクト全体:", err);
+        console.error("📊 エラーレスポンス:", err.response);
+        console.error("📋 ステータスコード:", err.response?.status);
+        console.error("💬 エラーデータ:", err.response?.data);
 
-**ガネーシャ 🐘**：「このプロジェクトは **Laravel Sail** を使っとるから、起動方法がちょっと特別やで」
-
-```bash
-# ターミナルで実行（Sail環境の起動）
-sail up -d
-
-# Vite（フロントエンド）を起動
-sail npm run dev
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
 ```
 
-**ガネーシャ 🐘**：「Sail は Docker を使って Laravel を動かす仕組みや。`sail up -d` で Laravel サーバーが起動するで」
+**ガネーシャ 🐘**：「コードを保存したら、ブラウザでタスク詳細ページを開いてみ。さっきのエラーの原因を探ろう」
+
+**生徒 👩‍💻**：「はい！」
 
 #### 🌐 ブラウザで確認
 
 1. ブラウザで `http://localhost/tasks/1` にアクセス
 2. デベロッパーツールを開いて Console タブを表示（さっき覚えた方法で！）
 
-**生徒 👩‍💻**：「わぁ！コンソールにログがいっぱい出ました！」
+**生徒 👩‍💻**：「わぁ！コンソールにログがいっぱい出ました！でも...」
 
 ```
 🚀 fetchTask が呼ばれたで！
 📍 タスクID: 1
 📡 APIリクエストを送信するで： /api/tasks/1
-✅ APIレスポンス成功！ ▶︎ {data: {•••}, status: 200, statusText: 'OK', headers: AxiosHeaders, config: {•••}, •••}
-📦 response.data の中身： ▶︎ {data: {•••}}
-📝 取得したタスク： ▶︎ {id: 1, project_id: 1, title: '...', status: 'todo', •••}
+❌ エラーが発生したで！
+🔍 エラーオブジェクト全体: ▶︎ Error: Request failed with status code 500
+📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, ...}
+📋 ステータスコード: 500
+💬 エラーデータ: ▶︎ {message: '...', exception: '...', ...}
 🏁 fetchTask 終了！
 ```
 
-**ガネーシャ 🐘**：「せやろ！これが**プログラムの中が見える瞬間**や！成功した時の流れが全部見えとるな」
+**生徒 👩‍💻**：「あれ？エラーが出ました！でも、リクエストは送信されてますね...`/api/tasks/1`って」
 
-**生徒 👩‍💻**：「あれ？`Object {...}` じゃなくて、`{data: {•••}, status: 200, ...}` って表示されてます。最初から一部が見えてますね」
+**ガネーシャ 🐘**：「おお！よう気づいたな。フロントエンド（JavaScript）側は問題ないってことやな」
 
-**ガネーシャ 🐘**：「おお、ええところに気づいたな！Console はな、**親切に一部のプロパティを最初から見せてくれる**んや。でも `{•••}` って部分はまだ隠れとるやろ？そこを開いていくんや」
+**生徒 👩‍💻**：「でも、`status code 500`って...これは何ですか？」
+
+**ガネーシャ 🐘**：「ええ質問や！500 番台のエラーはな、**サーバー側（Laravel）でエラーが起きた**ってことや。つまり、バックエンドに問題があるんや」
+
+**生徒 👩‍💻**：「なるほど...じゃあ、エラーの詳細を見てみます！`📊 エラーレスポンス`をクリックしてみます」
+
+**ガネーシャ 🐘**：「ええ調子や！▶︎ をクリックして展開してみ」
 
 ---
 
-### 📝 手順 3.5：コンソールでオブジェクトの中身を見る魔法
+### 📝 手順 3.5：エラーレスポンスを展開してみる
 
-**生徒 👩‍💻**：「`{data: {•••}, status: 200, ...}` の `{•••}` の部分って何ですか？中身が見えません...」
+**生徒 👩‍💻**：「`📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, ...}` の `{•••}` の部分って何ですか？中身が見えません...」
 
 **ガネーシャ 🐘**：「おお、ええ質問や！これはな、**JavaScript のオブジェクト（データの塊）**の**要約表示**なんや」
 
@@ -275,9 +502,9 @@ const user = {
 
 ```
 例：
-✅ APIレスポンス成功！ ▶︎ {data: {•••}, status: 200, statusText: 'OK', ...}
-                        ↑          ↑
-                    最初から見える  隠れてる部分
+📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, statusText: 'Internal Server Error', ...}
+                    ↑          ↑
+                最初から見える  隠れてる部分
 ```
 
 **生徒 👩‍💻**：「なるほど！じゃあ、`{•••}` の中を見るにはどうすればいいんですか？」
@@ -289,9 +516,9 @@ const user = {
 **Console 画面（実際の表示）：**
 
 ```
-✅ APIレスポンス成功！ ▶︎ {data: {•••}, status: 200, statusText: 'OK', headers: AxiosHeaders, config: {•••}, •••}
-                       ↑
-                   この三角をクリック！
+📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, statusText: 'Internal Server Error', ...}
+                    ↑
+                この三角をクリック！
 ```
 
 **生徒 👩‍💻**：「あ！小さな三角がありました！クリックします」
@@ -301,25 +528,27 @@ const user = {
 **▶︎ をクリックすると → ▼ に変わって全体が展開される：**
 
 ```
-✅ APIレスポンス成功！ ▼ {data: {•••}, status: 200, statusText: 'OK', ...}
+📊 エラーレスポンス: ▼ {data: {•••}, status: 500, statusText: 'Internal Server Error', ...}
   config: ▶︎ {transitional: {•••}, adapter: [...], ...}
-  data: ▶︎ {data: {•••}}         ← これもクリックできる！
+  data: ▶︎ {message: '...', exception: '...', ...}    ← これもクリックできる！
   headers: ▶︎ AxiosHeaders {•••}
   request: ▶︎ XMLHttpRequest {•••}
-  status: 200                   ← 数値はそのまま表示
-  statusText: "OK"              ← 文字列もそのまま表示
+  status: 500                   ← エラーステータスコード
+  statusText: "Internal Server Error"  ← エラーメッセージ
 ```
 
-**生徒 👩‍💻**：「わぁ！全部の項目が見えました！でも、`data: ▶︎ {data: {•••}}` ってまた `{•••}` がありますね...」
+**生徒 👩‍💻**：「わぁ！全部の項目が見えました！でも、`data: ▶︎ {message: '...', exception: '...', ...}` ってまた `{•••}` がありますね...」
 
 **ガネーシャ 🐘**：「せやろ！**オブジェクトの中にオブジェクトが入っとる**んや！これを**入れ子構造（ネスト）**って言うんや。箱の中に箱が入っとる感じやな」
 
 ```
 📦 axios のレスポンス（大きな箱）
-  ├─ 📝 status: 200（数値）
-  ├─ 📝 statusText: "OK"（文字列）
-  ├─ 📦 data:（また箱！）← Laravel からのデータ
-  │    └─ 📦 data:（さらに箱！）← 実際のタスクデータ
+  ├─ 📝 status: 500（エラーステータス）
+  ├─ 📝 statusText: "Internal Server Error"（エラーメッセージ）
+  ├─ 📦 data:（また箱！）← Laravel が返したエラー情報
+  │    ├─ 📝 message: "..."（エラーメッセージ）
+  │    ├─ 📝 exception: "..."（例外クラス名）
+  │    └─ 📝 file, line, trace など（エラー詳細）
   ├─ 📦 headers:（ヘッダー情報）
   └─ 📦 config:（設定情報）
 ```
@@ -343,24 +572,412 @@ const user = {
 
 #### 📖 実際に階層を開いていく
 
-**ステップ 1：最初の `data` を開く**
+**ステップ 1：`data` を開く（Laravel のエラー詳細）**
 
-**`data: ▶︎ {data: {•••}}` をクリックすると：**
+**`data: ▶︎ {message: '...', exception: '...', ...}` をクリックすると：**
 
 ```
-✅ APIレスポンス成功！ ▼ {data: {•••}, status: 200, ...}
+📊 エラーレスポンス: ▼ {data: {•••}, status: 500, ...}
   config: ▶︎ {...}
-  data: ▼ {data: {•••}}       ← 今ここを開いた！
-    data: ▶︎ {id: 1, project_id: 1, title: '...', •••}  ← え！また data がある！
+  data: ▼ {message: '...', exception: '...', file: '...', ...}  ← 今ここを開いた！
+    message: "Call to undefined relationship [creatdBy] on model [App\\Models\\Task]."
+    exception: "BadMethodCallException"
+    file: "/var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/..."
+    line: 1234
+    trace: ▶︎ [...]
   headers: ▶︎ {...}
   request: ▶︎ XMLHttpRequest {...}
-  status: 200
-  statusText: "OK"
+  status: 500
+  statusText: "Internal Server Error"
 ```
 
-**生徒 👩‍💻**：「あ！`data` の中に、また `data` がありますね...これは？」
+**生徒 👩‍💻**：「あ！エラーメッセージが見えました！`Call to undefined relationship [creatdBy]`って...」
 
-**ガネーシャ 🐘**：「ええところに気づいたな！これが **response.data.data** って二重になってる理由や」
+**ガネーシャ 🐘**：「おお！読めるか？`creatdBy`っていうリレーションが定義されてへんって言うとるな」
+
+**生徒 👩‍💻**：「あれ？`creatdBy`...これって`createdBy`の間違いじゃないですか？**d と e が逆**になってます！」
+
+**ガネーシャ 🐘**：「**正解や！**でもちょっと待てや。他にも重要な情報があるで」
+
+#### 💡 エラーデータの各プロパティを理解しよう
+
+**ガネーシャ 🐘**：「今見たエラーデータには、色々な情報が詰まっとるんや。一つずつ見ていこう」
+
+```
+data: ▼ {message: '...', exception: '...', file: '...', ...}
+  message: "Call to undefined relationship [creatdBy] on model [App\\Models\\Task]."
+  exception: "BadMethodCallException"
+  file: "/var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/..."
+  line: 1234
+  trace: ▶︎ [...]
+```
+
+**生徒 👩‍💻**：「`message`、`exception`、`file`、`line`、`trace`...色々ありますね」
+
+**ガネーシャ 🐘**：「せや！それぞれ意味があるんや」
+
+| プロパティ    | 意味                                 | 例                                             |
+| :------------ | :----------------------------------- | :--------------------------------------------- |
+| **message**   | エラーメッセージ（何が起きたか）     | "Call to undefined relationship [creatdBy]..." |
+| **exception** | 例外クラス名（エラーの種類）         | "BadMethodCallException"                       |
+| **file**      | エラーが発生したファイル             | "/var/www/html/vendor/laravel/..."             |
+| **line**      | エラーが発生した行番号               | 1234                                           |
+| **trace**     | エラーの経路（どの順番で呼ばれたか） | 配列形式で表示                                 |
+
+**生徒 👩‍💻**：「`trace`って何ですか？」
+
+**ガネーシャ 🐘**：「ええ質問や！`trace`はな、**エラーが発生するまでの経路**を記録したもんや。`trace: ▶︎ [...]`をクリックしてみ」
+
+#### 🔍 trace を展開してみる
+
+**`trace: ▶︎ [...]` をクリックすると：**
+
+```
+trace: ▼ [...]
+  0: ▶︎ {file: '/var/www/html/vendor/laravel/framework/...', line: 123, ...}
+  1: ▶︎ {file: '/var/www/html/app/Services/TaskService.php', line: 72, ...}
+  2: ▶︎ {file: '/var/www/html/app/Http/Controllers/Api/TaskController.php', line: 67, ...}
+  3: ▶︎ {file: '/var/www/html/vendor/laravel/framework/...', line: 456, ...}
+  ...
+```
+
+**生徒 👩‍💻**：「配列になってますね！0, 1, 2, 3...」
+
+**ガネーシャ 🐘**：「せや！これが**エラーが発生するまでの関数呼び出しの順番**や」
+
+```
+📞 関数呼び出しの流れ（下から上へ）
+
+3. Laravel フレームワーク
+   ↓
+2. TaskController.php (line: 67)  ← コントローラー
+   ↓
+1. TaskService.php (line: 72)     ← ここでエラー発生！
+   ↓
+0. Laravel フレームワーク（エラー処理）
+```
+
+**生徒 👩‍💻**：「あ！`TaskService.php`の 72 行目でエラーが起きたってことですね！」
+
+**ガネーシャ 🐘**：「**その通り！**`trace`を見れば、**どのファイルのどの行でエラーが起きたか**が一発で分かるんや」
+
+**生徒 👩‍💻**：「じゃあ、`TaskService.php`の 72 行目を見てみます！」
+
+#### 📝 TaskService.php を確認しよう
+
+**生徒 👩‍💻**：「`trace`で`TaskService.php`の 72 行目って分かったので、ファイルを開いてみます！」
+
+開くファイル：`app/Services/TaskService.php`
+
+**72 行目あたり：**
+
+```php
+// app/Services/TaskService.php
+public function getTask(Task $task, User $user): Task
+{
+    $this->checkTaskPermission($task, $user);
+
+    // ← 72行目
+    $task->load(['creatdBy', 'project']); // createdBy のはず...
+
+    return $task;
+}
+```
+
+**生徒 👩‍💻**：「あ！本当だ！`creatdBy`って書いてます！これ、`createdBy`の間違いですね！」
+
+**ガネーシャ 🐘**：「**正解や！**console.log で以下のことが分かったな：」
+
+```
+✅ console.log で分かったこと
+├─ エラーメッセージ: "Call to undefined relationship [creatdBy]"
+├─ エラーの種類: BadMethodCallException
+├─ 発生ファイル: TaskService.php
+├─ 発生行番号: 72
+└─ 原因: creatdBy → createdBy のタイポ
+```
+
+**生徒 👩‍💻**：「console.log すごい！こんなに詳しく分かるんですね！」
+
+**ガネーシャ 🐘**：「せやろ！**エラーの詳細をしっかりログに出す**ことで、デバッグが超楽になるんや。さて、原因が分かったから修正してみよう」
+
+---
+
+### 📝 手順 4：タイポを修正しよう
+
+**ガネーシャ 🐘**：「原因が分かったから、Laravel 側のタイポを修正しよう」
+
+開くファイル：`app/Services/TaskService.php`
+
+```php
+// 修正前
+$task->load(['creatdBy', 'project']);
+
+// 修正後
+$task->load(['createdBy', 'project']);
+```
+
+**ガネーシャ 🐘**：「保存してリロードしてみ」
+
+**生徒 👩‍💻**：「やりました！」
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+❌ エラーが発生したで！
+🔍 エラーオブジェクト全体: ▶︎ AxiosError {...}
+📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, ...}
+📋 ステータスコード: 500
+💬 エラーデータ: ▶︎ {message: '...', exception: '...', ...}
+```
+
+**生徒 👩‍💻**：「あれ？まだエラーが...あ、ブラウザをリロードしてなかった！リロードします！」
+
+**ガネーシャ 🐘**：「ブラウザのキャッシュが残ってたんやな。`Cmd + Shift + R`（Mac）で強制リロードや」
+
+**生徒 👩‍💻**：「リロードしました！」
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+```
+
+**生徒 👩‍💻**：「あれ？今度はエラーもなくなりましたが...成功のログも出ていません」
+
+**ガネーシャ 🐘**：「そらそうや！今のコードは**エラーの時だけログを出す**ようになっとるからな。成功の時のログも追加せなアカンで」
+
+**生徒 👩‍💻**：「なるほど！成功の時も console.log を追加する必要があるんですね！」
+
+---
+
+### 📝 手順 5：成功レスポンスも段階的にログを追加しよう
+
+**ガネーシャ 🐘**：「エラーの時と同じように、**成功の時も段階的にログを追加**していくで」
+
+**生徒 👩‍💻**：「エラーの時にやったみたいに、最初は最小限から始めるんですね！」
+
+**ガネーシャ 🐘**：「せや！まずは`response`だけ出してみよう」
+
+#### 📝 Step 1：まず response だけログに出す
+
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
+
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+
+        console.log("✅ レスポンス:", response); // ← 追加！
+
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        console.error("❌ エラーが発生したで！");
+        console.error("🔍 エラーオブジェクト全体:", err);
+        console.error("📊 エラーレスポンス:", err.response);
+        console.error("📋 ステータスコード:", err.response?.status);
+        console.error("💬 エラーデータ:", err.response?.data);
+
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
+```
+
+**生徒 👩‍💻**：「保存してリロードします！」
+
+#### 🔍 Step 1 の結果を確認
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+✅ レスポンス: ▶︎ {data: {•••}, status: 200, statusText: 'OK', headers: AxiosHeaders, config: {•••}, ...}
+```
+
+**生徒 👩‍💻**：「お！成功のログが出ました！`status: 200` だから成功ですね！」
+
+**ガネーシャ 🐘**：「せやな！でもな、`response` の中身を見るには ▶︎ をクリックせなアカンやろ？」
+
+**生徒 👩‍💻**：「はい、クリックしてみます」
+
+**`▶︎ {data: {•••}, status: 200, ...}` をクリックすると：**
+
+```
+✅ レスポンス: ▼ {data: {•••}, status: 200, statusText: 'OK', ...}
+  config: ▶︎ {transitional: {•••}, adapter: [...], ...}
+  data: ▶︎ {data: {•••}}         ← これが Laravel からのデータ！
+  headers: ▶︎ AxiosHeaders {•••}
+  request: ▶︎ XMLHttpRequest {•••}
+  status: 200                   ← 成功のステータスコード
+  statusText: "OK"              ← 成功メッセージ
+```
+
+**生徒 👩‍💻**：「`data: ▶︎ {data: {•••}}` ってのがありますね。これが Laravel から返ってきたデータですか？」
+
+**ガネーシャ 🐘**：「せや！でも、毎回クリックして探すのは面倒やろ？」
+
+**生徒 👩‍💻**：「確かに...`response` の中の `data` を探すのが大変です」
+
+#### 📝 Step 2：response.data も直接ログに出す
+
+**ガネーシャ 🐘**：「せやから、**最初から response.data を指定してログに出す**んや！」
+
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
+
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+
+        console.log("✅ レスポンス:", response);
+        console.log("📦 response.data:", response.data); // ← 追加！
+
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        console.error("❌ エラーが発生したで！");
+        console.error("🔍 エラーオブジェクト全体:", err);
+        console.error("📊 エラーレスポンス:", err.response);
+        console.error("📋 ステータスコード:", err.response?.status);
+        console.error("💬 エラーデータ:", err.response?.data);
+
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
+```
+
+**生徒 👩‍💻**：「保存して再度確認します！」
+
+#### 🔍 Step 2 の結果を確認
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+✅ レスポンス: ▶︎ {data: {•••}, status: 200, statusText: 'OK', ...}
+📦 response.data: ▶︎ {data: {•••}}
+```
+
+**生徒 👩‍💻**：「お！今度は`📦 response.data`が直接表示されました！」
+
+**ガネーシャ 🐘**：「せやろ！でもな、`response.data: ▶︎ {data: {•••}}` ってまた `data` の中に `data` があるやろ？これも展開してみたいよな」
+
+**生徒 👩‍💻**：「はい！▶︎ をクリックしてみます」
+
+**`▶︎ {data: {•••}}` をクリックすると：**
+
+```
+📦 response.data: ▼ {data: {•••}}
+  data: ▶︎ {id: 1, project_id: 1, title: '...', status: 'todo', •••}  ← 実際のタスクデータ！
+```
+
+**生徒 👩‍💻**：「あ！`data` の中にまた `data` がありますね。これが実際のタスクデータですか？」
+
+**ガネーシャ 🐘**：「せや！`response.data.data` で実際のタスクデータにアクセスできるんや。これも直接ログに出してみよう」
+
+#### 📝 Step 3：さらに詳細を追加
+
+**ガネーシャ 🐘**：「最終形はこんな感じや！」
+
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
+    console.log("📍 タスクID:", taskId);
+
+    try {
+        loading.value = true;
+
+        console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskId}`);
+
+        const response = await axios.get(`/api/tasks/${taskId}`);
+
+        console.log("✅ APIレスポンス成功！", response);
+        console.log("📦 response.data の中身：", response.data);
+        console.log("📝 取得したタスク：", response.data.data);
+
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        console.error("❌ エラーが発生したで！");
+        console.error("🔍 エラーオブジェクト全体:", err);
+        console.error("📊 エラーレスポンス:", err.response);
+        console.error("📋 ステータスコード:", err.response?.status);
+        console.error("💬 エラーデータ:", err.response?.data);
+
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+        console.log("🏁 fetchTask 終了！");
+    }
+};
+```
+
+**生徒 👩‍💻**：「保存してリロードします！」
+
+#### 🔍 Step 3 の結果を確認
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+📍 タスクID: 1
+📡 APIリクエストを送信するで： /api/tasks/1
+✅ APIレスポンス成功！ ▶︎ {data: {•••}, status: 200, statusText: 'OK', headers: AxiosHeaders, config: {•••}, •••}
+📦 response.data の中身： ▶︎ {data: {•••}}
+📝 取得したタスク： ▶︎ {id: 1, project_id: 1, title: '...', status: 'todo', •••}
+🏁 fetchTask 終了！
+```
+
+**生徒 👩‍💻**：「わぁ！今度は成功時の情報が全部見えます！タスク ID からレスポンスまで、全部の流れが分かりますね！」
+
+**ガネーシャ 🐘**：「せやろ！**エラーも成功も、段階的にログを追加**していくことで、**何が起きてるか**が一目瞭然になるんや」
+
+**生徒 👩‍💻**：「console.log、めっちゃ便利ですね！エラーの時も成功の時も、全部の流れが見えるから原因がすぐ分かります！」
+
+**ガネーシャ 🐘**：「せやろ！ここでポイントをまとめるで」
+
+#### 🎯 console.log の重要ポイント
+
+**ガネーシャ 🐘**：「ここまでで学んだことを整理しとこうや」
+
+##### 📌 Console の基本操作
+
+| 記号/操作 | 説明                                           |
+| :-------- | :--------------------------------------------- |
+| **▶︎**    | 右向き三角（閉じた状態）→ クリックすると展開   |
+| **▼**     | 下向き三角（開いた状態）→ クリックすると閉じる |
+| **{...}** | オブジェクトの要約表示（中身が隠れてる）       |
+| **[...]** | 配列の要約表示（中身が隠れてる）               |
+
+##### 📌 効率的なログの出し方
+
+| ポイント             | 説明                                               | 例                                           |
+| :------------------- | :------------------------------------------------- | :------------------------------------------- |
+| **段階的に追加**     | 最初は最小限、必要に応じて詳細を追加               | `err` → `err.response` → `err.response.data` |
+| **最初から詳細ログ** | 毎回 ▶︎ をクリックするのが面倒なら最初から全部出す | `console.error(err.response?.data)`          |
+| **絵文字を使う**     | ログが見やすくなる                                 | 🚀 ✅ ❌ 📊 📋 💬                            |
+| **trace を確認**     | エラーの発生場所と経路が分かる                     | ファイル名、行番号が分かる                   |
+
+**生徒 👩‍💻**：「なるほど！▶︎ をクリックして中身を見ることもできるし、最初から詳細ログを書いておくこともできるんですね！」
+
+**ガネーシャ 🐘**：「せや！**開発中は最初から詳細なログを書いておく方が効率的**や。毎回コンソールで ▶︎ をクリックして探すより、最初から `response.data.data` みたいに**ピンポイントでログを出す**方が断然楽やで」
+
+**生徒 👩‍💻**：「分かりました！エラーも成功も、段階的に追加していって、最終的には詳細ログを最初から書くんですね！」
+
+**ガネーシャ 🐘**：「**その通り！**さて、成功レスポンスの中で気になることがあるやろ？`response.data.data` って二重になってるのはなんでや？」
+
+---
+
+### 📝 手順 6：Laravel から返ってきたデータの構造を理解しよう
+
+**生徒 👩‍💻**：「そうなんです！`data` の中に `data` があるのが不思議で...」
+
+**ガネーシャ 🐘**：「ええ質問や！これが **response.data.data** って二重になってる理由や」
 
 #### 💡 なぜ data.data になるのか？
 
@@ -384,25 +1001,28 @@ public function show(Task $task) {
 // TaskResource は自動的に {data: {...}} でラップされる
 ```
 
-**実際の JSON レスポンス：**
+**ガネーシャ 🐘**：「axios は `response.data` にサーバーからの JSON を入れる。Laravel の TaskResource はデータを `{data: {...}}` でラップする。だから `response.data.data` で実際のタスクにアクセスできるんや」
 
-```json
-{
-  "data": {
-    "id": 1,
-    "project_id": 1,
-    "title": "サンプルタスク",
-    "status": "todo",
-    ...
-  }
-}
+**生徒 👩‍💻**：「なるほど！だから、コードで `task.value = response.data.data` って書いてたんですね！」
+
+**ガネーシャ 🐘**：「**その通り！**さすガネーシャの生徒や！」
+
+```javascript
+// だから、こう書く必要があるんや！
+task.value = response.data.data || response.data;
+//             ↑          ↑
+//          axios が    Laravel が
+//          格納した    ラップした
+//          JSON       data
 ```
 
-**ガネーシャ 🐘**：「axios は `response.data` にサーバーからの JSON を入れる。Laravel の TaskResource はデータを `{data: {...}}` でラップする。だから `response.data.data` で実際のタスクにアクセスできるんや」
+**生徒 👩‍💻**：「`|| response.data` って何ですか？」
+
+**ガネーシャ 🐘**：「ええ質問や！これはな、**フォールバック**っちゅうやつや。もし `response.data.data` が存在しなかったら、`response.data` を使うっちゅう意味や。一部のエンドポイントでは Resource を使ってない場合もあるから、念のための保険やな」
 
 **生徒 👩‍💻**：「なるほど！じゃあ、内側の `data` も開いてみます！」
 
-**ステップ 2：内側の `data` を開く（実際のタスクデータ）**
+#### 📖 内側の data を開く（実際のタスクデータ）
 
 **`data: ▶︎ {id: 1, project_id: 1, ...}` をクリックすると：**
 
@@ -444,6 +1064,7 @@ data: ▼ {id: 1, project_id: 1, title: '...', •••}
   id: 1
   project_id: 1
   title: "サンプルタスク"
+  created_by: 1  ← 数値のID（データベースの値そのまま）
   created_by_user: ▼ {id: 1, name: '山田太郎', email: 'taro@example.com'}  ← 開いた！
     id: 1                      ← ユーザーID
     name: "山田太郎"            ← ユーザー名
@@ -453,238 +1074,162 @@ data: ▼ {id: 1, project_id: 1, title: '...', •••}
   ...
 ```
 
-**生徒 👩‍💻**：「すごい！どんどん深く見ていけるんですね！これも **UserResource** で整形されたデータなんですか？」
+**生徒 👩‍💻**：「わぁ！タスクを作成したユーザーの詳細情報が見れますね！」
 
-**ガネーシャ 🐘**：「せや！TaskResource の中で `new UserResource($this->createdBy)` って呼んでるから、ユーザー情報もきれいに整形されとるんや。**▶︎ を見つけたらクリック、▶︎ を見つけたらクリック**。これを繰り返すのが Console マスターへの第一歩や！」
+**ガネーシャ 🐘**：「せやな！ところでな、よく見ると `created_by` と `created_by_user` の 2 つがあるやろ？」
 
-#### 📝 オブジェクト展開のコツまとめ
+**生徒 👩‍💻**：「あ、本当だ！`created_by` は `1`（数値）で、`created_by_user` はオブジェクトですね。何が違うんですか？」
 
-**ガネーシャ 🐘**：「ここまでのコツをまとめるで」
-
-| やること                             | 説明                                     |
-| :----------------------------------- | :--------------------------------------- |
-| **1. `{•••}` や `{...}` を見つける** | オブジェクトの要約表示（中身が隠れてる） |
-| **2. 左の ▶︎ をクリック**            | 全ての中身が展開されて ▼ になる          |
-| **3. さらに ▶︎ があればクリック**    | 何階層でも開ける！                       |
-| **4. ▼ をクリック**                  | 閉じて ▶︎ に戻る                         |
-
-**生徒 👩‍💻**：「これなら API から返ってきたデータの中身が全部確認できますね！」
-
-**ガネーシャ 🐘**：「さすガネーシャの生徒や！もう Console の使い方の基本は完璧やな！**▶︎ をクリックして階層を開いていく**のが Console を使いこなす第一歩や。これを**オブジェクトの展開**っていうんや」
+**ガネーシャ 🐘**：「ええ質問や！これは**Laravel のリレーション**の話やな。実際のコードを見せたるで」
 
 ---
 
-### 📝 手順 3.6：Laravel から返ってきたデータの構造を理解しよう
+#### 💡 created_by と created_by_user の違い（Laravel リレーション）
 
-**ガネーシャ 🐘**：「今見たデータはな、Laravel の API が返してくれとるんや。構造を整理してみよう」
+**ガネーシャ 🐘**：「まず、データベースには `created_by` カラムがあって、これはユーザー ID が入っとるんや」
 
-#### 📊 axios レスポンスの全体構造（実際の形）
+**📂 データベース構造：**
 
-```javascript
-// axios のレスポンス全体
-{
-    status: 200,           // HTTP ステータスコード
-    statusText: "OK",      // ステータステキスト
-    data: {                // ← Laravel から返ってきた JSON
-        data: {            // ← TaskResource が自動的に data でラップ
-            id: 1,
-            project_id: 1,
-            title: "サンプルタスク",
-            description: "...",
-            status: "todo",
-            created_by: 1,
-            created_by_user: {...},  // UserResource
-            project: {...},          // ProjectResource
-            created_at: "...",
-            updated_at: "..."
-        }
-    },
-    headers: {...},        // レスポンスヘッダー
-    config: {...},         // リクエスト設定
-    request: {...}         // リクエストオブジェクト
-}
+```
+tasks テーブル
+┌────┬─────────┬───────────┬────────────┐
+│ id │ title   │ status    │ created_by │  ← ユーザーIDだけ
+├────┼─────────┼───────────┼────────────┤
+│ 1  │ タスクA │ todo      │ 5          │
+│ 2  │ タスクB │ doing     │ 3          │
+└────┴─────────┴───────────┴────────────┘
+
+users テーブル
+┌────┬─────────┬──────────────────┐
+│ id │ name    │ email            │
+├────┼─────────┼──────────────────┤
+│ 3  │ 佐藤花子 │ hanako@...       │
+│ 5  │ 山田太郎 │ taro@...         │
+└────┴─────────┴──────────────────┘
 ```
 
-**ガネーシャ 🐘**：「`response.data.data` って二重になってるのは、**axios の response.data** と **Laravel の Resource が自動的に付ける data** が重なってるからやな」
+**生徒 👩‍💻**：「`created_by` には 5 とか 3 とかの ID しか入ってないんですね」
 
-**生徒 👩‍💻**：「なるほど！Laravel のどこでこの形式を作ってるんですか？」
+**ガネーシャ 🐘**：「せや！でも、フロントでは『タスクを作成したのは山田太郎さん』って**名前とメールも表示したい**やろ？そのために**リレーション**を使うんや」
 
-**ガネーシャ 🐘**：「ええ質問や！Laravel 側のコードを見てみよう」
+---
 
-#### 💡 Laravel 側のコード（実際のプロジェクト）
+#### 📂 ステップ 1：モデルのリレーション定義
 
-```php
-// app/Http/Controllers/Api/TaskController.php
-
-public function show(Request $request, Task $task): TaskResource|JsonResponse
-{
-    try {
-        $task = $this->taskService->getTask($task, $request->user());
-        return new TaskResource($task);  // ← これが自動的に {data: {...}} でラップされる
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => $e->getMessage(),
-        ], 403);
-    }
-}
-```
+**ファイル：`app/Models/Task.php`**
 
 ```php
-// app/Http/Resources/TaskResource.php
+<?php
 
-public function toArray(Request $request): array
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Task extends Model
 {
-    return [
-        'id' => $this->id,
-        'project_id' => $this->project_id,
-        'title' => $this->title,
-        'description' => $this->description,
-        'status' => $this->status,
-        'created_by' => $this->created_by,
-        'created_by_user' => new UserResource($this->whenLoaded('createdBy')),
-        'project' => new ProjectResource($this->whenLoaded('project')),
-        'created_at' => $this->created_at,
-        'updated_at' => $this->updated_at,
+    protected $fillable = [
+        'project_id',
+        'title',
+        'description',
+        'status',
+        'created_by',  // ← ユーザーIDだけ
     ];
-}
-```
 
-**Laravel が返す JSON（最終形）：**
-
-```json
-{
-    "data": {
-        "id": 1,
-        "project_id": 1,
-        "title": "サンプルタスク",
-        "description": "これはサンプルのタスクです",
-        "status": "todo",
-        "created_by": 1,
-        "created_by_user": {
-            "id": 1,
-            "name": "山田太郎",
-            "email": "taro@example.com"
-        },
-        "project": {
-            "id": 1,
-            "name": "サンプルプロジェクト"
-        },
-        "created_at": "2024-01-01T00:00:00.000000Z",
-        "updated_at": "2024-01-01T00:00:00.000000Z"
+    /**
+     * タスクを作成したユーザー
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+        //                       ↑           ↑
+        //                    Userモデル   外部キー（DBカラム名）
     }
 }
 ```
 
-**ガネーシャ 🐘**：「Laravel の **API Resource（JsonResource）** はな、**自動的に `data` でラップ**してくれるんや。これは Laravel の仕様なんや」
+**ガネーシャ 🐘**：「`createdBy()` メソッドを定義することで、`Task` モデルから `User` モデルの情報を引っ張ってこれるようになるんや」
 
-**生徒 👩‍💻**：「なるほど！だから `new TaskResource($task)` って返すだけで、`{data: {...}}` の形式になるんですね」
+**生徒 👩‍💻**：「なるほど！でも、これだけだとまだ API レスポンスには含まれないですよね？」
 
-**ガネーシャ 🐘**：「せや！これが**Laravel API Resource** の便利なところや。統一された形式でデータを返してくれるから、フロントエンド側が扱いやすいんやな」
+**ガネーシャ 🐘**：「せやな！次は **API Resource** で、API レスポンスに含めるんや」
 
 ---
 
-### 📝 手順 4：エラーパターンも試してみよう（わざとエラーを起こす！）
+#### 📂 ステップ 2：API Resource での記述
 
-**ガネーシャ 🐘**：「成功パターンが分かったところで、次はエラーの時を見てみよう。わざとエラーを起こすで！」
+**ファイル：`app/Http/Resources/TaskResource.php`**
 
-**生徒 👩‍💻**：「わざと...ですか？」
+```php
+<?php
 
-**ガネーシャ 🐘**：「せや！エラーを理解するには、エラーを起こして確認するのが一番や。ワシの教え子のエジソンくんも『失敗は成功の母』って言うとったで」
+namespace App\Http\Resources;
 
-#### 🎯 わざとエラーを起こす
+use Illuminate\Http\Resources\Json\JsonResource;
 
-**コードを一時的に変更：**
+class TaskResource extends JsonResource
+{
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'project_id' => $this->project_id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'status' => $this->status,
+            'created_by' => $this->created_by,  // ← ユーザーIDだけ（数値）
+            'created_by_user' => new UserResource($this->whenLoaded('createdBy')),  // ← ユーザー情報（オブジェクト）
+            'project' => new ProjectResource($this->whenLoaded('project')),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
+    }
+}
+```
+
+**重要なポイント：**
+
+```php
+'created_by' => $this->created_by,
+// ↑ データベースの created_by カラム（数値のID）をそのまま返す
+
+'created_by_user' => new UserResource($this->whenLoaded('createdBy')),
+// ↑ createdBy リレーションが読み込まれていれば、UserResource でラップして返す
+//   $this->whenLoaded('createdBy') ← リレーションが読み込まれているか確認
+//                      ↑ Task.php で定義した createdBy() メソッド名
+//   new UserResource(...) ← User情報を整形して返す
+```
+
+**ガネーシャ 🐘**：「つまりな：」
+
+```
+created_by       → 5                        （数値のID、DBの値そのまま）
+created_by_user  → {id: 5, name: "山田太郎", email: "..."}  （ユーザー情報のオブジェクト）
+```
+
+**生徒 👩‍💻**：「なるほど！`created_by` は数値だけど、`created_by_user` はユーザーの詳細情報が入ったオブジェクトなんですね！」
+
+**ガネーシャ 🐘**：「せや！だから Console で見ると、**2 つの形式**で返ってきとるんや。さっきの出力をもう一度見てみ」
+
+```
+created_by: 1  ← 数値のID（シンプル、比較用）
+created_by_user: ▼ {id: 1, name: '山田太郎', email: 'taro@example.com'}  ← オブジェクト（表示用）
+```
+
+**生徒 👩‍💻**：「じゃあ、`created_by` は何に使うんですか？」
+
+**ガネーシャ 🐘**：「ええ質問や！`created_by` は、例えば『自分が作成したタスクかどうか』をチェックする時に使うんや：」
 
 ```javascript
-const fetchTask = async () => {
-    console.log("🚀 fetchTask が呼ばれたで！");
-    console.log("📍 タスクID:", taskId);
-
-    try {
-        loading.value = true;
-
-        // わざと存在しないIDを指定してエラーを起こす
-        console.log("📡 APIリクエストを送信するで：", `/api/tasks/99999`);
-        const response = await axios.get(`/api/tasks/99999`);  // ← ここを変更
-
-        // ...以下同じ
+// 例：自分が作成したタスクか確認
+if (task.created_by === currentUser.id) {
+    console.log("これは自分が作成したタスクです");
+}
 ```
 
-**ガネーシャ 🐘**：「コードを保存して、ブラウザをリロード（`F5` または `Cmd + R`）してみ」
+**生徒 👩‍💻**：「なるほど！ID だけで比較したい時は `created_by`、名前を表示したい時は `created_by_user.name` を使うんですね！」
 
-**Console に表示される内容：**
-
-```
-🚀 fetchTask が呼ばれたで！
-📍 タスクID: 1
-📡 APIリクエストを送信するで： /api/tasks/99999
-❌ エラーが発生したで！
-🔍 エラーオブジェクト全体: ▶︎ Error: Request failed with status code 404
-📊 エラーレスポンス: ▶︎ Object
-📋 ステータスコード: 404
-💬 エラーデータ: ▶︎ Object
-🏁 fetchTask 終了！
-```
-
-**生徒 👩‍💻**：「エラーのログが出ました！今度は赤く表示されてますね」
-
-**ガネーシャ 🐘**：「せや！`console.error()` で出力したログは赤く表示されるんや。エラーレスポンスの中身も ▶︎ をクリックして見てみよう」
-
-**`📊 エラーレスポンス: ▶︎ Object` をクリックすると：**
-
-```
-📊 エラーレスポンス: ▼ {status: 404, statusText: "Not Found", data: {•••}, ...}
-  status: 404
-  statusText: "Not Found"
-  data: ▼ {message: '...', exception: '...', file: '...', ...}
-    message: "No query results for model [App\\Models\\Task] 99999"  ← Laravel のエラーメッセージ
-    exception: "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"
-    file: "/var/www/html/vendor/laravel/framework/src/Illuminate/..."
-    line: 419
-    trace: ▶︎ [...]  ← スタックトレース
-  headers: ▶︎ {...}
-  config: ▶︎ {...}
-  request: ▶︎ XMLHttpRequest {...}
-```
-
-**生徒 👩‍💻**：「あれ？成功時と構造が全然違いますね...`data: {data: {...}}` じゃないです」
-
-**ガネーシャ 🐘**：「おお、ええところに気づいたな！これはな、**Laravel のエラーレスポンス**なんや」
-
-#### 💡 なぜエラー時の構造が違うのか？
-
-**ガネーシャ 🐘**：「成功時は TaskResource が `{data: {...}}` の形で返すけど、エラー時は Laravel が直接エラー情報を返すから、構造が違うんや」
-
-**成功時と エラー時の違い：**
-
-| 状態         | レスポンス構造                            | 特徴                                      |
-| :----------- | :---------------------------------------- | :---------------------------------------- |
-| **成功時**   | `{data: {id: 1, ...}}`                    | TaskResource が整形したデータ             |
-| **エラー時** | `{message: "...", exception: "...", ...}` | Laravel のエラー情報（詳細な trace 付き） |
-
-**生徒 👩‍💻**：「エラーレスポンスの方が情報が多いですね」
-
-**ガネーシャ 🐘**：「せや！エラー時は `exception`、`file`、`line`、`trace` とかの詳細情報が入っとるんや。これを見れば、**どこでエラーが起きたか**が分かるんやで」
-
-**生徒 👩‍💻**：「なるほど！Console で ▶︎ をクリックすれば、エラーの詳細も全部確認できますね」
-
-**ガネーシャ 🐘**：「せや！**▶︎ をクリックして展開する**のを忘れんようにな。エラーの `trace` を開けば、エラーが発生した経路が全部見えるで。これができれば、デバッグが 100 倍楽になるで」
-
-#### 📝 コードを元に戻そう
-
-**ガネーシャ 🐘**：「エラーの確認ができたら、コードを元に戻しておこうや」
-
-```javascript
-// 変更したコード
-const response = await axios.get(`/api/tasks/99999`);
-
-// 元に戻す（正しいコード）
-const response = await axios.get(`/api/tasks/${taskId}`);
-```
-
-**ガネーシャ 🐘**：「保存してリロードしたら、また成功のログが出るはずや」
-
-**生徒 👩‍💻**：「はい！元に戻りました」
+**ガネーシャ 🐘**：「さすガネーシャの生徒や！完璧に理解しとるな！**▶︎ を見つけたらクリック、▶︎ を見つけたらクリック**。これを繰り返すのが Console マスターへの第一歩や！」
 
 ---
 
@@ -710,9 +1255,9 @@ const response = await axios.get(`/api/tasks/${taskId}`);
 
 ---
 
-### 📝 手順 5：Laravel のエラーを完全理解する（超重要！）
+### 📝 手順 7：Laravel のエラーを完全理解する（超重要！）
 
-**ガネーシャ 🐘**：「ここからが本番や！エラーが出た時に、**何が起きてるか理解できる**ようになるで」
+**ガネーシャ 🐘**：「さて、ここからはもっと深くエラーの種類を学んでいくで！エラーが出た時に、**何が起きてるか理解できる**ようになろう」
 
 **生徒 👩‍💻**：「エラーって難しそう...」
 
@@ -835,77 +1380,27 @@ catch (err) {
 **いつ起きる？**
 
 -   タイトルを空欄にして送信した時
--   文字数制限を超えた時
+-   タイトルが 255 文字を超えた時
 -   必須項目が入力されていない時
 
-**試してみよう：**
-
-```javascript
-// わざとタイトルを空にして送信
-const response = await axios.post("/api/projects/1/tasks", {
-    title: "", // 空欄！
-    description: "あいうえお".repeat(100), // 長すぎる！
-});
-```
-
-**Console に表示される内容：**
+**Console に表示される内容の例：**
 
 ```javascript
 📊 err.response: {
     status: 422,
     statusText: "Unprocessable Entity",
     data: {
-        message: "The title field is required. (and 1 more error)",
+        message: "The title field is required.",
         errors: {  // ← フィールドごとのエラー詳細
             title: [
                 "The title field is required."
-            ],
-            description: [
-                "The description field must not be greater than 255 characters."
             ]
         }
     }
 }
 ```
 
-**確認コード：**
-
-```javascript
-catch (err) {
-    if (err.response?.status === 422) {
-        console.error("📝 バリデーションエラー");
-        console.error("⚠️ エラー詳細:", err.response.data.errors);
-
-        // フィールドごとに表示
-        Object.entries(err.response.data.errors).forEach(([field, messages]) => {
-            console.error(`  ❌ ${field}:`, messages.join(", "));
-        });
-
-        // テーブル形式で見やすく表示
-        console.table(err.response.data.errors);
-    }
-}
-```
-
-**Console 出力：**
-
-```
-📝 バリデーションエラー
-⚠️ エラー詳細: {title: Array(1), description: Array(1)}
-  ❌ title: The title field is required.
-  ❌ description: The description field must not be greater than 255 characters.
-
-┌────────────────┬───────────────────────────────────────────────────────────┐
-│ (index)        │ Values                                                    │
-├────────────────┼───────────────────────────────────────────────────────────┤
-│ title          │ ["The title field is required."]                          │
-│ description    │ ["The description field must not be greater than 255..."] │
-└────────────────┴───────────────────────────────────────────────────────────┘
-```
-
-**生徒 👩‍💻**：「テーブル表示、見やすい！」
-
-**ガネーシャ 🐘**：「せやろ！`console.table()` は配列やオブジェクトを見る時の最強ツールや」
+**ガネーシャ 🐘**：「422 エラーは**バリデーションエラー**や。`errors` プロパティに、どのフィールドがどう間違ってるか詳しく入っとるんや。実際の確認方法は後のミッションでやるで！」
 
 ---
 
@@ -1026,104 +1521,47 @@ catch (err) {
 
 ---
 
-#### 📋 エラー確認の完全フロー（プロの技）
+#### 📋 エラー確認の基本フロー
 
-**ガネーシャ 🐘**：「エラーが起きた時は、この順番で確認するんがプロの流儀や」
+**ガネーシャ 🐘**：「エラーが起きた時は、まずは**どんなエラーか見る**ことが大事や」
 
 ```javascript
 catch (err) {
-    console.group("❌ エラー詳細分析");
+    console.group("❌ エラー詳細");
 
-    // Step 1: エラーの種類を確認
+    // エラーの種類を確認
     if (err.response) {
         // サーバーからレスポンスが返ってきた
-        console.error("🔴 サーバーエラー（Laravel からレスポンスあり）");
+        console.error("🔴 サーバーエラー");
         console.error("📊 ステータスコード:", err.response.status);
-        console.error("📋 ステータステキスト:", err.response.statusText);
-        console.error("💬 Laravel のメッセージ:", err.response.data.message);
-        console.error("📝 例外クラス:", err.response.data.exception);
-
-        // Step 2: ステータスコード別に詳細確認
-        console.group("💡 エラー別トラブルシューティング");
-        switch (err.response.status) {
-            case 400:
-                console.error("⚠️ 400 Bad Request: リクエストが不正です");
-                console.error("確認: 送信データの形式は正しいですか？");
-                break;
-
-            case 401:
-                console.error("🔐 401 Unauthorized: 認証が必要です");
-                console.error("確認: ログインしていますか？");
-                console.error("確認: トークンは有効ですか？");
-                break;
-
-            case 403:
-                console.error("🚫 403 Forbidden: アクセスが拒否されました");
-                console.error("確認: このリソースへのアクセス権限はありますか？");
-                break;
-
-            case 404:
-                console.error("🔍 404 Not Found: リソースが見つかりません");
-                console.error("確認: URLは正しいですか？");
-                console.error("確認: リソースIDは存在しますか？");
-                break;
-
-            case 422:
-                console.error("📝 422 Unprocessable Entity: バリデーションエラー");
-                console.error("バリデーションエラー詳細:");
-                if (err.response.data.errors) {
-                    console.table(err.response.data.errors);
-                    Object.entries(err.response.data.errors).forEach(([field, messages]) => {
-                        console.error(`  ❌ ${field}:`, messages.join(", "));
-                    });
-                }
-                break;
-
-            case 500:
-                console.error("💥 500 Internal Server Error: サーバー内部エラー");
-                console.error("確認: storage/logs/laravel.log を確認してください");
-                break;
-
-            default:
-                console.error(`❓ ${err.response.status}: その他のエラー`);
-        }
-        console.groupEnd();
-
-        // Step 3: 完全なレスポンスデータを確認
-        console.group("📦 完全なレスポンスデータ");
-        console.error("Response Data:", err.response.data);
-        console.groupEnd();
+        console.error("💬 メッセージ:", err.response.data.message);
+        console.error("📦 レスポンスデータ:", err.response.data);
 
     } else if (err.request) {
         // リクエストは送信されたが、レスポンスがない
-        console.error("🌐 ネットワークエラー（レスポンスなし）");
+        console.error("🌐 ネットワークエラー");
         console.error("💬 メッセージ:", err.message);
-        console.error("📍 トラブルシューティング:");
-        console.error("  1. Laravel サーバーは起動していますか？");
-        console.error("     → ターミナルで 'php artisan serve' を確認");
-        console.error("  2. Vite は起動していますか？");
-        console.error("     → ターミナルで 'npm run dev' を確認");
-        console.error("  3. ネットワーク接続は正常ですか？");
-        console.error("  4. CORS の設定は正しいですか？");
 
     } else {
         // リクエストの設定中にエラーが発生
         console.error("⚙️ リクエスト設定エラー");
-        console.error("💬 エラーメッセージ:", err.message);
-        console.error("📍 確認: axios の設定を確認してください");
+        console.error("💬 メッセージ:", err.message);
     }
 
     console.groupEnd();
+
+    // ユーザーにもエラーを表示
+    toast.error("処理に失敗しました");
 }
 ```
 
-**生徒 👩‍💻**：「すごく詳しい！これなら何が起きてるか完全に分かりますね！」
+**生徒 👩‍💻**：「これなら、エラーの中身が確認できますね！」
 
-**ガネーシャ 🐘**：「せやろ！これが**プロのエラー確認フロー**や。エラーが出ても、もう怖くないやろ？」
+**ガネーシャ 🐘**：「せや！**console.error でエラーの中身を見る**。これが基本や！」
 
-**生徒 👩‍💻**：「はい！エラーが出るのが楽しみになってきました（笑）」
+**生徒 👩‍💻**：「でも、このエラーをどう対処すればいいんですか？」
 
-**ガネーシャ 🐘**：「ええ心がけや！エラーは**成長のチャンス**やからな」
+**ガネーシャ 🐘**：「**それは次のレッスン（ERROR_HANDLING_LESSON）で教えるで！**今は『エラーを見る』ことに集中や」
 
 ---
 
@@ -1305,46 +1743,97 @@ console.timeEnd("⏱️ API呼び出し時間");
 
 # 第 4 章：実践ミッション！API 通信を完全に理解する
 
-**ガネーシャ 🐘**：「さぁ、ここからが本番の本番や！お前のプロジェクトで実際に API 通信を**完全に可視化**してみるで！」
+**ガネーシャ 🐘**：「さぁ、ここまでで`console.log`の基本は完璧や！次は**実際にタスクを作成**しながら、POST リクエストと成功/エラーレスポンスを確認してみよう！」
 
-**生徒 👩‍💻**：「可視化...ですか？」
+**生徒 👩‍💻**：「タスク作成...ですか？」
 
-**ガネーシャ 🐘**：「せや！今からやることは以下の 4 つや：」
-
-```
-🎯 実践ミッション
-
-1. リクエストの内容を確認する
-2. レスポンスの中身を徹底的に見る
-3. エラーの原因を特定する
-4. Networkタブと連携してプロのデバッグをする
-```
+**ガネーシャ 🐘**：「せや！今までは**タスク取得（GET）**でエラーと成功を見てきたけど、**タスク作成（POST）**も同じように確認できるんや」
 
 ---
 
-## 🎯 ミッション 1：リクエスト内容を完全に把握する
+## 🎯 ミッション 1：タスク作成で成功とエラーを体験しよう
 
-**ガネーシャ 🐘**：「まずはな、**自分が何をサーバーに送ってるか**を理解せなアカンで」
+**ガネーシャ 🐘**：「さぁ、実践や！タスク作成で**成功とバリデーションエラーの両方**を確認するで」
 
-### 📝 実装：タスク作成処理にログを追加
+### 📍 準備：タスク作成ページを開く
 
-開くファイル：`resources/js/Pages/Projects/Show.vue` （プロジェクト詳細ページ）
+**ガネーシャ 🐘**：「まずはプロジェクト詳細ページを開くで」
 
-**ガネーシャ 🐘**：「このファイルの中にタスク作成処理があるはずや。探してみ」
+```
+📂 ファイル： resources/js/Pages/Projects/Show.vue
+🌐 URL： http://localhost/project/1
+```
 
-**生徒 👩‍💻**：「ありました！`handleTaskCreate` 関数ですね」
+**生徒 👩‍💻**：「開きました！タスク作成フォームがありますね」
+
+**ガネーシャ 🐘**：「せや！Console タブも開いておくんやで」
+
+**生徒 👩‍💻**：「`Show.vue` がタスク作成を担当してるんですね！」
+
+**ガネーシャ 🐘**：「そういうこっちゃ！このファイルの中に `createTask` 関数があって、そこでタスク作成の API 通信をしとるんや」
+
+---
+
+### 📝 準備：まず console.log を仕込もう
+
+**ガネーシャ 🐘**：「さぁ、実践や！まずは**何が起きてるか見えるように**するで」
+
+**生徒 👩‍💻**：「見えるように...？」
+
+**ガネーシャ 🐘**：「せや！今のコードは**成功しても失敗しても何も見えへん**。だから `console.log` を追加して、**中身を覗けるようにする**んや」
+
+**生徒 👩‍💻**：「なるほど！それで何が起きてるか分かるんですね！」
+
+#### 🔧 console.log を追加する
+
+**やること：**
+
+1. `resources/js/Pages/Projects/Show.vue` を開く
+2. `createTask` 関数（135 行目あたり）を探す
+3. 以下のコードに書き換える
+
+**元のコード（console.log なし）:**
 
 ```javascript
-const handleTaskCreate = async () => {
-    console.group("📝 タスク作成処理開始");
-    console.log("📤 送信するデータ:", taskForm.value);
-    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
-    console.log("🕒 送信時刻:", new Date().toLocaleTimeString());
-
+const createTask = async () => {
     try {
+        creatingTask.value = true;
         const response = await axios.post(
             `/api/projects/${projectId}/tasks`,
-            taskForm.value
+            newTask.value
+        );
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
+    } catch (err) {
+        console.error("Failed to create task:", err);
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+    }
+};
+```
+
+**生徒 👩‍💻**：「これが元のコードですね。確かに `console.log` がほとんどない...」
+
+**ガネーシャ 🐘**：「せや！これを以下のように書き換えるんや」
+
+**書き換え後のコード（console.log を追加）:**
+
+```javascript
+const createTask = async () => {
+    console.group("📝 タスク作成処理開始");
+    console.log("📤 送信するデータ:", newTask.value);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
+    try {
+        creatingTask.value = true;
+
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            newTask.value
         );
 
         console.log("✅ 作成成功！");
@@ -1353,29 +1842,342 @@ const handleTaskCreate = async () => {
         console.log("📝 レスポンスデータ:", response.data);
         console.log("🆕 作成されたタスク:", response.data.data);
 
-        // 成功処理...
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
     } catch (err) {
         console.error("❌ 作成失敗！");
-        console.error("🔍 エラーオブジェクト:", err);
         console.error("📊 HTTPステータス:", err.response?.status);
-        console.error("📝 エラーレスポンス:", err.response?.data);
         console.error("💬 エラーメッセージ:", err.response?.data?.message);
+        console.error("📋 エラー詳細:", err.response?.data?.errors);
 
-        // バリデーションエラーの場合
         if (err.response?.data?.errors) {
-            console.error("⚠️ バリデーションエラー:", err.response.data.errors);
             console.table(err.response.data.errors);
         }
+
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
     } finally {
+        creatingTask.value = false;
         console.log("🏁 タスク作成処理終了");
         console.groupEnd();
     }
 };
 ```
 
-**生徒 👩‍💻**：「すごく詳しくログを出してますね！」
+**ガネーシャ 🐘**：「この変更で、タスク作成の**全ての段階**が Console に表示されるようになるで！」
 
-**ガネーシャ 🐘**：「せや！これが**プロのデバッグ**や。問題が起きた時に、どこで何が起きてるか一目瞭然になるんや」
+**生徒 👩‍💻**：「わぁ！`console.group` で囲んだり、成功時とエラー時で分けてますね！」
+
+**ガネーシャ 🐘**：「せやせや！保存したら、次は実際に動かしてみよう」
+
+**手順：**
+
+1. ファイルを保存（`Cmd + S` または `Ctrl + S`）
+2. ブラウザをリロード（念のため）
+
+---
+
+### 📝 Step 1：まずは成功パターンを確認
+
+**ガネーシャ 🐘**：「準備ができたら、最初は普通にタスクを作ってみよう」
+
+**やること：**
+
+1. タイトル：「テストタスク」
+2. 説明：「これはテストです」
+3. 「タスクを作成」ボタンをクリック
+4. Console タブを確認
+
+**生徒 👩‍💻**：「作成しました！」
+
+#### 🔍 Console に表示される内容（成功）
+
+```
+📝 タスク作成処理開始
+📤 送信するデータ: {title: "テストタスク", description: "これはテストです"}
+📍 送信先URL: /api/projects/1/tasks
+✅ 作成成功！
+📦 レスポンス全体: ▶︎ {data: {•••}, status: 201, ...}
+📊 ステータスコード: 201
+📝 レスポンスデータ: ▶︎ {data: {•••}, message: "タスクを作成しました"}
+🆕 作成されたタスク: ▶︎ {id: 10, title: "テストタスク", •••}
+🏁 タスク作成処理終了
+```
+
+**生徒 👩‍💻**：「わぁ！ステータスコードが `201` になってますね！」
+
+**ガネーシャ 🐘**：「せや！`201 Created` は**リソースが正常に作成された**ことを示すステータスコードや。成功やな！」
+
+**生徒 👩‍💻**：「`▶︎ レスポンス全体` をクリックして中身も見てみます！」
+
+#### 🔍 レスポンス全体を展開
+
+```
+📦 レスポンス全体: ▼ {data: {•••}, status: 201, ...}
+  config: ▶︎ {...}
+  data: ▼ {data: {•••}, message: "タスクを作成しました"}
+    data: ▶︎ {id: 10, title: "テストタスク", ...}  ← 作成されたタスク
+    message: "タスクを作成しました"                 ← カスタムメッセージ
+  headers: ▶︎ {...}
+  status: 201                                        ← Created
+  statusText: "Created"
+```
+
+**生徒 👩‍💻**：「`data` の中に `data` と `message` がありますね！」
+
+**ガネーシャ 🐘**：「せや！Laravel が `TaskResource` と `additional(['message' => '...'])` で両方返しとるんや。さて、次はエラーを見てみよう！」
+
+---
+
+### 📝 Step 2：バリデーションエラーを発生させる
+
+**ガネーシャ 🐘**：「次は**わざとエラーを出す**んや。フォームには`required`属性があるから、コードを一時的に書き換えるで」
+
+**生徒 👩‍💻**：「え？コードを書き換えるんですか？」
+
+**ガネーシャ 🐘**：「せや！フォームの`required`をバイパスして、強制的に空データを送るんや」
+
+#### 🔧 コードを一時的に修正
+
+開くファイル：`resources/js/Pages/Projects/Show.vue`
+
+**`createTask` 関数を探して、さっき追加したコードの一部を修正：**
+
+**修正箇所：`newTask.value` を使わず、わざと空のデータを送る**
+
+```javascript
+const createTask = async () => {
+    console.group("📝 タスク作成処理開始");
+    console.log("📤 送信するデータ:", newTask.value);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
+    try {
+        creatingTask.value = true;
+
+        // ❌ 一時的にこの2行を追加！
+        const testData = { title: "", description: "テスト" };
+
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            testData // ← newTask.value から testData に変更
+        );
+
+        console.log("✅ 作成成功！");
+        console.log("📦 レスポンス全体:", response);
+        console.log("📊 ステータスコード:", response.status);
+        console.log("📝 レスポンスデータ:", response.data);
+        console.log("🆕 作成されたタスク:", response.data.data);
+
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
+    } catch (err) {
+        console.error("❌ 作成失敗！");
+        console.error("📊 HTTPステータス:", err.response?.status);
+        console.error("💬 エラーメッセージ:", err.response?.data?.message);
+        console.error("📋 エラー詳細:", err.response?.data?.errors);
+
+        if (err.response?.data?.errors) {
+            console.table(err.response.data.errors);
+        }
+
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+        console.log("🏁 タスク作成処理終了");
+        console.groupEnd();
+    }
+};
+```
+
+**変更点：**
+
+-   `const testData = { title: "", description: "テスト" };` を追加
+-   `axios.post` の第 2 引数を `newTask.value` から `testData` に変更
+
+**ガネーシャ 🐘**：「これで`title`が空のデータを送信するようになったで。保存してタスク作成ボタンをクリックや！」
+
+**生徒 👩‍💻**：「保存しました！クリックします！」
+
+#### 🔍 Console に表示される内容（バリデーションエラー）
+
+```
+❌ 作成失敗！
+📊 HTTPステータス: 422
+💬 エラーメッセージ: The title field is required.
+📋 エラー詳細: ▶︎ {title: Array(1)}
+
+┌─────────┬──────────────────────────────────────┐
+│ (index) │ Values                               │
+├─────────┼──────────────────────────────────────┤
+│ title   │ ["The title field is required."]     │
+└─────────┴──────────────────────────────────────┘
+```
+
+**生徒 👩‍💻**：「おお！`422` エラーが出ました！しかも`console.table`で表形式になってる！」
+
+**ガネーシャ 🐘**：「せやろ！`📋 エラー詳細` の `▶︎` をクリックして中身も見てみ」
+
+#### 🔍 エラー詳細を展開
+
+```
+📋 エラー詳細: ▼ {title: Array(1)}
+  title: ▼ Array(1)
+    0: "The title field is required."
+```
+
+**生徒 👩‍💻**：「`title`フィールドのエラーメッセージが配列で入ってますね！」
+
+**ガネーシャ 🐘**：「せや！Laravel のバリデーションは、**フィールドごとにエラーメッセージを配列で返す**んや。複数のエラーがあれば配列に複数入るで」
+
+---
+
+### 📝 Step 3：別のバリデーションエラーも試してみる
+
+**ガネーシャ 🐘**：「次は 256 文字のタイトルを送ってみよう。max は 255 やからエラーになるはずや」
+
+#### 🔧 コードを再度修正
+
+**変更箇所：`testData` の `title` を 256 文字にする**
+
+```javascript
+// ❌ testData の title 部分だけ変更
+const testData = {
+    title: "あ".repeat(256), // ← 空 → 256文字に変更
+    description: "テスト",
+};
+```
+
+**完全なコード：**
+
+```javascript
+const createTask = async () => {
+    console.group("📝 タスク作成処理開始");
+    console.log("📤 送信するデータ:", newTask.value);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
+    try {
+        creatingTask.value = true;
+
+        // ❌ 今度は256文字にする
+        const testData = {
+            title: "あ".repeat(256),
+            description: "テスト",
+        };
+
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            testData
+        );
+
+        console.log("✅ 作成成功！");
+        console.log("📦 レスポンス全体:", response);
+        console.log("📊 ステータスコード:", response.status);
+        console.log("📝 レスポンスデータ:", response.data);
+        console.log("🆕 作成されたタスク:", response.data.data);
+
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
+    } catch (err) {
+        console.error("❌ 作成失敗！");
+        console.error("📊 HTTPステータス:", err.response?.status);
+        console.error("💬 エラーメッセージ:", err.response?.data?.message);
+        console.error("📋 エラー詳細:", err.response?.data?.errors);
+
+        if (err.response?.data?.errors) {
+            console.table(err.response.data.errors);
+        }
+
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+        console.log("🏁 タスク作成処理終了");
+        console.groupEnd();
+    }
+};
+```
+
+**生徒 👩‍💻**：「保存してクリックします！」
+
+#### 🔍 Console に表示される内容（文字数超過エラー）
+
+```
+❌ 作成失敗！
+📊 HTTPステータス: 422
+💬 エラーメッセージ: The title field must not be greater than 255 characters.
+📋 エラー詳細: ▶︎ {title: Array(1)}
+
+┌─────────┬──────────────────────────────────────────────────────────────┐
+│ (index) │ Values                                                       │
+├─────────┼──────────────────────────────────────────────────────────────┤
+│ title   │ ["The title field must not be greater than 255 characters."] │
+└─────────┴──────────────────────────────────────────────────────────────┘
+```
+
+**生徒 👩‍💻**：「今度は文字数超過のエラーが出ました！」
+
+**ガネーシャ 🐘**：「せやろ！同じ`422`でも、エラーメッセージが違うやろ？Laravel が**どのルールに違反したか**教えてくれとるんや」
+
+---
+
+### 📝 Step 4：コードを元に戻す
+
+**ガネーシャ 🐘**：「確認が終わったら、**必ず元に戻す**んやで！`testData`を削除して、`newTask.value`に戻すんや」
+
+```javascript
+const createTask = async () => {
+    console.group("📝 タスク作成処理開始");
+    console.log("📤 送信するデータ:", newTask.value);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
+    try {
+        creatingTask.value = true;
+
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            newTask.value // ← 元に戻す！
+        );
+
+        console.log("✅ 作成成功！");
+        console.log("📦 レスポンス全体:", response);
+        console.log("📊 ステータスコード:", response.status);
+        console.log("📝 レスポンスデータ:", response.data);
+        console.log("🆕 作成されたタスク:", response.data.data);
+
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
+    } catch (err) {
+        console.error("❌ 作成失敗！");
+        console.error("📊 HTTPステータス:", err.response?.status);
+        console.error("💬 エラーメッセージ:", err.response?.data?.message);
+        console.error("📋 エラー詳細:", err.response?.data?.errors);
+
+        if (err.response?.data?.errors) {
+            console.table(err.response.data.errors);
+        }
+
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+        console.log("🏁 タスク作成処理終了");
+        console.groupEnd();
+    }
+};
+```
+
+**生徒 👩‍💻**：「元に戻しました！」
+
+**ガネーシャ 🐘**：「よっしゃ！これで**成功レスポンス（201）**と**バリデーションエラー（422）**の両方が確認できたな！」
 
 ---
 
@@ -1389,34 +2191,86 @@ const handleTaskCreate = async () => {
 
 ### 📊 Laravel のレスポンス構造
 
-```javascript
-// ✅ 成功時のレスポンス
-{
-  success: true,
-  message: "タスクを作成しました",
-  data: {
-    id: 1,
-    title: "サンプルタスク",
-    description: "説明文",
-    status: "todo",
-    project: { ... },
-    created_by_user: { ... }
-  }
-}
+**ガネーシャ 🐘**：「このプロジェクトではな、タスク作成時に**カスタムレスポンス**を返しとるんや」
 
-// ❌ エラー時のレスポンス（バリデーションエラーの例）
+**生徒 👩‍💻**：「カスタムレスポンス...ですか？」
+
+**ガネーシャ 🐘**：「せや！Laravel 側で`additional(['message' => 'タスクを作成しました'])`って追加しとるんや。実際のコードを見てみよう」
+
+#### 💡 Laravel 側のコード（TaskController.php）
+
+```php
+public function store(TaskRequest $request, Project $project): JsonResponse
 {
-  message: "The title field is required. (and 1 more error)",
-  errors: {
-    title: ["The title field is required."],
-    description: ["The description field must not be greater than 255 characters."]
+    try {
+        $task = $this->taskService->createTask(
+            $request->validated(),
+            $project,
+            $request->user()
+        );
+
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを作成しました'])  // ← messageを追加
+            ->response()
+            ->setStatusCode(201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => $e->getMessage(),
+        ], 403);
+    }
+}
+```
+
+#### ✅ 成功時のレスポンス構造
+
+```javascript
+// axios のレスポンス全体
+{
+  status: 201,                    // HTTPステータスコード（Created）
+  statusText: "Created",
+  data: {                         // ← Laravel から返ってきた JSON
+    data: {                       // ← TaskResource が自動的に data でラップ
+      id: 9,
+      project_id: 1,
+      title: "y",
+      description: null,
+      status: "todo",
+      created_by: 1,
+      created_by_user: { ... },
+      project: { ... },
+      created_at: "...",
+      updated_at: "..."
+    },
+    message: "タスクを作成しました"  // ← additional() で追加されたメッセージ
+  },
+  headers: { ... },
+  config: { ... }
+}
+```
+
+**ガネーシャ 🐘**：「見てみ？`data.data`（TaskResource のデータ）と`data.message`（カスタムメッセージ）の両方が返ってきとるやろ」
+
+#### ❌ エラー時のレスポンス（バリデーションエラーの例）
+
+**ガネーシャ 🐘**：「次はエラー時や。バリデーションエラーは**422 ステータス**で返ってくるんや」
+
+```javascript
+// バリデーションエラー（422）のレスポンス
+{
+  status: 422,
+  statusText: "Unprocessable Entity",
+  data: {
+    message: "The title field is required.",  // エラーサマリー
+    errors: {                                 // フィールド別の詳細エラー
+      title: ["The title field is required."]
+    }
   }
 }
 ```
 
 **ガネーシャ 🐘**：「この構造を理解しとけば、どこにどんなデータがあるか分かるやろ？」
 
-**生徒 👩‍💻**：「なるほど！成功時は `data` プロパティにデータが入ってて、エラー時（404や500）は `exception` と `trace` が、バリデーションエラー時（422）は `errors` プロパティが入ってるんですね」
+**生徒 👩‍💻**：「なるほど！成功時は `data` プロパティにデータが入ってて、エラー時（404 や 500）は `exception` と `trace` が、バリデーションエラー時（422）は `errors` プロパティが入ってるんですね」
 
 **ガネーシャ 🐘**：「さすガネーシャの生徒や！飲み込みが早いな！」
 
@@ -1456,70 +2310,22 @@ console.groupEnd();
 
 ## 🎯 ミッション 3：エラーを徹底的に追跡する
 
-**ガネーシャ 🐘**：「お前のプロジェクトには既に `useApiError.js` っちゅう優秀なエラーハンドリングがあるんやけど、これをもっと活用してみるで」
+**ガネーシャ 🐘**：「エラーが起きた時にな、**どんな情報を確認すればいいか**を教えるで！」
 
-**生徒 👩‍💻**：「useApiError.js ですか？」
+**生徒 👩‍💻**：「はい！お願いします！」
 
-**ガネーシャ 🐘**：「せや。このファイル、見てみ」
-
-開くファイル：`resources/js/composables/useApiError.js`
-
-```javascript
-// 39-52行目
-if (import.meta.env.APP_DEBUG) {
-    console.group("🚨 API Error");
-    console.error("Error:", err);
-    if (err.response) {
-        console.error("Status:", err.response.status);
-        console.error("Data:", err.response.data);
-        console.error("URL:", err.config?.url);
-    } else {
-        console.error("Network Error:", err.message);
-    }
-    console.groupEnd();
-}
-```
-
-**生徒 👩‍💻**：「あ、`import.meta.env.APP_DEBUG` が `true` の時だけログを出すんですね！」
-
-**ガネーシャ 🐘**：「せや！これが**環境に応じた出し分け**や。開発中はログを出して、本番環境では出さへんようにする。これはセキュリティにも繋がるんや」
+**ガネーシャ 🐘**：「エラー時にはな、この順番で情報を確認していくんや」
 
 ---
 
-### 📝 .env ファイルで APP_DEBUG を切り替える
+### 📝 実装：詳細なエラーログ
 
-**ガネーシャ 🐘**：「お前のプロジェクトの `.env` ファイルを見てみ」
-
-開くファイル：`.env`（プロジェクトルートにある）
-
-```bash
-# 開発中はこれを true に
-VITE_APP_DEBUG=true
-
-# 本番環境ではこれを false に
-# VITE_APP_DEBUG=false
-```
-
-**生徒 👩‍💻**：「あ、`VITE_APP_DEBUG` って書いてあります！」
-
-**ガネーシャ 🐘**：「せや！Vite（ビルドツール）を使っとるから `VITE_` プレフィックスが必要なんや。これを `true` にするとログが出て、`false` にするとログが出なくなる」
-
-| 環境             | APP_DEBUG |  ログ出力   | 用途                     |
-| :--------------- | :-------: | :---------: | :----------------------- |
-| 開発環境         |  `true`   |   ✅ 出す   | デバッグ作業             |
-| ステージング環境 |  `false`  | ❌ 出さない | 本番に近い環境でのテスト |
-| 本番環境         |  `false`  | ❌ 出さない | セキュリティ対策         |
-
----
-
-### 📝 実装：より詳細なエラーログ
-
-**ガネーシャ 🐘**：「せっかくやから、エラーの時にもっと詳しい情報を出すようにしてみよう」
+**ガネーシャ 🐘**：「エラーの時にもっと詳しい情報を出すようにしてみよう」
 
 ```javascript
 // エラーをキャッチした時
 catch (err) {
-  console.group("❌ エラー詳細分析");
+  console.group("❌ エラー詳細");
 
   // エラーの種類を判定
   if (err.response) {
@@ -1527,43 +2333,12 @@ catch (err) {
     console.error("🔴 サーバーエラー");
     console.error("📊 ステータスコード:", err.response.status);
     console.error("💬 メッセージ:", err.response.data.message);
-    console.error("📝 例外クラス:", err.response.data.exception);
-
-    // ステータスコード別の詳細
-    switch (err.response.status) {
-      case 400:
-        console.error("⚠️ 400: リクエストが不正です");
-        break;
-      case 401:
-        console.error("🔐 401: 認証が必要です");
-        break;
-      case 403:
-        console.error("🚫 403: アクセスが拒否されました");
-        break;
-      case 404:
-        console.error("🔍 404: リソースが見つかりません");
-        break;
-      case 422:
-        console.error("📝 422: バリデーションエラー");
-        console.table(err.response.data.errors);
-        break;
-      case 500:
-        console.error("💥 500: サーバー内部エラー");
-        break;
-      default:
-        console.error("❓ その他のエラー");
-    }
-
-    console.error("📦 レスポンス詳細:", err.response.data);
+    console.error("📦 レスポンスデータ:", err.response.data);
 
   } else if (err.request) {
     // リクエストは送信されたが、レスポンスがない（ネットワークエラー）
     console.error("🌐 ネットワークエラー");
-    console.error("💬 原因: サーバーに接続できませんでした");
-    console.error("🔍 確認事項:");
-    console.error("  - サーバーは起動していますか？");
-    console.error("  - ネットワーク接続は正常ですか？");
-    console.error("  - CORSの設定は正しいですか？");
+    console.error("💬 メッセージ:", err.message);
 
   } else {
     // リクエストの設定中にエラーが発生
@@ -1571,16 +2346,16 @@ catch (err) {
     console.error("💬 メッセージ:", err.message);
   }
 
-  console.error("📍 エラー発生箇所:", err.stack);
   console.groupEnd();
 
-  handleError(err, "処理に失敗しました");
+  // ユーザーにもエラーを表示
+  toast.error("処理に失敗しました");
 }
 ```
 
-**生徒 👩‍💻**：「うわぁ！これならエラーの原因がすぐ分かりますね！」
+**生徒 👩‍💻**：「これなら、エラーの中身が見えますね！」
 
-**ガネーシャ 🐘**：「せやろ！エラーハンドリングは**未来の自分を助ける投資**や。ワシの教え子のベンジャミン・フランクリンくんも『時間こそ金なり』って言うとったけど、デバッグ時間を短縮することは**時間を生み出すこと**なんやで」
+**ガネーシャ 🐘**：「せや！**console.error でエラーを見る**。まずはこれが基本や！ワシの教え子のベンジャミン・フランクリンくんも『時間こそ金なり』って言うとったけど、デバッグ時間を短縮することは**時間を生み出すこと**なんやで」
 
 ---
 
@@ -1745,149 +2520,7 @@ const fetchTask = async (taskId) => {
 
 ---
 
-# 第 5 章：実践演習問題
-
-**ガネーシャ 🐘**：「さぁ、ここまで学んだことを実際に手を動かして試すで！」
-
-**生徒 👩‍💻**：「はい！やってみます！」
-
----
-
-## 🎯 演習 1：タスク一覧取得のログを追加する
-
-### 問題
-
-`resources/js/Pages/Projects/Show.vue` のタスク一覧取得処理に、以下のログを追加してください：
-
-1. 処理開始のログ
-2. リクエスト URL のログ
-3. 取得したタスクの件数
-4. 取得したタスクのリスト（テーブル形式）
-5. 処理時間の計測
-
-### ヒント
-
-```javascript
-const fetchTasks = async () => {
-    // ここにログを追加してみよう！
-    // console.time, console.log, console.table を使ってね
-
-    try {
-        const response = await axios.get(`/api/projects/${projectId}/tasks`);
-        // ...
-    } catch (err) {
-        // ...
-    } finally {
-        // ...
-    }
-};
-```
-
----
-
-## 🎯 演習 2：バリデーションエラーを見やすく表示する
-
-### 問題
-
-タスク作成時にバリデーションエラーが発生した場合、エラー内容をコンソールに**テーブル形式**で表示してください。
-
-### 例
-
-```
-タイトルを空欄にしてタスクを作成
-↓
-コンソールに以下のように表示される：
-
-❌ バリデーションエラー
-┌──────────────┬────────────────────────────────┐
-│   フィールド   │          エラー内容              │
-├──────────────┼────────────────────────────────┤
-│    title     │ タイトルは必須です               │
-│ description  │ 説明は255文字以内で入力してください │
-└──────────────┴────────────────────────────────┘
-```
-
-### ヒント
-
-```javascript
-if (err.response?.status === 422) {
-    // バリデーションエラーの場合
-    // console.table を使ってみよう！
-}
-```
-
----
-
-## 🎯 演習 3：API レスポンス時間を計測する
-
-### 問題
-
-全ての API 通信の実行時間を計測し、以下の条件で警告を出してください：
-
--   200ms 以下：正常（緑色のログ）
--   200ms〜500ms：注意（黄色のログ）
--   500ms 以上：遅い（赤色のログ）
-
-### ヒント
-
-```javascript
-console.time("API通信");
-const response = await axios.get("/api/tasks");
-console.timeEnd("API通信");
-
-// 時間を取得するには...
-const startTime = performance.now();
-// ... 処理 ...
-const endTime = performance.now();
-const duration = endTime - startTime;
-
-if (duration < 200) {
-    console.log(`✅ 速い: ${duration}ms`);
-} else if (duration < 500) {
-    console.warn(`⚠️ 少し遅い: ${duration}ms`);
-} else {
-    console.error(`❌ 遅い: ${duration}ms`);
-}
-```
-
----
-
-## 🎯 演習 4：エラー発生時のスクリーンショットを取る
-
-### 問題
-
-デベロッパーツールの Console タブと Network タブを開いた状態で、以下のエラーを**意図的に発生させて**、スクリーンショットを撮ってください：
-
-1. 404 エラー（存在しないタスクを取得）
-2. 422 エラー（バリデーションエラー）
-3. 500 エラー（サーバーエラー）
-4. ネットワークエラー（サーバーを停止させる）
-
-### 実行方法
-
-```javascript
-// 404 エラーを発生させる
-const response = await axios.get("/api/tasks/99999");
-
-// 422 エラーを発生させる
-const response = await axios.post("/api/projects/1/tasks", {
-    title: "", // 空欄にする
-    description: "",
-});
-
-// 500 エラーを発生させる
-// routes/api.php の /api/test エンドポイントを使う
-const response = await axios.get("/api/test");
-
-// ネットワークエラーを発生させる
-// ターミナルで php artisan serve を停止してからリクエスト
-```
-
-**ガネーシャ 🐘**：「各エラーの時に、Console と Network でどんな情報が表示されるか確認するんやで！」
-
----
-
-# 第 6 章：実務で使える console.log のベストプラクティス
+# 第 5 章：実務で使える console.log のベストプラクティス
 
 **ガネーシャ 🐘**：「最後に、実務で使える console.log の**黄金ルール**を教えるで」
 
@@ -1989,25 +2622,7 @@ console.timeEnd("⏱️ データ取得"); // ⏱️ データ取得: 245.123ms
 
 ---
 
-### 8️⃣ 本番環境ではログを出さない
-
-```javascript
-// ✅ 良い例
-if (import.meta.env.DEV) {
-    console.log("🔧 開発環境でのみ表示されるログ");
-}
-
-// または
-if (import.meta.env.VITE_APP_DEBUG) {
-    console.log("🔧 デバッグモードでのみ表示されるログ");
-}
-```
-
-**理由**：セキュリティとパフォーマンスのため。
-
----
-
-### 9️⃣ ログは処理の「前」「後」「エラー」に分ける
+### 8️⃣ ログは処理の「前」「後」「エラー」に分ける
 
 ```javascript
 // ✅ 良い例
@@ -2024,7 +2639,7 @@ try {
 
 ---
 
-### 🔟 ログは「削除」ではなく「コメントアウト」する
+### 9️⃣ ログは「削除」ではなく「コメントアウト」する
 
 ```javascript
 // ✅ 良い例
