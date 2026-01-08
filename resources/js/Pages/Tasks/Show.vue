@@ -30,7 +30,7 @@ const form = ref({
 const fetchTask = async () => {
   try {
     loading.value = true;
-    const response = await axios.get(`/api/tasks/${taskId}`);
+    const response = await axios.get(`/api/tasks/${taskid}`);
     task.value = response.data.data || response.data;
   } catch (err) {
     toast.error("タスクの読み込みに失敗しました");
