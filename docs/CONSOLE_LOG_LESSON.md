@@ -423,9 +423,13 @@ const fetchTask = async () => {
 ```javascript
 const fetchTask = async () => {
     console.log("🚀 fetchTask が呼ばれたで！");
+    console.log("📍 タスクID:", taskId);
 
     try {
         loading.value = true;
+
+        console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskId}`);
+
         const response = await axios.get(`/api/tasks/${taskId}`);
         task.value = response.data.data || response.data;
     } catch (err) {
@@ -438,6 +442,7 @@ const fetchTask = async () => {
         toast.error("タスクの読み込みに失敗しました");
     } finally {
         loading.value = false;
+        console.log("🏁 fetchTask 終了！");
     }
 };
 ```
