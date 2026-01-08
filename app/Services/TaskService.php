@@ -69,7 +69,7 @@ class TaskService
         $this->checkTaskPermission($task, $user);
 
         // リレーションをロード
-        $task->load(['createdBy', 'project']);
+        $task->load(['creatdBy', 'project']); // ⚠️ タイポ：createdBy → creatdBy
 
         return $task;
     }
