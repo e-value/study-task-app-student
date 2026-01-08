@@ -54,7 +54,7 @@ git pull origin lesson5-1
 const fetchTask = async () => {
     try {
         loading.value = true;
-        const response = await axios.get(`/api/tasks/${taskid}`); // ← ⚠️ 実はここにタイポがある！
+        const response = await axios.get(`/api/tasks/${taskid}`);
         task.value = response.data.data || response.data;
     } catch (err) {
         toast.error("タスクの読み込みに失敗しました");
@@ -229,7 +229,7 @@ console.log("名前:", name, "年齢:", age); // → 名前: 太郎 年齢: 25
 const fetchTask = async () => {
     try {
         loading.value = true;
-        const response = await axios.get(`/api/tasks/${taskid}`); // ← ⚠️ タイポあり
+        const response = await axios.get(`/api/tasks/${taskid}`);
         task.value = response.data.data || response.data;
     } catch (err) {
         toast.error("タスクの読み込みに失敗しました");
@@ -253,7 +253,7 @@ const fetchTask = async () => {
 
         console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskid}`);
 
-        const response = await axios.get(`/api/tasks/${taskid}`); // ← ⚠️ まだタイポあり
+        const response = await axios.get(`/api/tasks/${taskid}`);
 
         console.log("✅ APIレスポンス成功！", response);
         console.log("📦 response.data の中身：", response.data);
@@ -701,10 +701,10 @@ Uncaught ReferenceError: taskid is not defined
 **ガネーシャ 🐘**：「原因が分かったから、タイポを修正しよう」
 
 ```javascript
-// ❌ タイポしているコード
+// 修正前
 const response = await axios.get(`/api/tasks/${taskid}`);
 
-// ✅ 修正後（正しいコード）
+// 修正後
 const response = await axios.get(`/api/tasks/${taskId}`);
 ```
 
