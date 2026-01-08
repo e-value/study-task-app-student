@@ -229,7 +229,7 @@ console.log("名前:", name, "年齢:", age); // → 名前: 太郎 年齢: 25
 const fetchTask = async () => {
     try {
         loading.value = true;
-        const response = await axios.get(`/api/tasks/${taskId}`);
+        const response = await axios.get(`/api/tasks/${taskid}`); // ← ⚠️ タイポあり
         task.value = response.data.data || response.data;
     } catch (err) {
         toast.error("タスクの読み込みに失敗しました");
@@ -251,9 +251,9 @@ const fetchTask = async () => {
     try {
         loading.value = true;
 
-        console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskId}`);
+        console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskid}`);
 
-        const response = await axios.get(`/api/tasks/${taskId}`);
+        const response = await axios.get(`/api/tasks/${taskid}`); // ← ⚠️ まだタイポあり
 
         console.log("✅ APIレスポンス成功！", response);
         console.log("📦 response.data の中身：", response.data);
