@@ -420,6 +420,28 @@ const fetchTask = async () => {
 
 ### 📝 手順 3：エラーの原因を特定しよう
 
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
+
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        console.error("❌ エラーが発生したで！");
+        console.error("🔍 エラーオブジェクト全体:", err);
+        console.error("📊 エラーレスポンス:", err.response);
+        console.error("📋 ステータスコード:", err.response?.status);
+        console.error("💬 エラーデータ:", err.response?.data);
+
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
+```
+
 **ガネーシャ 🐘**：「コードを保存したら、ブラウザでタスク詳細ページを開いてみ。さっきのエラーの原因を探ろう」
 
 **生徒 👩‍💻**：「はい！」
