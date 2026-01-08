@@ -99,17 +99,85 @@ console.log("名前:", name, "年齢:", age); // → 名前: 太郎 年齢: 25
 
 ---
 
-# 第 2 章：実践！このプロジェクトで試してみよう
+# 第 2 章：問題発生！何が起きているか分からない...
 
-## 🎯 ミッション 1：基本の console.log を試す
+## 😱 プロローグ：見えない問題
 
-**ガネーシャ 🐘**：「さぁ、ここからが本番や！お前のプロジェクトの実際のコードで console.log を使ってみるで！」
+**生徒 👩‍💻**：「ガネーシャ先生！タスク詳細ページを開いたら、データが表示されないことがあるんです...」
+
+**ガネーシャ 🐘**：「ほう？どんな時に表示されへんのや？」
+
+**生徒 👩‍💻**：「それが...分からないんです。画面が真っ白になったり、ローディングが終わらなかったり...」
+
+**ガネーシャ 🐘**：「ほな、今どうやって原因を調べとるんや？」
+
+**生徒 👩‍💻**：「えっと...コードを読んで...推測して...」
+
+**ガネーシャ 🐘**：「**それがアカンのや！**プログラムは推測で直すもんやない。**事実を確認する**んや！」
+
+---
+
+## 🔍 現状確認：何も見えていない状態
+
+**ガネーシャ 🐘**：「ちょっと、お前のコード見せてみ」
+
+開くファイル：`resources/js/Pages/Tasks/Show.vue`
+
+**現在のコード（30 行目あたり）：**
+
+```javascript
+const fetchTask = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        alert("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
+```
+
+**生徒 👩‍💻**：「このコードで API を呼んでいるんですけど...」
+
+**ガネーシャ 🐘**：「なるほどな。でもな、**このコードからは何も分からへん**やろ？」
+
+**生徒 👩‍💻**：「え？どういうことですか？」
+
+**ガネーシャ 🐘**：「例えばや：」
+
+```
+❓ 謎だらけの状態
+├─ fetchTask は本当に呼ばれているのか？
+├─ API リクエストは送信されたのか？
+├─ レスポンスは返ってきたのか？
+├─ response.data の中身は何が入っているのか？
+├─ エラーが起きているのか？起きていないのか？
+└─ もしエラーなら、何のエラーなのか？
+```
+
+**生徒 👩‍💻**：「た、確かに...何も分かりませんね...😰」
+
+**ガネーシャ 🐘**：「これが**デバッグ情報がない**状態や。目隠しして料理してるようなもんやな！」
+
+---
+
+## 💡 解決策：console.log で「見える化」する！
+
+**ガネーシャ 🐘**：「ほな、今から**プログラムの中を覗き見する魔法**を教えたるわ！」
+
+**生徒 👩‍💻**：「魔法...ですか？」
+
+**ガネーシャ 🐘**：「せや！その名も**console.log**や！」
+
+---
+
+## 🎯 ミッション 1：デベロッパーツールを開いて準備する
 
 ### 📝 手順 1：ブラウザのデベロッパーツールを開く
 
-**生徒 👩‍💻**：「デベロッパーツール...？」
-
-**ガネーシャ 🐘**：「それが**虫眼鏡の本体**や！これを開かんことには始まらへんで」
+**ガネーシャ 🐘**：「まずはな、**虫眼鏡の本体**を開かなアカン」
 
 #### 🔑 デベロッパーツールの開き方（これだけ覚えれば OK！）
 
@@ -151,7 +219,7 @@ console.log("名前:", name, "年齢:", age); // → 名前: 太郎 年齢: 25
 
 ---
 
-### 📝 手順 2：実際の Vue ファイルに console.log を追加してみよう
+### 📝 手順 2：実際に console.log を追加してみよう
 
 **ガネーシャ 🐘**：「ほな、お前のプロジェクトの `Show.vue` ファイルを開いてみ。タスク詳細ページのコードや」
 
@@ -1213,104 +1281,47 @@ catch (err) {
 
 ---
 
-#### 📋 エラー確認の完全フロー（プロの技）
+#### 📋 エラー確認の基本フロー
 
-**ガネーシャ 🐘**：「エラーが起きた時は、この順番で確認するんがプロの流儀や」
+**ガネーシャ 🐘**：「エラーが起きた時は、まずは**どんなエラーか見る**ことが大事や」
 
 ```javascript
 catch (err) {
-    console.group("❌ エラー詳細分析");
+    console.group("❌ エラー詳細");
 
-    // Step 1: エラーの種類を確認
+    // エラーの種類を確認
     if (err.response) {
         // サーバーからレスポンスが返ってきた
-        console.error("🔴 サーバーエラー（Laravel からレスポンスあり）");
+        console.error("🔴 サーバーエラー");
         console.error("📊 ステータスコード:", err.response.status);
-        console.error("📋 ステータステキスト:", err.response.statusText);
-        console.error("💬 Laravel のメッセージ:", err.response.data.message);
-        console.error("📝 例外クラス:", err.response.data.exception);
-
-        // Step 2: ステータスコード別に詳細確認
-        console.group("💡 エラー別トラブルシューティング");
-        switch (err.response.status) {
-            case 400:
-                console.error("⚠️ 400 Bad Request: リクエストが不正です");
-                console.error("確認: 送信データの形式は正しいですか？");
-                break;
-
-            case 401:
-                console.error("🔐 401 Unauthorized: 認証が必要です");
-                console.error("確認: ログインしていますか？");
-                console.error("確認: トークンは有効ですか？");
-                break;
-
-            case 403:
-                console.error("🚫 403 Forbidden: アクセスが拒否されました");
-                console.error("確認: このリソースへのアクセス権限はありますか？");
-                break;
-
-            case 404:
-                console.error("🔍 404 Not Found: リソースが見つかりません");
-                console.error("確認: URLは正しいですか？");
-                console.error("確認: リソースIDは存在しますか？");
-                break;
-
-            case 422:
-                console.error("📝 422 Unprocessable Entity: バリデーションエラー");
-                console.error("バリデーションエラー詳細:");
-                if (err.response.data.errors) {
-                    console.table(err.response.data.errors);
-                    Object.entries(err.response.data.errors).forEach(([field, messages]) => {
-                        console.error(`  ❌ ${field}:`, messages.join(", "));
-                    });
-                }
-                break;
-
-            case 500:
-                console.error("💥 500 Internal Server Error: サーバー内部エラー");
-                console.error("確認: storage/logs/laravel.log を確認してください");
-                break;
-
-            default:
-                console.error(`❓ ${err.response.status}: その他のエラー`);
-        }
-        console.groupEnd();
-
-        // Step 3: 完全なレスポンスデータを確認
-        console.group("📦 完全なレスポンスデータ");
-        console.error("Response Data:", err.response.data);
-        console.groupEnd();
+        console.error("💬 メッセージ:", err.response.data.message);
+        console.error("📦 レスポンスデータ:", err.response.data);
 
     } else if (err.request) {
         // リクエストは送信されたが、レスポンスがない
-        console.error("🌐 ネットワークエラー（レスポンスなし）");
+        console.error("🌐 ネットワークエラー");
         console.error("💬 メッセージ:", err.message);
-        console.error("📍 トラブルシューティング:");
-        console.error("  1. Laravel サーバーは起動していますか？");
-        console.error("     → ターミナルで 'php artisan serve' を確認");
-        console.error("  2. Vite は起動していますか？");
-        console.error("     → ターミナルで 'npm run dev' を確認");
-        console.error("  3. ネットワーク接続は正常ですか？");
-        console.error("  4. CORS の設定は正しいですか？");
 
     } else {
         // リクエストの設定中にエラーが発生
         console.error("⚙️ リクエスト設定エラー");
-        console.error("💬 エラーメッセージ:", err.message);
-        console.error("📍 確認: axios の設定を確認してください");
+        console.error("💬 メッセージ:", err.message);
     }
 
     console.groupEnd();
+
+    // ユーザーにもエラーを表示
+    alert("処理に失敗しました");
 }
 ```
 
-**生徒 👩‍💻**：「すごく詳しい！これなら何が起きてるか完全に分かりますね！」
+**生徒 👩‍💻**：「これなら、エラーの中身が確認できますね！」
 
-**ガネーシャ 🐘**：「せやろ！これが**プロのエラー確認フロー**や。エラーが出ても、もう怖くないやろ？」
+**ガネーシャ 🐘**：「せや！**console.errorでエラーの中身を見る**。これが基本や！」
 
-**生徒 👩‍💻**：「はい！エラーが出るのが楽しみになってきました（笑）」
+**生徒 👩‍💻**：「でも、このエラーをどう対処すればいいんですか？」
 
-**ガネーシャ 🐘**：「ええ心がけや！エラーは**成長のチャンス**やからな」
+**ガネーシャ 🐘**：「**それは次のレッスン（ERROR_HANDLING_LESSON）で教えるで！**今は『エラーを見る』ことに集中や」
 
 ---
 
@@ -1729,7 +1740,7 @@ console.groupEnd();
 ```javascript
 // エラーをキャッチした時
 catch (err) {
-  console.group("❌ エラー詳細分析");
+  console.group("❌ エラー詳細");
 
   // エラーの種類を判定
   if (err.response) {
@@ -1737,43 +1748,12 @@ catch (err) {
     console.error("🔴 サーバーエラー");
     console.error("📊 ステータスコード:", err.response.status);
     console.error("💬 メッセージ:", err.response.data.message);
-    console.error("📝 例外クラス:", err.response.data.exception);
-
-    // ステータスコード別の詳細
-    switch (err.response.status) {
-      case 400:
-        console.error("⚠️ 400: リクエストが不正です");
-        break;
-      case 401:
-        console.error("🔐 401: 認証が必要です");
-        break;
-      case 403:
-        console.error("🚫 403: アクセスが拒否されました");
-        break;
-      case 404:
-        console.error("🔍 404: リソースが見つかりません");
-        break;
-      case 422:
-        console.error("📝 422: バリデーションエラー");
-        console.table(err.response.data.errors);
-        break;
-      case 500:
-        console.error("💥 500: サーバー内部エラー");
-        break;
-      default:
-        console.error("❓ その他のエラー");
-    }
-
-    console.error("📦 レスポンス詳細:", err.response.data);
+    console.error("📦 レスポンスデータ:", err.response.data);
 
   } else if (err.request) {
     // リクエストは送信されたが、レスポンスがない（ネットワークエラー）
     console.error("🌐 ネットワークエラー");
-    console.error("💬 原因: サーバーに接続できませんでした");
-    console.error("🔍 確認事項:");
-    console.error("  - サーバーは起動していますか？");
-    console.error("  - ネットワーク接続は正常ですか？");
-    console.error("  - CORSの設定は正しいですか？");
+    console.error("💬 メッセージ:", err.message);
 
   } else {
     // リクエストの設定中にエラーが発生
@@ -1781,7 +1761,6 @@ catch (err) {
     console.error("💬 メッセージ:", err.message);
   }
 
-  console.error("📍 エラー発生箇所:", err.stack);
   console.groupEnd();
 
   // ユーザーにもエラーを表示
@@ -1789,9 +1768,9 @@ catch (err) {
 }
 ```
 
-**生徒 👩‍💻**：「うわぁ！これならエラーの原因がすぐ分かりますね！」
+**生徒 👩‍💻**：「これなら、エラーの中身が見えますね！」
 
-**ガネーシャ 🐘**：「せやろ！エラーハンドリングは**未来の自分を助ける投資**や。ワシの教え子のベンジャミン・フランクリンくんも『時間こそ金なり』って言うとったけど、デバッグ時間を短縮することは**時間を生み出すこと**なんやで」
+**ガネーシャ 🐘**：「せや！**console.errorでエラーを見る**。まずはこれが基本や！ワシの教え子のベンジャミン・フランクリンくんも『時間こそ金なり』って言うとったけど、デバッグ時間を短縮することは**時間を生み出すこと**なんやで」
 
 ---
 
