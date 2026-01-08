@@ -54,7 +54,7 @@ git pull origin lesson5-1
 const fetchTask = async () => {
     try {
         loading.value = true;
-        const response = await axios.get(`/api/tasks/${taskid}`);  // ← ⚠️ 実はここにタイポがある！
+        const response = await axios.get(`/api/tasks/${taskid}`); // ← ⚠️ 実はここにタイポがある！
         task.value = response.data.data || response.data;
     } catch (err) {
         toast.error("タスクの読み込みに失敗しました");
@@ -724,7 +724,7 @@ const response = await axios.get(`/api/tasks/${taskId}`);
 🏁 fetchTask 終了！
 ```
 
-**生徒 👩‍💻**：「わぁ！今度は成功しました！`/api/tasks/1`ってちゃんとIDが入ってます！」
+**生徒 👩‍💻**：「わぁ！今度は成功しました！`/api/tasks/1`ってちゃんと ID が入ってます！」
 
 **ガネーシャ 🐘**：「せやろ？**console.log があれば、タイポも一発で見つかる**んや。これがデバッグの基本や！」
 
