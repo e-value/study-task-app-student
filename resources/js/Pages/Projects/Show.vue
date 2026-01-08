@@ -133,90 +133,20 @@ const fetchUsers = async () => {
 };
 
 const createTask = async () => {
-  console.group("📝 タスク作成処理開始");
-
-  // ❌ ここを一時的に変更！（元の newTask.value を使わない）
-  const testData = {
-    title: "", // ← わざと空にする！
-    description: "これはテストです",
-  };
-
-  console.log("📤 送信するデータ:", testData);
-  console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
-
   try {
     creatingTask.value = true;
-
-    // newTask.value ではなく testData を送信
     const response = await axios.post(
       `/api/projects/${projectId}/tasks`,
-      testData // ← ここを変更！
+      newTask.value
     );
-
-    console.log("✅ 作成成功！");
-    console.log("📦 レスポンス全体:", response);
-    // ... 以下同じ
+    tasks.value.unshift(response.data.data);
+    newTask.value = { title: "", description: "" };
+    toast.success(response.data.message || "タスクを作成しました");
   } catch (err) {
-    // エラーをキャッチした時
-    console.group("❌ エラー詳細分析");
-
-    // エラーの種類を判定
-    if (err.response) {
-      // サーバーからレスポンスが返ってきた（400番台、500番台）
-      console.error("🔴 サーバーエラー");
-      console.error("📊 ステータスコード:", err.response.status);
-      console.error("💬 メッセージ:", err.response.data.message);
-      console.error("📝 例外クラス:", err.response.data.exception);
-
-      // ステータスコード別の詳細
-      switch (err.response.status) {
-        case 400:
-          console.error("⚠️ 400: リクエストが不正です");
-          break;
-        case 401:
-          console.error("🔐 401: 認証が必要です");
-          break;
-        case 403:
-          console.error("🚫 403: アクセスが拒否されました");
-          break;
-        case 404:
-          console.error("🔍 404: リソースが見つかりません");
-          break;
-        case 422:
-          console.error("📝 422: バリデーションエラー");
-          console.table(err.response.data.errors);
-          break;
-        case 500:
-          console.error("💥 500: サーバー内部エラー");
-          break;
-        default:
-          console.error("❓ その他のエラー");
-      }
-
-      console.error("📦 レスポンス詳細:", err.response.data);
-    } else if (err.request) {
-      // リクエストは送信されたが、レスポンスがない（ネットワークエラー）
-      console.error("🌐 ネットワークエラー");
-      console.error("💬 原因: サーバーに接続できませんでした");
-      console.error("🔍 確認事項:");
-      console.error("  - サーバーは起動していますか？");
-      console.error("  - ネットワーク接続は正常ですか？");
-      console.error("  - CORSの設定は正しいですか？");
-    } else {
-      // リクエストの設定中にエラーが発生
-      console.error("⚙️ リクエスト設定エラー");
-      console.error("💬 メッセージ:", err.message);
-    }
-
-    console.error("📍 エラー発生箇所:", err.stack);
-    console.groupEnd();
-
-    // ユーザーにもエラーを表示
-    alert("処理に失敗しました");
+    console.error("Failed to create task:", err);
+    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
   } finally {
     creatingTask.value = false;
-    console.log("🏁 タスク作成処理終了");
-    console.groupEnd();
   }
 };
 

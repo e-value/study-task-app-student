@@ -52,7 +52,7 @@ const fetchTask = async () => {
     console.error("💬 エラーデータ:", err.response?.data);
 
     // 画面にもエラーを表示（ユーザー向け）
-    alert("タスクの読み込みに失敗しました");
+    toast.error("タスクの読み込みに失敗しました");
   } finally {
     loading.value = false;
     console.log("🏁 fetchTask 終了！");
