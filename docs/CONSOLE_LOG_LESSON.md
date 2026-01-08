@@ -981,6 +981,23 @@ public function show(Task $task) {
 
 **ガネーシャ 🐘**：「axios は `response.data` にサーバーからの JSON を入れる。Laravel の TaskResource はデータを `{data: {...}}` でラップする。だから `response.data.data` で実際のタスクにアクセスできるんや」
 
+**生徒 👩‍💻**：「なるほど！だから、コードで `task.value = response.data.data` って書いてたんですね！」
+
+**ガネーシャ 🐘**：「**その通り！**さすガネーシャの生徒や！」
+
+```javascript
+// だから、こう書く必要があるんや！
+task.value = response.data.data || response.data;
+//             ↑          ↑
+//          axios が    Laravel が
+//          格納した    ラップした
+//          JSON       data
+```
+
+**生徒 👩‍💻**：「`|| response.data` って何ですか？」
+
+**ガネーシャ 🐘**：「ええ質問や！これはな、**フォールバック**っちゅうやつや。もし `response.data.data` が存在しなかったら、`response.data` を使うっちゅう意味や。一部のエンドポイントでは Resource を使ってない場合もあるから、念のための保険やな」
+
 **生徒 👩‍💻**：「なるほど！じゃあ、内側の `data` も開いてみます！」
 
 #### 📖 内側の data を開く（実際のタスクデータ）
@@ -1790,86 +1807,64 @@ console.timeEnd("⏱️ API呼び出し時間");
 
 # 第 4 章：実践ミッション！API 通信を完全に理解する
 
-**ガネーシャ 🐘**：「さぁ、ここからが本番の本番や！お前のプロジェクトで実際に API 通信を**完全に可視化**してみるで！」
+**ガネーシャ 🐘**：「さぁ、ここまでで`console.log`の基本は完璧や！次は**実際にタスクを作成**しながら、POST リクエストと成功/エラーレスポンスを確認してみよう！」
 
-**生徒 👩‍💻**：「可視化...ですか？」
+**生徒 👩‍💻**：「タスク作成...ですか？」
 
-**ガネーシャ 🐘**：「せや！今からやることは以下の 4 つや：」
-
-```
-🎯 実践ミッション
-
-1. リクエストの内容を確認する
-2. レスポンスの中身を徹底的に見る
-3. エラーの原因を特定する
-4. Networkタブと連携してプロのデバッグをする
-```
+**ガネーシャ 🐘**：「せや！今までは**タスク取得（GET）**でエラーと成功を見てきたけど、**タスク作成（POST）**も同じように確認できるんや」
 
 ---
 
-## 🎯 ミッション 1：リクエスト内容を完全に把握する
+## 🎯 ミッション 1：タスク作成ページでレスポンスを確認しよう
 
-**ガネーシャ 🐘**：「まずはな、**自分が何をサーバーに送ってるか**を理解せなアカンで」
+**ガネーシャ 🐘**：「まずはタスク作成ページを開くで」
 
-### 📝 実装：タスク作成処理にログを追加
+### 📍 タスク作成ページを開く
 
-開くファイル：`resources/js/Pages/Projects/Show.vue` （プロジェクト詳細ページ）
+**生徒 👩‍💻**：「どのページですか？」
 
-**ガネーシャ 🐘**：「このファイルの中にタスク作成処理があるはずや。探してみ」
+**ガネーシャ 🐘**：「プロジェクト詳細ページや。以下のURLを開いてみ」
 
-**生徒 👩‍💻**：「ありました！`createTask` 関数ですね」
-
-```javascript
-const createTask = async () => {
-    console.group("📝 タスク作成処理開始");
-    console.log("📤 送信するデータ:", newTask.value);
-    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
-    console.log("🕒 送信時刻:", new Date().toLocaleTimeString());
-
-    try {
-        creatingTask.value = true;
-
-        const response = await axios.post(
-            `/api/projects/${projectId}/tasks`,
-            newTask.value
-        );
-
-        console.log("✅ 作成成功！");
-        console.log("📦 レスポンス全体:", response);
-        console.log("📊 ステータスコード:", response.status);
-        console.log("📝 レスポンスデータ:", response.data);
-        console.log("🆕 作成されたタスク:", response.data.data);
-
-        tasks.value.unshift(response.data.data);
-        newTask.value = { title: "", description: "" };
-        toast.success(response.data.message || "タスクを作成しました");
-    } catch (err) {
-        console.error("❌ 作成失敗！");
-        console.error("🔍 エラーオブジェクト:", err);
-        console.error("📊 HTTPステータス:", err.response?.status);
-        console.error("📝 エラーレスポンス:", err.response?.data);
-        console.error("💬 エラーメッセージ:", err.response?.data?.message);
-
-        // バリデーションエラーの場合
-        if (err.response?.data?.errors) {
-            console.error("⚠️ バリデーションエラー:", err.response.data.errors);
-            console.table(err.response.data.errors);
-        }
-
-        toast.error(
-            err.response?.data?.message || "タスクの作成に失敗しました"
-        );
-    } finally {
-        creatingTask.value = false;
-        console.log("🏁 タスク作成処理終了");
-        console.groupEnd();
-    }
-};
+```
+http://localhost/project/1
 ```
 
-**生徒 👩‍💻**：「すごく詳しくログを出してますね！」
+**生徒 👩‍💻**：「開きました！タスク作成フォームがありますね」
 
-**ガネーシャ 🐘**：「せや！これが**プロのデバッグ**や。問題が起きた時に、どこで何が起きてるか一目瞭然になるんや」
+**ガネーシャ 🐘**：「せやな！ここで新しいタスクを作成すると、**POST リクエスト**が送信されて、Laravel からレスポンスが返ってくるんや」
+
+### 📝 実際にタスクを作成してみよう
+
+**ガネーシャ 🐘**：「今まで学んだことを活かして、Console タブを開いた状態で以下を試してみよう：」
+
+```
+🎯 やってみること
+
+1. Console タブを開く（Cmd + Option + I → Console タブ）
+2. タスクのタイトルと説明を入力
+3. 「タスクを作成」ボタンをクリック
+4. Console に表示されるログを確認
+```
+
+**生徒 👩‍💻**：「やってみます！」
+
+**Console に表示される内容（既にログが入っている場合）：**
+
+```
+📝 タスク作成処理開始
+📤 送信するデータ: {title: "新しいタスク", description: "テスト"}
+📍 送信先URL: /api/projects/1/tasks
+✅ 作成成功！
+📦 レスポンス全体: ▶︎ {data: {•••}, status: 201, ...}
+📊 ステータスコード: 201
+📝 レスポンスデータ: ▶︎ {data: {•••}, message: "タスクを作成しました"}
+🆕 作成されたタスク: ▶︎ {id: 10, title: "新しいタスク", •••}
+🏁 タスク作成処理終了
+```
+
+**生徒 👩‍💻**：「わぁ！ステータスコードが `201` になってますね！`200` とは違うんですか？」
+
+**ガネーシャ 🐘**：「ええ質問や！`201 Created` は**リソースが正常に作成された**ことを示すステータスコードや。GET リクエストの成功は `200 OK`、POST の成功は `201 Created` が返ってくることが多いんや」
 
 ---
 
@@ -1960,14 +1955,9 @@ public function store(TaskRequest $request, Project $project): JsonResponse
 }
 ```
 
-<<<<<<< Updated upstream
-**生徒 👩‍💻**：「なるほど！成功時は `data.data` と `data.message` があって、エラー時（422）は `data.errors` プロパティが入ってるんですね」
-=======
 **ガネーシャ 🐘**：「この構造を理解しとけば、どこにどんなデータがあるか分かるやろ？」
 
 **生徒 👩‍💻**：「なるほど！成功時は `data` プロパティにデータが入ってて、エラー時（404 や 500）は `exception` と `trace` が、バリデーションエラー時（422）は `errors` プロパティが入ってるんですね」
-
-> > > > > > > Stashed changes
 
 **ガネーシャ 🐘**：「さすガネーシャの生徒や！飲み込みが早いな！」
 
@@ -2017,12 +2007,7 @@ console.groupEnd();
 
 ### 📝 実装：詳細なエラーログ
 
-<<<<<<< Updated upstream
-**ガネーシャ 🐘**：「せっかくやから、エラーの時にもっと詳しい情報を出すようにしてみよう」
-=======
 **ガネーシャ 🐘**：「エラーの時にもっと詳しい情報を出すようにしてみよう」
-
-> > > > > > > Stashed changes
 
 ```javascript
 // エラーをキャッチした時
