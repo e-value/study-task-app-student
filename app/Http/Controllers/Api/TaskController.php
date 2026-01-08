@@ -64,14 +64,8 @@ class TaskController extends ApiController
      */
     public function show(Request $request, Task $task): TaskResource|JsonResponse
     {
-        try {
-            $task = $this->taskService->getTask($task, $request->user());
-            return new TaskResource($task);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 500);
-        }
+        $task = $this->taskService->getTask($task, $request->user());
+        return new TaskResource($task);
     }
 
     /**
