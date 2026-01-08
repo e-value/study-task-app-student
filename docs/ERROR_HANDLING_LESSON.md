@@ -22,7 +22,7 @@
 
 👩‍💻「お電話ありがとうございます！」
 
-📞 **クライアント**：「あの...急ぎの用件なんですけど...さっきタスクの詳細を開いたら、変な英語の文字がいっぱい出てきて...😰」
+📞 **クライアント**：「あの...急ぎの用件なんですけど...さっきプロジェクトのページを開いたら、変な英語の文字がいっぱい出てきて...😰」
 
 👩‍💻「え...？でも、これまで 2 週間問題なく使えてたはずでは...」
 
@@ -38,15 +38,15 @@
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  Exception:                                                     │
-│  Call to undefined relationship [creatdBy] on model             │
-│  [App\Models\Task].                                             │
+│  Call to undefined relationship [usrs] on model                 │
+│  [App\Models\Project].                                          │
 │                                                                 │
-│  in /var/www/html/app/Services/TaskService.php:72               │
+│  in /var/www/html/app/Services/ProjectService.php:53           │
 │                                                                 │
 │  Stack trace:                                                   │
-│  #0 /var/www/html/app/Services/TaskService.php(72):            │
+│  #0 /var/www/html/app/Services/ProjectService.php(53):         │
 │     Illuminate\Database\Eloquent\Model->__call()                │
-│  #1 /var/www/html/app/Http/Controllers/Api/TaskController.php  │
+│  #1 /var/www/html/app/Http/Controllers/Api/ProjectController.  │
 │  #2 /var/www/html/vendor/laravel/framework/src/Illuminate/...   │
 │  #3 /var/www/html/vendor/laravel/framework/src/Illuminate/...   │
 │  ...                                                            │
@@ -65,13 +65,13 @@
 
 🐘「**あちゃー、これはアカンやつや！**DB のファイルパスとか丸見えやないか！しかも本番環境（production）やと！？」
 
-👩‍💻「で、でも、開発中は console.log でちゃんとデバッグしてたのに...なんで急に...」
+👩‍💻「で、でも、昨日タスク機能を修正した時は問題なかったのに...なんで急に...」
 
-🐘「落ち着きや。エラー内容を見てみ。`creatdBy`って書いてあるやろ？」
+🐘「落ち着きや。エラー内容を見てみ。`usrs`って書いてあるやろ？」
 
-👩‍💻「あ...本当だ...`createdBy`じゃなくて`creatdBy`...これって...」
+👩‍💻「あ...本当だ...`users`じゃなくて`usrs`...これって...」
 
-🐘「せや。**たった一文字のタイポ**や。おそらく最近の更新で誰かが間違えて修正してもうたんやろな」
+🐘「せや。**たった一文字のタイポ**や。おそらく昨日タスク機能を修正した際に、誤って ProjectService も開いて触ってもうたんやろな」
 
 👩‍💻「console.log でデバッグはできても...エラーハンドリングしてないと、こんなことになるんですね...」
 

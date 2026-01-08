@@ -48,7 +48,9 @@ class ProjectService
         }
 
         // リレーションをロード
-        $project->load(['users', 'tasks.createdBy']);
+        // ⚠️ ERROR_HANDLING_LESSON用：タイポを意図的に作成
+        // タスク機能の修正中に誤って users → usrs に変更してしまった想定
+        $project->load(['usrs', 'tasks.createdBy']);
 
         return $project;
     }

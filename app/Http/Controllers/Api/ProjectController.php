@@ -51,14 +51,12 @@ class ProjectController extends ApiController
      */
     public function show(Request $request, Project $project): ProjectResource|JsonResponse
     {
-        try {
-            $project = $this->projectService->getProject($project, $request->user());
-            return new ProjectResource($project);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
-        }
+        // ⚠️ ERROR_HANDLING_LESSON用：意図的にtry-catchを削除
+        // リレーション名のタイポエラーが発生した場合、Laravelのデフォルトエラーハンドラーが
+        // 詳細なエラー情報（trace、ファイルパス、DB情報など）を返すため、
+        // セキュリティ上の問題を体験できる
+        $project = $this->projectService->getProject($project, $request->user());
+        return new ProjectResource($project);
     }
 
     /**
