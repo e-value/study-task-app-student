@@ -293,20 +293,6 @@ const fetchTask = async () => {
 
 **生徒 👩‍💻**：「はい！」
 
-#### 🚀 サーバーを起動する
-
-**ガネーシャ 🐘**：「このプロジェクトは **Laravel Sail** を使っとるから、起動方法がちょっと特別やで」
-
-```bash
-# ターミナルで実行（Sail環境の起動）
-sail up -d
-
-# Vite（フロントエンド）を起動
-sail npm run dev
-```
-
-**ガネーシャ 🐘**：「Sail は Docker を使って Laravel を動かす仕組みや。`sail up -d` で Laravel サーバーが起動するで」
-
 #### 🌐 ブラウザで確認
 
 1. ブラウザで `http://localhost/tasks/1` にアクセス
@@ -469,10 +455,10 @@ const user = {
 public function getTask(Task $task, User $user): Task
 {
     $this->checkTaskPermission($task, $user);
-    
+
     // ここにタイポがある！
     $task->load(['creatdBy', 'project']); // ← createdBy のはず
-    
+
     return $task;
 }
 ```
@@ -540,7 +526,7 @@ $task->load(['createdBy', 'project']);
 
 ### 📝 手順 5：成功レスポンスを詳しく見てみよう
 
-**ガネーシャ 🐘**：「今見た成功レスポンスもな、さっきのエラーと同じように▶︎をクリックして中身を見ていこう」
+**ガネーシャ 🐘**：「今見た成功レスポンスもな、さっきのエラーと同じように ▶︎ をクリックして中身を見ていこう」
 
 #### 🎯 成功レスポンスを展開する
 
