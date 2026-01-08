@@ -4,6 +4,8 @@ import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import ApiError from "@/Components/ApiError.vue";
+import { useApiError } from "@/composables/useApiError";
 
 const route = useRoute();
 const router = useRouter();
@@ -15,7 +17,9 @@ const loading = ref(true);
 const editing = ref(false);
 const saving = ref(false);
 const deleting = ref(false);
-const error = ref(null);
+
+// エラーハンドリング用のComposable
+const { error, requestId, statusCode, handleError, clearError } = useApiError();
 
 const form = ref({
   title: "",
@@ -24,14 +28,20 @@ const form = ref({
 });
 
 const fetchTask = async () => {
+  console.log("🚀 fetchTask が呼ばれたで！");
+
   try {
     loading.value = true;
     const response = await axios.get(`/api/tasks/${taskId}`);
-    task.value = response.data.data;
+    task.value = response.data.data || response.data;
   } catch (err) {
-    console.error("Failed to fetch task:", err);
-    error.value =
-      err.response?.data?.message || "タスクの読み込みに失敗しました";
+    console.error("❌ エラーが発生したで！");
+    console.error("🔍 エラーオブジェクト全体:", err);
+    console.error("📊 エラーレスポンス:", err.response);
+    console.error("📋 ステータスコード:", err.response?.status);
+    console.error("💬 エラーデータ:", err.response?.data);
+
+    toast.error("タスクの読み込みに失敗しました");
   } finally {
     loading.value = false;
   }
@@ -46,21 +56,20 @@ const startEditing = () => {
 
 const cancelEditing = () => {
   editing.value = false;
-  error.value = null;
+  clearError();
 };
 
 const saveChanges = async () => {
   try {
     saving.value = true;
-    error.value = null;
+    clearError();
 
     const response = await axios.put(`/api/tasks/${taskId}`, form.value);
     task.value = response.data.data;
     editing.value = false;
     toast.success(response.data.message || "タスクを更新しました");
   } catch (err) {
-    console.error("Failed to update task:", err);
-    error.value = err.response?.data?.message || "タスクの更新に失敗しました";
+    handleError(err, "タスクの更新に失敗しました");
     toast.error(error.value);
   } finally {
     saving.value = false;
@@ -73,8 +82,7 @@ const startTask = async () => {
     task.value = response.data.data;
     toast.success("タスクを開始しました");
   } catch (err) {
-    console.error("Failed to start task:", err);
-    error.value = err.response?.data?.message || "タスクの開始に失敗しました";
+    handleError(err, "タスクの開始に失敗しました");
     toast.error(error.value);
   }
 };
@@ -85,8 +93,7 @@ const completeTask = async () => {
     task.value = response.data.data;
     toast.success("タスクを完了しました");
   } catch (err) {
-    console.error("Failed to complete task:", err);
-    error.value = err.response?.data?.message || "タスクの完了に失敗しました";
+    handleError(err, "タスクの完了に失敗しました");
     toast.error(error.value);
   }
 };
@@ -116,8 +123,7 @@ const deleteTask = async () => {
       });
     }, 500);
   } catch (err) {
-    console.error("Failed to delete task:", err);
-    error.value = err.response?.data?.message || "タスクの削除に失敗しました";
+    handleError(err, "タスクの削除に失敗しました");
     toast.error(error.value);
     deleting.value = false;
   }
@@ -344,26 +350,12 @@ onMounted(() => {
           </div>
 
           <!-- エラー表示 -->
-          <div
-            v-if="error"
-            class="mb-6 backdrop-blur-lg bg-red-500/10 border border-red-300/50 rounded-2xl p-6 shadow-xl"
-          >
-            <div class="flex items-center gap-3">
-              <svg
-                class="w-6 h-6 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <p class="text-red-800 font-medium">{{ error }}</p>
-            </div>
+          <div v-if="error" class="mb-6">
+            <ApiError
+              :message="error"
+              :request-id="requestId"
+              :status-code="statusCode"
+            />
           </div>
 
           <!-- メインコンテンツ -->
@@ -558,28 +550,14 @@ onMounted(() => {
           </div>
         </template>
 
-        <!-- エラー（タスクが見つからない） -->
-        <div
+        <!-- エラー（タスクが見つからない、またはその他のエラー） -->
+        <ApiError
           v-else
-          class="backdrop-blur-lg bg-red-500/10 border border-red-300/50 rounded-2xl p-6 shadow-xl"
-        >
-          <div class="flex items-center gap-3">
-            <svg
-              class="w-6 h-6 text-red-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p class="text-red-800 font-medium">タスクが見つかりませんでした</p>
-          </div>
-        </div>
+          :message="error"
+          fallback-message="タスクが見つかりませんでした"
+          :request-id="requestId"
+          :status-code="statusCode"
+        />
       </div>
     </div>
   </AuthenticatedLayout>
