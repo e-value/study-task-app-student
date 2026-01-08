@@ -43,6 +43,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import axios from 'axios';
+import { useApiError } from '@/composables/useApiError';
 
 const router = useRouter();
 
@@ -52,11 +53,14 @@ const form = ref({
 });
 
 const processing = ref(false);
+
+// エラーハンドリング用のComposable
+const { error, validationErrors, handleError, clearError } = useApiError();
 const errors = ref('');
 
 const submit = async () => {
     processing.value = true;
-    errors.value = '';
+    clearError();
     form.value.errors = {};
 
     try {
@@ -66,14 +70,10 @@ const submit = async () => {
         
         // パスワード確認成功後、元のページに戻るか、ダッシュボードへ
         router.back();
-    } catch (error) {
-        if (error.response?.data?.errors) {
-            form.value.errors = error.response.data.errors;
-        } else if (error.response?.data?.message) {
-            errors.value = error.response.data.message;
-        } else {
-            errors.value = '入力されたパスワードが正しくありません。';
-        }
+    } catch (err) {
+        handleError(err, '入力されたパスワードが正しくありません。');
+        errors.value = error.value;
+        form.value.errors = validationErrors.value;
     } finally {
         processing.value = false;
         form.value.password = '';

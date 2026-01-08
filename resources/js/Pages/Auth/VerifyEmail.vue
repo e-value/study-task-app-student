@@ -34,6 +34,7 @@ import { useAuthStore } from '../../stores/auth';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import axios from 'axios';
+import { useApiError } from '@/composables/useApiError';
 
 const router = useRouter();
 const toast = useToast();
@@ -42,17 +43,21 @@ const authStore = useAuthStore();
 const processing = ref(false);
 const verificationLinkSent = ref(false);
 
+// エラーハンドリング用のComposable
+const { error, handleError, clearError } = useApiError();
+
 const submit = async () => {
     processing.value = true;
     verificationLinkSent.value = false;
+    clearError();
 
     try {
         await axios.post('/email/verification-notification');
         verificationLinkSent.value = true;
         toast.success('確認メールを送信しました');
-    } catch (error) {
-        console.error('Error sending verification email:', error);
-        toast.error('確認メールの送信に失敗しました');
+    } catch (err) {
+        handleError(err, '確認メールの送信に失敗しました');
+        toast.error(error.value);
     } finally {
         processing.value = false;
     }

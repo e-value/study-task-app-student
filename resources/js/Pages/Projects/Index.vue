@@ -3,25 +3,26 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useApiError } from "@/composables/useApiError";
 
 const router = useRouter();
 const projects = ref([]);
 const loading = ref(true);
-const error = ref(null);
 const searchQuery = ref("");
 const filterStatus = ref("all");
 const sortBy = ref("name");
 
+// エラーハンドリング用のComposable
+const { error, handleError, clearError } = useApiError();
+
 const fetchProjects = async () => {
   try {
     loading.value = true;
-    error.value = null;
+    clearError();
     const response = await axios.get("/api/projects");
     projects.value = response.data.data;
   } catch (err) {
-    console.error("Failed to fetch projects:", err);
-    error.value =
-      err.response?.data?.message || "プロジェクトの読み込みに失敗しました";
+    handleError(err, "プロジェクトの読み込みに失敗しました");
   } finally {
     loading.value = false;
   }

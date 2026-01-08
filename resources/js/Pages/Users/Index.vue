@@ -4,16 +4,19 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Pagination from "@/Components/Pagination.vue";
+import { useApiError } from "@/composables/useApiError";
 
 const router = useRouter();
 const users = ref([]);
 const pagination = ref({});
 const loading = ref(true);
-const error = ref(null);
 const searchQuery = ref("");
 const sortBy = ref("name");
 const currentPage = ref(1);
 const perPage = ref(15);
+
+// エラーハンドリング用のComposable
+const { error, handleError, clearError } = useApiError();
 
 // デバウンス用タイマー
 let searchTimeout = null;
@@ -21,7 +24,7 @@ let searchTimeout = null;
 const fetchUsers = async (page = 1) => {
   try {
     loading.value = true;
-    error.value = null;
+    clearError();
     
     const params = {
       page: page,
@@ -39,9 +42,7 @@ const fetchUsers = async (page = 1) => {
     pagination.value = response.data.meta;
     currentPage.value = page;
   } catch (err) {
-    console.error("Failed to fetch users:", err);
-    error.value =
-      err.response?.data?.message || "ユーザーの読み込みに失敗しました";
+    handleError(err, "ユーザーの読み込みに失敗しました");
   } finally {
     loading.value = false;
   }
