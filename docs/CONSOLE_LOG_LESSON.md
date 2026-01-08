@@ -1584,20 +1584,125 @@ console.timeEnd("⏱️ API呼び出し時間");
 **ガネーシャ 🐘**：「まずはプロジェクト詳細ページを開くで」
 
 ```
-http://localhost/project/1
+📂 ファイル： resources/js/Pages/Projects/Show.vue
+🌐 URL： http://localhost/project/1
 ```
 
 **生徒 👩‍💻**：「開きました！タスク作成フォームがありますね」
 
 **ガネーシャ 🐘**：「せや！Console タブも開いておくんやで」
 
+**生徒 👩‍💻**：「`Show.vue` がタスク作成を担当してるんですね！」
+
+**ガネーシャ 🐘**：「そういうこっちゃ！このファイルの中に `createTask` 関数があって、そこでタスク作成の API 通信をしとるんや」
+
+---
+
+### 📝 準備：まず console.log を仕込もう
+
+**ガネーシャ 🐘**：「さぁ、実践や！まずは**何が起きてるか見えるように**するで」
+
+**生徒 👩‍💻**：「見えるように...？」
+
+**ガネーシャ 🐘**：「せや！今のコードは**成功しても失敗しても何も見えへん**。だから `console.log` を追加して、**中身を覗けるようにする**んや」
+
+**生徒 👩‍💻**：「なるほど！それで何が起きてるか分かるんですね！」
+
+#### 🔧 console.log を追加する
+
+**やること：**
+1. `resources/js/Pages/Projects/Show.vue` を開く
+2. `createTask` 関数（135行目あたり）を探す
+3. 以下のコードに書き換える
+
+**元のコード（console.log なし）:**
+
+```javascript
+const createTask = async () => {
+  try {
+    creatingTask.value = true;
+    const response = await axios.post(
+      `/api/projects/${projectId}/tasks`,
+      newTask.value
+    );
+    tasks.value.unshift(response.data.data);
+    newTask.value = { title: "", description: "" };
+    toast.success(response.data.message || "タスクを作成しました");
+  } catch (err) {
+    console.error("Failed to create task:", err);
+    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
+  } finally {
+    creatingTask.value = false;
+  }
+};
+```
+
+**生徒 👩‍💻**：「これが元のコードですね。確かに `console.log` がほとんどない...」
+
+**ガネーシャ 🐘**：「せや！これを以下のように書き換えるんや」
+
+**書き換え後のコード（console.log を追加）:**
+
+```javascript
+const createTask = async () => {
+  console.group("📝 タスク作成処理開始");
+  console.log("📤 送信するデータ:", newTask.value);
+  console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
+  try {
+    creatingTask.value = true;
+
+    const response = await axios.post(
+      `/api/projects/${projectId}/tasks`,
+      newTask.value
+    );
+
+    console.log("✅ 作成成功！");
+    console.log("📦 レスポンス全体:", response);
+    console.log("📊 ステータスコード:", response.status);
+    console.log("📝 レスポンスデータ:", response.data);
+    console.log("🆕 作成されたタスク:", response.data.data);
+
+    tasks.value.unshift(response.data.data);
+    newTask.value = { title: "", description: "" };
+    toast.success(response.data.message || "タスクを作成しました");
+  } catch (err) {
+    console.error("❌ 作成失敗！");
+    console.error("📊 HTTPステータス:", err.response?.status);
+    console.error("💬 エラーメッセージ:", err.response?.data?.message);
+    console.error("📋 エラー詳細:", err.response?.data?.errors);
+
+    if (err.response?.data?.errors) {
+      console.table(err.response.data.errors);
+    }
+
+    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
+  } finally {
+    creatingTask.value = false;
+    console.log("🏁 タスク作成処理終了");
+    console.groupEnd();
+  }
+};
+```
+
+**ガネーシャ 🐘**：「この変更で、タスク作成の**全ての段階**が Console に表示されるようになるで！」
+
+**生徒 👩‍💻**：「わぁ！`console.group` で囲んだり、成功時とエラー時で分けてますね！」
+
+**ガネーシャ 🐘**：「せやせや！保存したら、次は実際に動かしてみよう」
+
+**手順：**
+1. ファイルを保存（`Cmd + S` または `Ctrl + S`）
+2. ブラウザをリロード（念のため）
+
 ---
 
 ### 📝 Step 1：まずは成功パターンを確認
 
-**ガネーシャ 🐘**：「最初は普通にタスクを作ってみよう」
+**ガネーシャ 🐘**：「準備ができたら、最初は普通にタスクを作ってみよう」
 
 **やること：**
+
 1. タイトル：「テストタスク」
 2. 説明：「これはテストです」
 3. 「タスクを作成」ボタンをクリック
@@ -1656,21 +1761,33 @@ http://localhost/project/1
 
 開くファイル：`resources/js/Pages/Projects/Show.vue`
 
-**`createTask` 関数（135行目あたり）を探して、以下のように一時的に修正：**
+**`createTask` 関数を探して、さっき追加したコードの一部を修正：**
+
+**修正箇所：`newTask.value` を使わず、わざと空のデータを送る**
 
 ```javascript
 const createTask = async () => {
+    console.group("📝 タスク作成処理開始");
+    console.log("📤 送信するデータ:", newTask.value);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
     try {
         creatingTask.value = true;
-        
+
         // ❌ 一時的にこの2行を追加！
         const testData = { title: "", description: "テスト" };
-        
+
         const response = await axios.post(
             `/api/projects/${projectId}/tasks`,
-            testData  // ← newTask.value から testData に変更
+            testData // ← newTask.value から testData に変更
         );
-        
+
+        console.log("✅ 作成成功！");
+        console.log("📦 レスポンス全体:", response);
+        console.log("📊 ステータスコード:", response.status);
+        console.log("📝 レスポンスデータ:", response.data);
+        console.log("🆕 作成されたタスク:", response.data.data);
+
         tasks.value.unshift(response.data.data);
         newTask.value = { title: "", description: "" };
         toast.success(response.data.message || "タスクを作成しました");
@@ -1679,23 +1796,29 @@ const createTask = async () => {
         console.error("📊 HTTPステータス:", err.response?.status);
         console.error("💬 エラーメッセージ:", err.response?.data?.message);
         console.error("📋 エラー詳細:", err.response?.data?.errors);
-        
+
         if (err.response?.data?.errors) {
             console.table(err.response.data.errors);
         }
-        
+
         toast.error(
             err.response?.data?.message || "タスクの作成に失敗しました"
         );
     } finally {
         creatingTask.value = false;
+        console.log("🏁 タスク作成処理終了");
+        console.groupEnd();
     }
 };
 ```
 
-**ガネーシャ 🐘**：「これで`title`が空のデータを送信するようになったで。保存してブラウザで確認や！」
+**変更点：**
+- `const testData = { title: "", description: "テスト" };` を追加
+- `axios.post` の第2引数を `newTask.value` から `testData` に変更
 
-**生徒 👩‍💻**：「保存しました！タスク作成ボタンをクリックします！」
+**ガネーシャ 🐘**：「これで`title`が空のデータを送信するようになったで。保存してタスク作成ボタンをクリックや！」
+
+**生徒 👩‍💻**：「保存しました！クリックします！」
 
 #### 🔍 Console に表示される内容（バリデーションエラー）
 
@@ -1732,27 +1855,68 @@ const createTask = async () => {
 
 ### 📝 Step 3：別のバリデーションエラーも試してみる
 
-**ガネーシャ 🐘**：「次は256文字のタイトルを送ってみよう。maxは255やからエラーになるはずや」
+**ガネーシャ 🐘**：「次は 256 文字のタイトルを送ってみよう。max は 255 やからエラーになるはずや」
 
 #### 🔧 コードを再度修正
 
+**変更箇所：`testData` の `title` を256文字にする**
+
+```javascript
+// ❌ testData の title 部分だけ変更
+const testData = {
+  title: "あ".repeat(256),  // ← 空 → 256文字に変更
+  description: "テスト"
+};
+```
+
+**完全なコード：**
+
 ```javascript
 const createTask = async () => {
-    try {
-        creatingTask.value = true;
-        
-        // ❌ 今度は256文字にする
-        const testData = { 
-            title: "あ".repeat(256), 
-            description: "テスト" 
-        };
-        
-        const response = await axios.post(
-            `/api/projects/${projectId}/tasks`,
-            testData
-        );
-        
-        // ... 以下同じ
+  console.group("📝 タスク作成処理開始");
+  console.log("📤 送信するデータ:", newTask.value);
+  console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
+  try {
+    creatingTask.value = true;
+
+    // ❌ 今度は256文字にする
+    const testData = {
+      title: "あ".repeat(256),
+      description: "テスト"
+    };
+
+    const response = await axios.post(
+      `/api/projects/${projectId}/tasks`,
+      testData
+    );
+
+    console.log("✅ 作成成功！");
+    console.log("📦 レスポンス全体:", response);
+    console.log("📊 ステータスコード:", response.status);
+    console.log("📝 レスポンスデータ:", response.data);
+    console.log("🆕 作成されたタスク:", response.data.data);
+
+    tasks.value.unshift(response.data.data);
+    newTask.value = { title: "", description: "" };
+    toast.success(response.data.message || "タスクを作成しました");
+  } catch (err) {
+    console.error("❌ 作成失敗！");
+    console.error("📊 HTTPステータス:", err.response?.status);
+    console.error("💬 エラーメッセージ:", err.response?.data?.message);
+    console.error("📋 エラー詳細:", err.response?.data?.errors);
+
+    if (err.response?.data?.errors) {
+      console.table(err.response.data.errors);
+    }
+
+    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
+  } finally {
+    creatingTask.value = false;
+    console.log("🏁 タスク作成処理終了");
+    console.groupEnd();
+  }
+};
 ```
 
 **生徒 👩‍💻**：「保存してクリックします！」
@@ -1780,26 +1944,48 @@ const createTask = async () => {
 
 ### 📝 Step 4：コードを元に戻す
 
-**ガネーシャ 🐘**：「確認が終わったら、**必ず元に戻す**んやで！」
+**ガネーシャ 🐘**：「確認が終わったら、**必ず元に戻す**んやで！`testData`を削除して、`newTask.value`に戻すんや」
 
 ```javascript
 const createTask = async () => {
+    console.group("📝 タスク作成処理開始");
+    console.log("📤 送信するデータ:", newTask.value);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+
     try {
         creatingTask.value = true;
+
         const response = await axios.post(
             `/api/projects/${projectId}/tasks`,
             newTask.value // ← 元に戻す！
         );
+
+        console.log("✅ 作成成功！");
+        console.log("📦 レスポンス全体:", response);
+        console.log("📊 ステータスコード:", response.status);
+        console.log("📝 レスポンスデータ:", response.data);
+        console.log("🆕 作成されたタスク:", response.data.data);
+
         tasks.value.unshift(response.data.data);
         newTask.value = { title: "", description: "" };
         toast.success(response.data.message || "タスクを作成しました");
     } catch (err) {
-        console.error("Failed to create task:", err);
+        console.error("❌ 作成失敗！");
+        console.error("📊 HTTPステータス:", err.response?.status);
+        console.error("💬 エラーメッセージ:", err.response?.data?.message);
+        console.error("📋 エラー詳細:", err.response?.data?.errors);
+
+        if (err.response?.data?.errors) {
+            console.table(err.response.data.errors);
+        }
+
         toast.error(
             err.response?.data?.message || "タスクの作成に失敗しました"
         );
     } finally {
         creatingTask.value = false;
+        console.log("🏁 タスク作成処理終了");
+        console.groupEnd();
     }
 };
 ```
