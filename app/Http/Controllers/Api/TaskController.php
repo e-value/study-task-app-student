@@ -70,7 +70,7 @@ class TaskController extends ApiController
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
-            ], 403);
+            ], 500);
         }
     }
 
