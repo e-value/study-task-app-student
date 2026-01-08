@@ -684,9 +684,9 @@ public function getTask(Task $task, User $user): Task
 
 ---
 
-### 📝 手順 4：タイポを修正して成功パターンを確認しよう
+### 📝 手順 4：タイポを修正しよう
 
-**ガネーシャ 🐘**：「ほな、Laravel 側のタイポを修正しよう」
+**ガネーシャ 🐘**：「原因が分かったから、Laravel 側のタイポを修正しよう」
 
 開くファイル：`app/Services/TaskService.php`
 
@@ -698,11 +698,173 @@ $task->load(['creatdBy', 'project']);
 $task->load(['createdBy', 'project']);
 ```
 
-**ガネーシャ 🐘**：「保存してリロードしてみ。さっき追加した **Step 3 の詳細ログ**が入ってるから、成功時のレスポンスも全部見えるはずや」
+**ガネーシャ 🐘**：「保存してリロードしてみ」
 
 **生徒 👩‍💻**：「やりました！」
 
-**現在のコード（Step 3 の詳細ログ版）：**
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+❌ エラーが発生したで！
+🔍 エラーオブジェクト全体: ▶︎ AxiosError {...}
+📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, ...}
+📋 ステータスコード: 500
+💬 エラーデータ: ▶︎ {message: '...', exception: '...', ...}
+```
+
+**生徒 👩‍💻**：「あれ？まだエラーが...あ、ブラウザをリロードしてなかった！リロードします！」
+
+**ガネーシャ 🐘**：「ブラウザのキャッシュが残ってたんやな。`Cmd + Shift + R`（Mac）で強制リロードや」
+
+**生徒 👩‍💻**：「リロードしました！」
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+```
+
+**生徒 👩‍💻**：「あれ？今度はエラーもなくなりましたが...成功のログも出ていません」
+
+**ガネーシャ 🐘**：「そらそうや！今のコードは**エラーの時だけログを出す**ようになっとるからな。成功の時のログも追加せなアカンで」
+
+**生徒 👩‍💻**：「なるほど！成功の時もconsole.logを追加する必要があるんですね！」
+
+---
+
+### 📝 手順 5：成功レスポンスも段階的にログを追加しよう
+
+**ガネーシャ 🐘**：「エラーの時と同じように、**成功の時も段階的にログを追加**していくで」
+
+**生徒 👩‍💻**：「エラーの時にやったみたいに、最初は最小限から始めるんですね！」
+
+**ガネーシャ 🐘**：「せや！まずは`response`だけ出してみよう」
+
+#### 📝 Step 1：まず response だけログに出す
+
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
+
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+
+        console.log("✅ レスポンス:", response); // ← 追加！
+
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        console.error("❌ エラーが発生したで！");
+        console.error("🔍 エラーオブジェクト全体:", err);
+        console.error("📊 エラーレスポンス:", err.response);
+        console.error("📋 ステータスコード:", err.response?.status);
+        console.error("💬 エラーデータ:", err.response?.data);
+
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
+```
+
+**生徒 👩‍💻**：「保存してリロードします！」
+
+#### 🔍 Step 1 の結果を確認
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+✅ レスポンス: ▶︎ {data: {•••}, status: 200, statusText: 'OK', headers: AxiosHeaders, config: {•••}, ...}
+```
+
+**生徒 👩‍💻**：「お！成功のログが出ました！`status: 200` だから成功ですね！」
+
+**ガネーシャ 🐘**：「せやな！でもな、`response` の中身を見るには ▶︎ をクリックせなアカンやろ？」
+
+**生徒 👩‍💻**：「はい、クリックしてみます」
+
+**`▶︎ {data: {•••}, status: 200, ...}` をクリックすると：**
+
+```
+✅ レスポンス: ▼ {data: {•••}, status: 200, statusText: 'OK', ...}
+  config: ▶︎ {transitional: {•••}, adapter: [...], ...}
+  data: ▶︎ {data: {•••}}         ← これが Laravel からのデータ！
+  headers: ▶︎ AxiosHeaders {•••}
+  request: ▶︎ XMLHttpRequest {•••}
+  status: 200                   ← 成功のステータスコード
+  statusText: "OK"              ← 成功メッセージ
+```
+
+**生徒 👩‍💻**：「`data: ▶︎ {data: {•••}}` ってのがありますね。これが Laravel から返ってきたデータですか？」
+
+**ガネーシャ 🐘**：「せや！でも、毎回クリックして探すのは面倒やろ？」
+
+**生徒 👩‍💻**：「確かに...`response` の中の `data` を探すのが大変です」
+
+#### 📝 Step 2：response.data も直接ログに出す
+
+**ガネーシャ 🐘**：「せやから、**最初から response.data を指定してログに出す**んや！」
+
+```javascript
+const fetchTask = async () => {
+    console.log("🚀 fetchTask が呼ばれたで！");
+
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/tasks/${taskId}`);
+
+        console.log("✅ レスポンス:", response);
+        console.log("📦 response.data:", response.data); // ← 追加！
+
+        task.value = response.data.data || response.data;
+    } catch (err) {
+        console.error("❌ エラーが発生したで！");
+        console.error("🔍 エラーオブジェクト全体:", err);
+        console.error("📊 エラーレスポンス:", err.response);
+        console.error("📋 ステータスコード:", err.response?.status);
+        console.error("💬 エラーデータ:", err.response?.data);
+
+        toast.error("タスクの読み込みに失敗しました");
+    } finally {
+        loading.value = false;
+    }
+};
+```
+
+**生徒 👩‍💻**：「保存して再度確認します！」
+
+#### 🔍 Step 2 の結果を確認
+
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+✅ レスポンス: ▶︎ {data: {•••}, status: 200, statusText: 'OK', ...}
+📦 response.data: ▶︎ {data: {•••}}
+```
+
+**生徒 👩‍💻**：「お！今度は`📦 response.data`が直接表示されました！」
+
+**ガネーシャ 🐘**：「せやろ！でもな、`response.data: ▶︎ {data: {•••}}` ってまた `data` の中に `data` があるやろ？これも展開してみたいよな」
+
+**生徒 👩‍💻**：「はい！▶︎ をクリックしてみます」
+
+**`▶︎ {data: {•••}}` をクリックすると：**
+
+```
+📦 response.data: ▼ {data: {•••}}
+  data: ▶︎ {id: 1, project_id: 1, title: '...', status: 'todo', •••}  ← 実際のタスクデータ！
+```
+
+**生徒 👩‍💻**：「あ！`data` の中にまた `data` がありますね。これが実際のタスクデータですか？」
+
+**ガネーシャ 🐘**：「せや！`response.data.data` で実際のタスクデータにアクセスできるんや。これも直接ログに出してみよう」
+
+#### 📝 Step 3：さらに詳細を追加
+
+**ガネーシャ 🐘**：「最終形はこんな感じや！」
 
 ```javascript
 const fetchTask = async () => {
@@ -736,6 +898,10 @@ const fetchTask = async () => {
 };
 ```
 
+**生徒 👩‍💻**：「保存してリロードします！」
+
+#### 🔍 Step 3 の結果を確認
+
 **Console に表示される内容：**
 
 ```
@@ -748,11 +914,11 @@ const fetchTask = async () => {
 🏁 fetchTask 終了！
 ```
 
-**生徒 👩‍💻**：「わぁ！今度は成功しました！ステータスコードも 200 になってます！」
+**生徒 👩‍💻**：「わぁ！今度は成功時の情報が全部見えます！タスクIDからレスポンスまで、全部の流れが分かりますね！」
 
-**ガネーシャ 🐘**：「せやろ？**console.log があれば、エラーレスポンスの中身を見て、バックエンドのタイポも発見できる**んや。これがデバッグの基本や！」
+**ガネーシャ 🐘**：「せやろ！**エラーも成功も、段階的にログを追加**していくことで、**何が起きてるか**が一目瞭然になるんや」
 
-**生徒 👩‍💻**：「console.log、めっちゃ便利ですね！エラーの詳細まで全部見えるから、原因がすぐ分かります！」
+**生徒 👩‍💻**：「console.log、めっちゃ便利ですね！エラーの時も成功の時も、全部の流れが見えるから原因がすぐ分かります！」
 
 **ガネーシャ 🐘**：「せやろ！ここでポイントをまとめるで」
 
@@ -762,12 +928,12 @@ const fetchTask = async () => {
 
 ##### 📌 Console の基本操作
 
-| 記号/操作 | 説明 |
-| :--- | :--- |
-| **▶︎** | 右向き三角（閉じた状態）→ クリックすると展開 |
-| **▼** | 下向き三角（開いた状態）→ クリックすると閉じる |
-| **{...}** | オブジェクトの要約表示（中身が隠れてる） |
-| **[...]** | 配列の要約表示（中身が隠れてる） |
+| 記号/操作 | 説明                                           |
+| :-------- | :--------------------------------------------- |
+| **▶︎**    | 右向き三角（閉じた状態）→ クリックすると展開   |
+| **▼**     | 下向き三角（開いた状態）→ クリックすると閉じる |
+| **{...}** | オブジェクトの要約表示（中身が隠れてる）       |
+| **[...]** | 配列の要約表示（中身が隠れてる）               |
 
 ##### 📌 効率的なログの出し方
 
@@ -780,37 +946,19 @@ const fetchTask = async () => {
 
 **生徒 👩‍💻**：「なるほど！▶︎ をクリックして中身を見ることもできるし、最初から詳細ログを書いておくこともできるんですね！」
 
-**ガネーシャ 🐘**：「せや！**開発中は最初から詳細なログを書いておく方が効率的**や。毎回コンソールで ▶︎ をクリックして探すより、最初から `err.response?.data` みたいに**ピンポイントでログを出す**方が断然楽やで」
+**ガネーシャ 🐘**：「せや！**開発中は最初から詳細なログを書いておく方が効率的**や。毎回コンソールで ▶︎ をクリックして探すより、最初から `response.data.data` みたいに**ピンポイントでログを出す**方が断然楽やで」
 
-**生徒 👩‍💻**：「分かりました！これからは最初から詳細ログを書きます！」
+**生徒 👩‍💻**：「分かりました！エラーも成功も、段階的に追加していって、最終的には詳細ログを最初から書くんですね！」
 
-**ガネーシャ 🐘**：「ええ調子や！せやけど、まだまだ見るべき内容があるで。成功した時のレスポンスも詳しく確認してみよう」
+**ガネーシャ 🐘**：「**その通り！**さて、成功レスポンスの中で気になることがあるやろ？`response.data.data` って二重になってるのはなんでや？」
 
 ---
 
-### 📝 手順 5：成功レスポンスを詳しく見てみよう
+### 📝 手順 6：Laravel から返ってきたデータの構造を理解しよう
 
-**ガネーシャ 🐘**：「今見た成功レスポンスもな、さっきのエラーと同じように ▶︎ をクリックして中身を見ていこう」
+**生徒 👩‍💻**：「そうなんです！`data` の中に `data` があるのが不思議で...」
 
-#### 🎯 成功レスポンスを展開する
-
-**生徒 👩‍💻**：「`✅ APIレスポンス成功！ ▶︎ {data: {•••}, status: 200, ...}` をクリックしてみます！」
-
-**▶︎ をクリックすると：**
-
-```
-✅ APIレスポンス成功！ ▼ {data: {•••}, status: 200, statusText: 'OK', ...}
-  config: ▶︎ {transitional: {•••}, adapter: [...], ...}
-  data: ▶︎ {data: {•••}}         ← これもクリックできる！
-  headers: ▶︎ AxiosHeaders {•••}
-  request: ▶︎ XMLHttpRequest {•••}
-  status: 200                   ← 成功のステータスコード
-  statusText: "OK"              ← 成功メッセージ
-```
-
-**生徒 👩‍💻**：「`data: ▶︎ {data: {•••}}` ってまた `data` の中に `data` がありますね...これは？」
-
-**ガネーシャ 🐘**：「ええところに気づいたな！これが **response.data.data** って二重になってる理由や」
+**ガネーシャ 🐘**：「ええ質問や！これが **response.data.data** って二重になってる理由や」
 
 #### 💡 なぜ data.data になるのか？
 
@@ -895,115 +1043,6 @@ data: ▼ {id: 1, project_id: 1, title: '...', •••}
 
 ---
 
-### 📝 手順 6：Laravel から返ってきたデータの構造を理解しよう
-
-**ガネーシャ 🐘**：「今見たデータはな、Laravel の API が返してくれとるんや。構造を整理してみよう」
-
-#### 📊 axios レスポンスの全体構造（実際の形）
-
-```javascript
-// axios のレスポンス全体
-{
-    status: 200,           // HTTP ステータスコード
-    statusText: "OK",      // ステータステキスト
-    data: {                // ← Laravel から返ってきた JSON
-        data: {            // ← TaskResource が自動的に data でラップ
-            id: 1,
-            project_id: 1,
-            title: "サンプルタスク",
-            description: "...",
-            status: "todo",
-            created_by: 1,
-            created_by_user: {...},  // UserResource
-            project: {...},          // ProjectResource
-            created_at: "...",
-            updated_at: "..."
-        }
-    },
-    headers: {...},        // レスポンスヘッダー
-    config: {...},         // リクエスト設定
-    request: {...}         // リクエストオブジェクト
-}
-```
-
-**ガネーシャ 🐘**：「`response.data.data` って二重になってるのは、**axios の response.data** と **Laravel の Resource が自動的に付ける data** が重なってるからやな」
-
-**生徒 👩‍💻**：「なるほど！Laravel のどこでこの形式を作ってるんですか？」
-
-**ガネーシャ 🐘**：「ええ質問や！Laravel 側のコードを見てみよう」
-
-#### 💡 Laravel 側のコード（実際のプロジェクト）
-
-```php
-// app/Http/Controllers/Api/TaskController.php
-
-public function show(Request $request, Task $task): TaskResource|JsonResponse
-{
-    try {
-        $task = $this->taskService->getTask($task, $request->user());
-        return new TaskResource($task);  // ← これが自動的に {data: {...}} でラップされる
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => $e->getMessage(),
-        ], 403);
-    }
-}
-```
-
-```php
-// app/Http/Resources/TaskResource.php
-
-public function toArray(Request $request): array
-{
-    return [
-        'id' => $this->id,
-        'project_id' => $this->project_id,
-        'title' => $this->title,
-        'description' => $this->description,
-        'status' => $this->status,
-        'created_by' => $this->created_by,
-        'created_by_user' => new UserResource($this->whenLoaded('createdBy')),
-        'project' => new ProjectResource($this->whenLoaded('project')),
-        'created_at' => $this->created_at,
-        'updated_at' => $this->updated_at,
-    ];
-}
-```
-
-**Laravel が返す JSON（最終形）：**
-
-```json
-{
-    "data": {
-        "id": 1,
-        "project_id": 1,
-        "title": "サンプルタスク",
-        "description": "これはサンプルのタスクです",
-        "status": "todo",
-        "created_by": 1,
-        "created_by_user": {
-            "id": 1,
-            "name": "山田太郎",
-            "email": "taro@example.com"
-        },
-        "project": {
-            "id": 1,
-            "name": "サンプルプロジェクト"
-        },
-        "created_at": "2024-01-01T00:00:00.000000Z",
-        "updated_at": "2024-01-01T00:00:00.000000Z"
-    }
-}
-```
-
-**ガネーシャ 🐘**：「Laravel の **API Resource（JsonResource）** はな、**自動的に `data` でラップ**してくれるんや。これは Laravel の仕様なんや」
-
-**生徒 👩‍💻**：「なるほど！だから `new TaskResource($task)` って返すだけで、`{data: {...}}` の形式になるんですね」
-
-**ガネーシャ 🐘**：「せや！これが**Laravel API Resource** の便利なところや。統一された形式でデータを返してくれるから、フロントエンド側が扱いやすいんやな」
-
----
-
 ## 🎯 ポイント整理（ここまでのまとめ）
 
 **ガネーシャ 🐘**：「ここまでで学んだことを整理しとこうや」
@@ -1026,9 +1065,9 @@ public function toArray(Request $request): array
 
 ---
 
-### 📝 手順 5：Laravel のエラーを完全理解する（超重要！）
+### 📝 手順 7：Laravel のエラーを完全理解する（超重要！）
 
-**ガネーシャ 🐘**：「ここからが本番や！エラーが出た時に、**何が起きてるか理解できる**ようになるで」
+**ガネーシャ 🐘**：「さて、ここからはもっと深くエラーの種類を学んでいくで！エラーが出た時に、**何が起きてるか理解できる**ようになろう」
 
 **生徒 👩‍💻**：「エラーって難しそう...」
 
