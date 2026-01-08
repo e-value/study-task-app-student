@@ -1042,6 +1042,7 @@ data: ▼ {id: 1, project_id: 1, title: '...', •••}
   id: 1
   project_id: 1
   title: "サンプルタスク"
+  created_by: 1  ← 数値のID（データベースの値そのまま）
   created_by_user: ▼ {id: 1, name: '山田太郎', email: 'taro@example.com'}  ← 開いた！
     id: 1                      ← ユーザーID
     name: "山田太郎"            ← ユーザー名
@@ -1051,9 +1052,162 @@ data: ▼ {id: 1, project_id: 1, title: '...', •••}
   ...
 ```
 
-**生徒 👩‍💻**：「すごい！どんどん深く見ていけるんですね！これも **UserResource** で整形されたデータなんですか？」
+**生徒 👩‍💻**：「わぁ！タスクを作成したユーザーの詳細情報が見れますね！」
 
-**ガネーシャ 🐘**：「せや！TaskResource の中で `new UserResource($this->createdBy)` って呼んでるから、ユーザー情報もきれいに整形されとるんや。**▶︎ を見つけたらクリック、▶︎ を見つけたらクリック**。これを繰り返すのが Console マスターへの第一歩や！」
+**ガネーシャ 🐘**：「せやな！ところでな、よく見ると `created_by` と `created_by_user` の2つがあるやろ？」
+
+**生徒 👩‍💻**：「あ、本当だ！`created_by` は `1`（数値）で、`created_by_user` はオブジェクトですね。何が違うんですか？」
+
+**ガネーシャ 🐘**：「ええ質問や！これは**Laravel のリレーション**の話やな。実際のコードを見せたるで」
+
+---
+
+#### 💡 created_by と created_by_user の違い（Laravel リレーション）
+
+**ガネーシャ 🐘**：「まず、データベースには `created_by` カラムがあって、これはユーザーIDが入っとるんや」
+
+**📂 データベース構造：**
+
+```
+tasks テーブル
+┌────┬─────────┬───────────┬────────────┐
+│ id │ title   │ status    │ created_by │  ← ユーザーIDだけ
+├────┼─────────┼───────────┼────────────┤
+│ 1  │ タスクA │ todo      │ 5          │
+│ 2  │ タスクB │ doing     │ 3          │
+└────┴─────────┴───────────┴────────────┘
+
+users テーブル
+┌────┬─────────┬──────────────────┐
+│ id │ name    │ email            │
+├────┼─────────┼──────────────────┤
+│ 3  │ 佐藤花子 │ hanako@...       │
+│ 5  │ 山田太郎 │ taro@...         │
+└────┴─────────┴──────────────────┘
+```
+
+**生徒 👩‍💻**：「`created_by` には 5 とか 3 とかの ID しか入ってないんですね」
+
+**ガネーシャ 🐘**：「せや！でも、フロントでは『タスクを作成したのは山田太郎さん』って**名前とメールも表示したい**やろ？そのために**リレーション**を使うんや」
+
+---
+
+#### 📂 ステップ1：モデルのリレーション定義
+
+**ファイル：`app/Models/Task.php`**
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Task extends Model
+{
+    protected $fillable = [
+        'project_id',
+        'title',
+        'description',
+        'status',
+        'created_by',  // ← ユーザーIDだけ
+    ];
+
+    /**
+     * タスクを作成したユーザー
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+        //                       ↑           ↑
+        //                    Userモデル   外部キー（DBカラム名）
+    }
+}
+```
+
+**ガネーシャ 🐘**：「`createdBy()` メソッドを定義することで、`Task` モデルから `User` モデルの情報を引っ張ってこれるようになるんや」
+
+**生徒 👩‍💻**：「なるほど！でも、これだけだとまだ API レスポンスには含まれないですよね？」
+
+**ガネーシャ 🐘**：「せやな！次は **API Resource** で、API レスポンスに含めるんや」
+
+---
+
+#### 📂 ステップ2：API Resource での記述
+
+**ファイル：`app/Http/Resources/TaskResource.php`**
+
+```php
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class TaskResource extends JsonResource
+{
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'project_id' => $this->project_id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'status' => $this->status,
+            'created_by' => $this->created_by,  // ← ユーザーIDだけ（数値）
+            'created_by_user' => new UserResource($this->whenLoaded('createdBy')),  // ← ユーザー情報（オブジェクト）
+            'project' => new ProjectResource($this->whenLoaded('project')),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
+    }
+}
+```
+
+**重要なポイント：**
+
+```php
+'created_by' => $this->created_by,
+// ↑ データベースの created_by カラム（数値のID）をそのまま返す
+
+'created_by_user' => new UserResource($this->whenLoaded('createdBy')),
+// ↑ createdBy リレーションが読み込まれていれば、UserResource でラップして返す
+//   $this->whenLoaded('createdBy') ← リレーションが読み込まれているか確認
+//                      ↑ Task.php で定義した createdBy() メソッド名
+//   new UserResource(...) ← User情報を整形して返す
+```
+
+**ガネーシャ 🐘**：「つまりな：」
+
+```
+created_by       → 5                        （数値のID、DBの値そのまま）
+created_by_user  → {id: 5, name: "山田太郎", email: "..."}  （ユーザー情報のオブジェクト）
+```
+
+**生徒 👩‍💻**：「なるほど！`created_by` は数値だけど、`created_by_user` はユーザーの詳細情報が入ったオブジェクトなんですね！」
+
+**ガネーシャ 🐘**：「せや！だから Console で見ると、**2つの形式**で返ってきとるんや。さっきの出力をもう一度見てみ」
+
+```
+created_by: 1  ← 数値のID（シンプル、比較用）
+created_by_user: ▼ {id: 1, name: '山田太郎', email: 'taro@example.com'}  ← オブジェクト（表示用）
+```
+
+**生徒 👩‍💻**：「じゃあ、`created_by` は何に使うんですか？」
+
+**ガネーシャ 🐘**：「ええ質問や！`created_by` は、例えば『自分が作成したタスクかどうか』をチェックする時に使うんや：」
+
+```javascript
+// 例：自分が作成したタスクか確認
+if (task.created_by === currentUser.id) {
+    console.log("これは自分が作成したタスクです");
+}
+```
+
+**生徒 👩‍💻**：「なるほど！ID だけで比較したい時は `created_by`、名前を表示したい時は `created_by_user.name` を使うんですね！」
+
+**ガネーシャ 🐘**：「さすガネーシャの生徒や！完璧に理解しとるな！**▶︎ を見つけたらクリック、▶︎ を見つけたらクリック**。これを繰り返すのが Console マスターへの第一歩や！」
 
 ---
 
@@ -1611,29 +1765,32 @@ console.timeEnd("⏱️ API呼び出し時間");
 #### 🔧 console.log を追加する
 
 **やること：**
+
 1. `resources/js/Pages/Projects/Show.vue` を開く
-2. `createTask` 関数（135行目あたり）を探す
+2. `createTask` 関数（135 行目あたり）を探す
 3. 以下のコードに書き換える
 
 **元のコード（console.log なし）:**
 
 ```javascript
 const createTask = async () => {
-  try {
-    creatingTask.value = true;
-    const response = await axios.post(
-      `/api/projects/${projectId}/tasks`,
-      newTask.value
-    );
-    tasks.value.unshift(response.data.data);
-    newTask.value = { title: "", description: "" };
-    toast.success(response.data.message || "タスクを作成しました");
-  } catch (err) {
-    console.error("Failed to create task:", err);
-    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
-  } finally {
-    creatingTask.value = false;
-  }
+    try {
+        creatingTask.value = true;
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            newTask.value
+        );
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
+    } catch (err) {
+        console.error("Failed to create task:", err);
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+    }
 };
 ```
 
@@ -1645,43 +1802,45 @@ const createTask = async () => {
 
 ```javascript
 const createTask = async () => {
-  console.group("📝 タスク作成処理開始");
-  console.log("📤 送信するデータ:", newTask.value);
-  console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+    console.group("📝 タスク作成処理開始");
+    console.log("📤 送信するデータ:", newTask.value);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
 
-  try {
-    creatingTask.value = true;
+    try {
+        creatingTask.value = true;
 
-    const response = await axios.post(
-      `/api/projects/${projectId}/tasks`,
-      newTask.value
-    );
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            newTask.value
+        );
 
-    console.log("✅ 作成成功！");
-    console.log("📦 レスポンス全体:", response);
-    console.log("📊 ステータスコード:", response.status);
-    console.log("📝 レスポンスデータ:", response.data);
-    console.log("🆕 作成されたタスク:", response.data.data);
+        console.log("✅ 作成成功！");
+        console.log("📦 レスポンス全体:", response);
+        console.log("📊 ステータスコード:", response.status);
+        console.log("📝 レスポンスデータ:", response.data);
+        console.log("🆕 作成されたタスク:", response.data.data);
 
-    tasks.value.unshift(response.data.data);
-    newTask.value = { title: "", description: "" };
-    toast.success(response.data.message || "タスクを作成しました");
-  } catch (err) {
-    console.error("❌ 作成失敗！");
-    console.error("📊 HTTPステータス:", err.response?.status);
-    console.error("💬 エラーメッセージ:", err.response?.data?.message);
-    console.error("📋 エラー詳細:", err.response?.data?.errors);
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
+    } catch (err) {
+        console.error("❌ 作成失敗！");
+        console.error("📊 HTTPステータス:", err.response?.status);
+        console.error("💬 エラーメッセージ:", err.response?.data?.message);
+        console.error("📋 エラー詳細:", err.response?.data?.errors);
 
-    if (err.response?.data?.errors) {
-      console.table(err.response.data.errors);
+        if (err.response?.data?.errors) {
+            console.table(err.response.data.errors);
+        }
+
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+        console.log("🏁 タスク作成処理終了");
+        console.groupEnd();
     }
-
-    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
-  } finally {
-    creatingTask.value = false;
-    console.log("🏁 タスク作成処理終了");
-    console.groupEnd();
-  }
 };
 ```
 
@@ -1692,6 +1851,7 @@ const createTask = async () => {
 **ガネーシャ 🐘**：「せやせや！保存したら、次は実際に動かしてみよう」
 
 **手順：**
+
 1. ファイルを保存（`Cmd + S` または `Ctrl + S`）
 2. ブラウザをリロード（念のため）
 
@@ -1813,8 +1973,9 @@ const createTask = async () => {
 ```
 
 **変更点：**
-- `const testData = { title: "", description: "テスト" };` を追加
-- `axios.post` の第2引数を `newTask.value` から `testData` に変更
+
+-   `const testData = { title: "", description: "テスト" };` を追加
+-   `axios.post` の第 2 引数を `newTask.value` から `testData` に変更
 
 **ガネーシャ 🐘**：「これで`title`が空のデータを送信するようになったで。保存してタスク作成ボタンをクリックや！」
 
@@ -1859,13 +2020,13 @@ const createTask = async () => {
 
 #### 🔧 コードを再度修正
 
-**変更箇所：`testData` の `title` を256文字にする**
+**変更箇所：`testData` の `title` を 256 文字にする**
 
 ```javascript
 // ❌ testData の title 部分だけ変更
 const testData = {
-  title: "あ".repeat(256),  // ← 空 → 256文字に変更
-  description: "テスト"
+    title: "あ".repeat(256), // ← 空 → 256文字に変更
+    description: "テスト",
 };
 ```
 
@@ -1873,49 +2034,51 @@ const testData = {
 
 ```javascript
 const createTask = async () => {
-  console.group("📝 タスク作成処理開始");
-  console.log("📤 送信するデータ:", newTask.value);
-  console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
+    console.group("📝 タスク作成処理開始");
+    console.log("📤 送信するデータ:", newTask.value);
+    console.log("📍 送信先URL:", `/api/projects/${projectId}/tasks`);
 
-  try {
-    creatingTask.value = true;
+    try {
+        creatingTask.value = true;
 
-    // ❌ 今度は256文字にする
-    const testData = {
-      title: "あ".repeat(256),
-      description: "テスト"
-    };
+        // ❌ 今度は256文字にする
+        const testData = {
+            title: "あ".repeat(256),
+            description: "テスト",
+        };
 
-    const response = await axios.post(
-      `/api/projects/${projectId}/tasks`,
-      testData
-    );
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            testData
+        );
 
-    console.log("✅ 作成成功！");
-    console.log("📦 レスポンス全体:", response);
-    console.log("📊 ステータスコード:", response.status);
-    console.log("📝 レスポンスデータ:", response.data);
-    console.log("🆕 作成されたタスク:", response.data.data);
+        console.log("✅ 作成成功！");
+        console.log("📦 レスポンス全体:", response);
+        console.log("📊 ステータスコード:", response.status);
+        console.log("📝 レスポンスデータ:", response.data);
+        console.log("🆕 作成されたタスク:", response.data.data);
 
-    tasks.value.unshift(response.data.data);
-    newTask.value = { title: "", description: "" };
-    toast.success(response.data.message || "タスクを作成しました");
-  } catch (err) {
-    console.error("❌ 作成失敗！");
-    console.error("📊 HTTPステータス:", err.response?.status);
-    console.error("💬 エラーメッセージ:", err.response?.data?.message);
-    console.error("📋 エラー詳細:", err.response?.data?.errors);
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
+    } catch (err) {
+        console.error("❌ 作成失敗！");
+        console.error("📊 HTTPステータス:", err.response?.status);
+        console.error("💬 エラーメッセージ:", err.response?.data?.message);
+        console.error("📋 エラー詳細:", err.response?.data?.errors);
 
-    if (err.response?.data?.errors) {
-      console.table(err.response.data.errors);
+        if (err.response?.data?.errors) {
+            console.table(err.response.data.errors);
+        }
+
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+        console.log("🏁 タスク作成処理終了");
+        console.groupEnd();
     }
-
-    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
-  } finally {
-    creatingTask.value = false;
-    console.log("🏁 タスク作成処理終了");
-    console.groupEnd();
-  }
 };
 ```
 
