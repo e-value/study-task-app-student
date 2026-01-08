@@ -64,12 +64,14 @@ class TaskController extends ApiController
      */
     public function show(Request $request, Task $task): TaskResource|JsonResponse
     {
-        // ⚠️ lesson5-2用：意図的にtry-catchを削除
-        // タイポエラーが発生した場合、Laravelのデフォルトエラーハンドラーが
-        // 詳細なエラー情報（trace、ファイルパスなど）を返すため、
-        // セキュリティ上の問題を体験できる
-        $task = $this->taskService->getTask($task, $request->user());
-        return new TaskResource($task);
+        try {
+            $task = $this->taskService->getTask($task, $request->user());
+            return new TaskResource($task);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
