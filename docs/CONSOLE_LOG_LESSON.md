@@ -1103,21 +1103,23 @@ const createTask = async () => {
 ```javascript
 // ✅ 元に戻す（正しいコード）
 const createTask = async () => {
-  try {
-    creatingTask.value = true;
-    const response = await axios.post(
-      `/api/projects/${projectId}/tasks`,
-      newTask.value // ← 元に戻す！
-    );
-    tasks.value.unshift(response.data.data);
-    newTask.value = { title: "", description: "" };
-    toast.success(response.data.message || "タスクを作成しました");
-  } catch (err) {
-    console.error("Failed to create task:", err);
-    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
-  } finally {
-    creatingTask.value = false;
-  }
+    try {
+        creatingTask.value = true;
+        const response = await axios.post(
+            `/api/projects/${projectId}/tasks`,
+            newTask.value // ← 元に戻す！
+        );
+        tasks.value.unshift(response.data.data);
+        newTask.value = { title: "", description: "" };
+        toast.success(response.data.message || "タスクを作成しました");
+    } catch (err) {
+        console.error("Failed to create task:", err);
+        toast.error(
+            err.response?.data?.message || "タスクの作成に失敗しました"
+        );
+    } finally {
+        creatingTask.value = false;
+    }
 };
 ```
 
