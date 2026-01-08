@@ -293,20 +293,6 @@ const fetchTask = async () => {
 
 **生徒 👩‍💻**：「はい！」
 
-#### 🚀 サーバーを起動する
-
-**ガネーシャ 🐘**：「このプロジェクトは **Laravel Sail** を使っとるから、起動方法がちょっと特別やで」
-
-```bash
-# ターミナルで実行（Sail環境の起動）
-sail up -d
-
-# Vite（フロントエンド）を起動
-sail npm run dev
-```
-
-**ガネーシャ 🐘**：「Sail は Docker を使って Laravel を動かす仕組みや。`sail up -d` で Laravel サーバーが起動するで」
-
 #### 🌐 ブラウザで確認
 
 1. ブラウザで `http://localhost/tasks/1` にアクセス
@@ -322,7 +308,7 @@ sail npm run dev
 🔍 エラーオブジェクト全体: ▶︎ Error: Request failed with status code 500
 📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, ...}
 📋 ステータスコード: 500
-💬 エラーデータ: ▶︎ {message: '...', exception: '...', ...}
+💬 エラーデータ: ▶︎ {message: '...'}
 🏁 fetchTask 終了！
 ```
 
@@ -391,7 +377,7 @@ const user = {
 ```
 📊 エラーレスポンス: ▼ {data: {•••}, status: 500, statusText: 'Internal Server Error', ...}
   config: ▶︎ {transitional: {•••}, adapter: [...], ...}
-  data: ▶︎ {message: '...', exception: '...', ...}    ← これもクリックできる！
+  data: ▶︎ {message: '...'}    ← これもクリックできる！
   headers: ▶︎ AxiosHeaders {•••}
   request: ▶︎ XMLHttpRequest {•••}
   status: 500                   ← エラーステータスコード
@@ -407,9 +393,7 @@ const user = {
   ├─ 📝 status: 500（エラーステータス）
   ├─ 📝 statusText: "Internal Server Error"（エラーメッセージ）
   ├─ 📦 data:（また箱！）← Laravel が返したエラー情報
-  │    ├─ 📝 message: "..."（エラーメッセージ）
-  │    ├─ 📝 exception: "..."（例外クラス名）
-  │    └─ 📝 file, line, trace など（エラー詳細）
+  │    └─ 📝 message: "..."（エラーメッセージ）
   ├─ 📦 headers:（ヘッダー情報）
   └─ 📦 config:（設定情報）
 ```
@@ -435,17 +419,13 @@ const user = {
 
 **ステップ 1：`data` を開く（Laravel のエラー詳細）**
 
-**`data: ▶︎ {message: '...', exception: '...', ...}` をクリックすると：**
+**`data: ▶︎ {message: '...'}` をクリックすると：**
 
 ```
 📊 エラーレスポンス: ▼ {data: {•••}, status: 500, ...}
   config: ▶︎ {...}
-  data: ▼ {message: '...', exception: '...', file: '...', ...}  ← 今ここを開いた！
+  data: ▼ {message: '...'}  ← 今ここを開いた！
     message: "Call to undefined relationship [creatdBy] on model [App\\Models\\Task]."
-    exception: "BadMethodCallException"
-    file: "/var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/..."
-    line: 1234
-    trace: ▶︎ [...]
   headers: ▶︎ {...}
   request: ▶︎ XMLHttpRequest {...}
   status: 500
@@ -469,10 +449,10 @@ const user = {
 public function getTask(Task $task, User $user): Task
 {
     $this->checkTaskPermission($task, $user);
-    
+
     // ここにタイポがある！
     $task->load(['creatdBy', 'project']); // ← createdBy のはず
-    
+
     return $task;
 }
 ```
@@ -540,7 +520,7 @@ $task->load(['createdBy', 'project']);
 
 ### 📝 手順 5：成功レスポンスを詳しく見てみよう
 
-**ガネーシャ 🐘**：「今見た成功レスポンスもな、さっきのエラーと同じように▶︎をクリックして中身を見ていこう」
+**ガネーシャ 🐘**：「今見た成功レスポンスもな、さっきのエラーと同じように ▶︎ をクリックして中身を見ていこう」
 
 #### 🎯 成功レスポンスを展開する
 
