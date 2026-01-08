@@ -18,6 +18,7 @@ export const useAuthStore = defineStore('auth', {
                 this.user = response.data;
                 this.checked = true;
             } catch (error) {
+                // 認証チェックの失敗は正常な動作（未ログイン状態）
                 this.user = null;
                 this.checked = true;
             }
@@ -27,7 +28,7 @@ export const useAuthStore = defineStore('auth', {
             // CSRFクッキーを取得
             await axios.get('/sanctum/csrf-cookie');
             
-            // ログイン
+            // ログイン（エラーは呼び出し側でhandleErrorを使う）
             await axios.post('/login', credentials);
             
             // ユーザー情報を取得
@@ -38,7 +39,7 @@ export const useAuthStore = defineStore('auth', {
             // CSRFクッキーを取得
             await axios.get('/sanctum/csrf-cookie');
             
-            // 登録
+            // 登録（エラーは呼び出し側でhandleErrorを使う）
             await axios.post('/register', data);
             
             // ユーザー情報を取得
@@ -46,17 +47,20 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async logout() {
+            // ログアウト（エラーは呼び出し側でhandleErrorを使う）
             await axios.post('/logout');
             this.user = null;
         },
 
         async forgotPassword(email) {
             await axios.get('/sanctum/csrf-cookie');
+            // エラーは呼び出し側でhandleErrorを使う
             return await axios.post('/forgot-password', { email });
         },
 
         async resetPassword(data) {
             await axios.get('/sanctum/csrf-cookie');
+            // エラーは呼び出し側でhandleErrorを使う
             return await axios.post('/reset-password', data);
         },
     },

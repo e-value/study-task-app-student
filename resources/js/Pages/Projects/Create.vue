@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useApiError } from "@/composables/useApiError";
 
 const router = useRouter();
 const toast = useToast();
@@ -14,14 +15,14 @@ const form = ref({
 });
 
 const creating = ref(false);
-const error = ref(null);
-const validationErrors = ref({});
+
+// エラーハンドリング用のComposable
+const { error, validationErrors, handleError, clearError } = useApiError();
 
 const createProject = async () => {
   try {
     creating.value = true;
-    error.value = null;
-    validationErrors.value = {};
+    clearError();
 
     const response = await axios.post("/api/projects", form.value);
 
@@ -35,14 +36,7 @@ const createProject = async () => {
       });
     }, 500);
   } catch (err) {
-    console.error("Failed to create project:", err);
-
-    if (err.response?.data?.errors) {
-      validationErrors.value = err.response.data.errors;
-    }
-
-    error.value =
-      err.response?.data?.message || "プロジェクトの作成に失敗しました";
+    handleError(err, "プロジェクトの作成に失敗しました");
     toast.error(error.value);
   } finally {
     creating.value = false;

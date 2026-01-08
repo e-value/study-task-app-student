@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useApiError } from "@/composables/useApiError";
 
 const toast = useToast();
 
@@ -15,10 +16,12 @@ const project = ref(null);
 const tasks = ref([]);
 const members = ref([]);
 const loading = ref(true);
-const error = ref(null);
-const memberError = ref(null);
 const activeTab = ref("tasks");
 const creatingTask = ref(false);
+
+// エラーハンドリング用のComposable
+const { error, handleError, clearError } = useApiError();
+const memberError = ref(null);
 
 // メンバー追加用の状態
 const addingMember = ref(false);
@@ -109,15 +112,13 @@ const formatDate = (dateString) => {
 const fetchProject = async () => {
   try {
     loading.value = true;
-    error.value = null;
+    clearError();
     const response = await axios.get(`/api/projects/${projectId}`);
     project.value = response.data.data;
     tasks.value = response.data.data.tasks || [];
     members.value = response.data.data.users || [];
   } catch (err) {
-    console.error("Failed to fetch project:", err);
-    error.value =
-      err.response?.data?.message || "プロジェクトの読み込みに失敗しました";
+    handleError(err, "プロジェクトの読み込みに失敗しました");
   } finally {
     loading.value = false;
   }
@@ -128,7 +129,7 @@ const fetchUsers = async () => {
     const response = await axios.get("/api/users/dropdown");
     allUsers.value = response.data.data || [];
   } catch (err) {
-    console.error("Failed to fetch users:", err);
+    handleError(err, "ユーザー一覧の読み込みに失敗しました");
   }
 };
 
@@ -143,8 +144,8 @@ const createTask = async () => {
     newTask.value = { title: "", description: "" };
     toast.success(response.data.message || "タスクを作成しました");
   } catch (err) {
-    console.error("Failed to create task:", err);
-    toast.error(err.response?.data?.message || "タスクの作成に失敗しました");
+    handleError(err, "タスクの作成に失敗しました");
+    toast.error(error.value);
   } finally {
     creatingTask.value = false;
   }
@@ -159,8 +160,8 @@ const startTask = async (taskId) => {
     }
     toast.success("タスクを開始しました");
   } catch (err) {
-    console.error("Failed to start task:", err);
-    toast.error(err.response?.data?.message || "タスクの開始に失敗しました");
+    handleError(err, "タスクの開始に失敗しました");
+    toast.error(error.value);
   }
 };
 
@@ -173,8 +174,8 @@ const completeTask = async (taskId) => {
     }
     toast.success("タスクを完了しました");
   } catch (err) {
-    console.error("Failed to complete task:", err);
-    toast.error(err.response?.data?.message || "タスクの完了に失敗しました");
+    handleError(err, "タスクの完了に失敗しました");
+    toast.error(error.value);
   }
 };
 
@@ -185,14 +186,15 @@ const deleteMember = async (userId) => {
 
   try {
     memberError.value = null;
-    const response = await axios.delete(`/api/projects/${projectId}/members/${userId}`);
+    const response = await axios.delete(
+      `/api/projects/${projectId}/members/${userId}`
+    );
     members.value = members.value.filter((m) => (m.id || m.user_id) !== userId);
     toast.success(response.data.message || "メンバーを削除しました");
   } catch (err) {
-    console.error("Failed to delete member:", err);
-    memberError.value =
-      err.response?.data?.message || "メンバーの削除に失敗しました";
-    toast.error(memberError.value);
+    handleError(err, "メンバーの削除に失敗しました");
+    memberError.value = error.value;
+    toast.error(error.value);
   }
 };
 
@@ -228,10 +230,9 @@ const addMember = async () => {
     showAddMemberForm.value = false;
     toast.success(response.data.message || "メンバーを追加しました");
   } catch (err) {
-    console.error("Failed to add member:", err);
-    memberError.value =
-      err.response?.data?.message || "メンバーの追加に失敗しました";
-    toast.error(memberError.value);
+    handleError(err, "メンバーの追加に失敗しました");
+    memberError.value = error.value;
+    toast.error(error.value);
   } finally {
     addingMember.value = false;
   }

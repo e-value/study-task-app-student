@@ -79,6 +79,7 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import { useApiError } from "@/composables/useApiError";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -91,12 +92,15 @@ const form = ref({
 });
 
 const processing = ref(false);
-const errors = ref("");
 const status = ref("");
+
+// エラーハンドリング用のComposable
+const { error, validationErrors, handleError, clearError } = useApiError();
+const errors = ref("");
 
 const submit = async () => {
   processing.value = true;
-  errors.value = "";
+  clearError();
   form.value.errors = {};
 
   try {
@@ -107,14 +111,10 @@ const submit = async () => {
     });
 
     router.push({ name: "projects" });
-  } catch (error) {
-    if (error.response?.data?.errors) {
-      form.value.errors = error.response.data.errors;
-    } else if (error.response?.data?.message) {
-      errors.value = error.response.data.message;
-    } else {
-      errors.value = "ログイン中にエラーが発生しました";
-    }
+  } catch (err) {
+    handleError(err, "ログイン中にエラーが発生しました");
+    errors.value = error.value;
+    form.value.errors = validationErrors.value;
   } finally {
     processing.value = false;
     form.value.password = "";

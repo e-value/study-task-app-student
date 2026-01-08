@@ -45,6 +45,7 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useApiError } from '@/composables/useApiError';
 
 const authStore = useAuthStore();
 
@@ -54,12 +55,15 @@ const form = ref({
 });
 
 const processing = ref(false);
-const errors = ref('');
 const status = ref('');
+
+// エラーハンドリング用のComposable
+const { error, validationErrors, handleError, clearError } = useApiError();
+const errors = ref('');
 
 const submit = async () => {
     processing.value = true;
-    errors.value = '';
+    clearError();
     status.value = '';
     form.value.errors = {};
 
@@ -67,14 +71,10 @@ const submit = async () => {
         await authStore.forgotPassword(form.value.email);
         status.value = 'パスワードリセットリンクをメールで送信しました！';
         form.value.email = '';
-    } catch (error) {
-        if (error.response?.data?.errors) {
-            form.value.errors = error.response.data.errors;
-        } else if (error.response?.data?.message) {
-            errors.value = error.response.data.message;
-        } else {
-            errors.value = 'エラーが発生しました。もう一度お試しください。';
-        }
+    } catch (err) {
+        handleError(err, 'エラーが発生しました。もう一度お試しください。');
+        errors.value = error.value;
+        form.value.errors = validationErrors.value;
     } finally {
         processing.value = false;
     }
