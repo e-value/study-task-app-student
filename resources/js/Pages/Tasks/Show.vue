@@ -33,8 +33,7 @@ const fetchTask = async () => {
     const response = await axios.get(`/api/tasks/${taskId}`);
     task.value = response.data.data || response.data;
   } catch (err) {
-    handleError(err, "タスクの読み込みに失敗しました");
-    toast.error(error.value);
+    toast.error("タスクの読み込みに失敗しました");
   } finally {
     loading.value = false;
   }
