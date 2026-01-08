@@ -18,10 +18,17 @@ class TaskController extends ApiController
     public function index(Request $request, Project $project): AnonymousResourceCollection|JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
-
+        $isMember = $project->users()
+        ->where('users.id', $request->user()->id)
+        ->exists();
 
         // メンバーでなければエラーを返す
         // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if(!$isMember) {
+            return response()->json([
+                'message'=>'このプロジェクトにアクセスする権限がありません'
+            ], 403);
+        }
 
         $tasks = $project->tasks()
             ->with('createdBy')
@@ -37,14 +44,26 @@ class TaskController extends ApiController
     public function store(Request $request, Project $project): TaskResource|JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
-
+        $isMember = $project->users()
+        ->where('users.id', $request->user()->id)
+        ->exists();
 
         // メンバーでなければエラーを返す
         // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
-
+        if(!$isMember) {
+            return response()->json([
+                'message'=>'このプロジェクトにアクセスする権限がありません'
+            ], 403);
+        }
 
         // バリデーションを記載
-
+        $validated = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:todo,doing,done',
+            'user_id' => 'nullable|exists:users,id',
+        ]);
 
         $task = Task::create([
             'project_id' => $project->id,
@@ -69,9 +88,18 @@ class TaskController extends ApiController
     public function show(Request $request, Task $task): TaskResource|JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
+        $project = $task->project;
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
 
         // メンバーでなければエラーを返す
         // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if(!$isMember) {
+            return response()->json([
+                'message'=>'このプロジェクトにアクセスする権限がありません'
+            ], 403);
+        }
 
         // タスクを読み込み（N+1問題を防ぐため）
         $task->load(['createdBy', 'project']);
@@ -85,18 +113,36 @@ class TaskController extends ApiController
     public function update(Request $request, Task $task): TaskResource|JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
-
+        $project = $task->project;
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
 
         // メンバーでなければエラーを返す
         // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if(!$isMember) {
+            return response()->json([
+                'message'=>'このプロジェクトにアクセスする権限がありません'
+            ], 403);
+        }
 
         // statusが“doneは更新不可（409）”を追加
-        // エラーコード: 409, エラーメッジ: doneは更新不可です
+        // エラーコード: 409, エラーメッセージ: doneは更新不可です
+        if($task->status === 'done'){
+            return response()->json([
+                'message'=>'doneは更新不可です',
+            ], 409);
+            
+        }
 
         // バリデーションを記載
+        $validated = $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|nullable|string',
+            'status' => 'sometimes|in:todo,doing',
+        ]);
 
-
-        $task->update($request->only(['title', 'description', 'status']));
+        $task->update($validated);
 
         // タスクを読み込み（N+1問題を防ぐため）
         $task->load(['createdBy', 'project']);
@@ -111,11 +157,18 @@ class TaskController extends ApiController
     public function destroy(Request $request, Task $task): JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
-
+        $project = $task->project;
+        $isMember = $project->users()
+        ->where('users.id', $request->user()->id)
+        ->exists();
 
         // メンバーでなければエラーを返す
         // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
-
+        if(!$isMember) {
+            return response()->json([
+                'message'=>'このプロジェクトにアクセスする権限がありません'
+            ], 403);
+        }
 
         $task->delete();
 
@@ -130,12 +183,27 @@ class TaskController extends ApiController
     public function start(Request $request, Task $task): TaskResource|JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
+        $project = $task->project;
+        $isMember = $project->users()
+        ->where('users.id', $request->user()->id)
+        ->exists();
 
         // メンバーでなければエラーを返す
         // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if(!$isMember) {
+            return response()->json([
+                'message'=>'このプロジェクトにアクセスする権限がありません'
+            ], 403);
+        }
 
         // ステータスがtodoでなければエラーを返す
         // エラーコード: 409, エラーメッセージ: 未着手のタスクのみ開始できます
+        if($task->status !== 'todo'){
+            return response()->json([
+                'message'=>'未着手のタスクのみ開始できます',
+            ], 409);
+            
+        }
 
         // タスクを開始
         $task->update(['status' => 'doing']);
@@ -153,12 +221,27 @@ class TaskController extends ApiController
     public function complete(Request $request, Task $task): TaskResource|JsonResponse
     {
         // 自分がプロジェクトのメンバーかチェック
+        $project = $task->project;
+        $isMember = $project->users()
+        ->where('users.id', $request->user()->id)
+        ->exists();
 
         // メンバーでなければエラーを返す
         // エラーコード: 403, エラーメッセージ: このプロジェクトにアクセスする権限がありません
+        if(!$isMember) {
+            return response()->json([
+                'message'=>'このプロジェクトにアクセスする権限がありません'
+            ], 403);
+        }
 
         // ステータスがdoingでなければエラーを返す
         // エラーコード: 409, エラーメッセージ: 作業中のタスクのみ完了できます
+        if($task->status !== 'doing'){
+            return response()->json([
+                'message'=>'作業中のタスクのみ完了できます',
+            ], 409);
+            
+        }
 
         // タスクを完了
         $task->update(['status' => 'done']);
