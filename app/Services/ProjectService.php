@@ -34,10 +34,35 @@ class ProjectService
     }
 
     // 他のメソッドもここに記載
-    public function updateProject() {}
+    public function updateProject(Project $project, array $data): Project {
+        $project->fill($data);
+        $project->save();
+
+        $project->load(['users', 'tasks.createdBy']);
+
+        return $project;
+    }
 
     // 他のメソッドもここに記載
+    public function canUpdate(Project $project, User $user): bool
+    {
+        $myUser = $this->getMyUser($project, $user);
 
+        return $myUser and in_array($myUser->pivot->role, ['project_owner', 'project_admin']);
+    }
+
+    public function canDestroy(Project $project, User $user): bool
+    {
+        $myUser = $this->getMyUser($project, $user);
+
+        return $myUser and $myUser->pivot->role === 'project_owner';
+    }
 
     // privateメソッドも定義
+    private function getMyUser(Project $project, User $user): ProjectMembership
+    {
+        $myUser = $project->users()
+        ->where('users.id', $user->id)
+        ->first();
+    }
 }

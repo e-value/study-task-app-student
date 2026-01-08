@@ -11,8 +11,19 @@ class ProjectRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // ログインユーザーであればプロジェクトを作成できる
-        return $this->user() !== null;
+        // show, update, destroyの場合
+        if ($this->project){
+            // 自分が所属しているかチェック
+            $isMember = $this->project->users()
+                ->where('users.id', $this->user()->id)
+                ->exists();
+            return $isMember;
+        }
+        // index, storeの場合
+        else{
+            // ログインユーザーであればプロジェクトを作成できる
+            return $this->user() !== null;
+        };
     }
 
     /**
@@ -23,8 +34,8 @@ class ProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'is_archived' => 'boolean',
+            'name' => 'sometimes|required|string|max:255',
+            'is_archived' => 'sometimes|boolean',
         ];
     }
 }
