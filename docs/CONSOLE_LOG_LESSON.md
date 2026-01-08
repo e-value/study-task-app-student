@@ -54,7 +54,7 @@ git pull origin lesson5-1
 const fetchTask = async () => {
     try {
         loading.value = true;
-        const response = await axios.get(`/api/tasks/${taskid}`);
+        const response = await axios.get(`/api/tasks/${taskId}`);
         task.value = response.data.data || response.data;
     } catch (err) {
         toast.error("タスクの読み込みに失敗しました");
@@ -229,7 +229,7 @@ console.log("名前:", name, "年齢:", age); // → 名前: 太郎 年齢: 25
 const fetchTask = async () => {
     try {
         loading.value = true;
-        const response = await axios.get(`/api/tasks/${taskid}`);
+        const response = await axios.get(`/api/tasks/${taskId}`);
         task.value = response.data.data || response.data;
     } catch (err) {
         toast.error("タスクの読み込みに失敗しました");
@@ -251,9 +251,9 @@ const fetchTask = async () => {
     try {
         loading.value = true;
 
-        console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskid}`);
+        console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskId}`);
 
-        const response = await axios.get(`/api/tasks/${taskid}`);
+        const response = await axios.get(`/api/tasks/${taskId}`);
 
         console.log("✅ APIレスポンス成功！", response);
         console.log("📦 response.data の中身：", response.data);
@@ -674,41 +674,85 @@ public function toArray(Request $request): array
 ```
 🚀 fetchTask が呼ばれたで！
 📍 タスクID: 1
-📡 APIリクエストを送信するで： /api/tasks/undefined
-Uncaught ReferenceError: taskid is not defined
-    at fetchTask (Show.vue:37)
-    at onMounted (Show.vue:150)
+📡 APIリクエストを送信するで： /api/tasks/1
+❌ エラーが発生したで！
+🔍 エラーオブジェクト全体: ▶︎ Error: Request failed with status code 500
+📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, ...}
+📋 ステータスコード: 500
+💬 エラーデータ: ▶︎ {message: '...', exception: '...', ...}
+🏁 fetchTask 終了！
 ```
 
-**生徒 👩‍💻**：「あれ？エラーが出ました！`taskid is not defined`って...」
+**生徒 👩‍💻**：「あれ？エラーが出ました！でも、リクエストは送信されてますね...`/api/tasks/1`って」
 
-**ガネーシャ 🐘**：「おお！よう見てみ。ログにも手がかりがあるで」
+**ガネーシャ 🐘**：「おお！よう気づいたな。フロントエンド（JavaScript）側は問題ないってことやな」
 
-**生徒 👩‍💻**：「あ！`📡 APIリクエストを送信するで： /api/tasks/undefined`って...`undefined`になってます！」
+**生徒 👩‍💻**：「でも、`status code 500`って...これは何ですか？」
 
-**ガネーシャ 🐘**：「せや！これが**変数未定義エラー（ReferenceError）**の証拠や。`taskid`って変数は存在せえへんから、`undefined`になっとるんや」
+**ガネーシャ 🐘**：「ええ質問や！500番台のエラーはな、**サーバー側（Laravel）でエラーが起きた**ってことや。つまり、バックエンドに問題があるんや」
 
-**生徒 👩‍💻**：「あ！コードを見直したら...`taskid`って書いてます！これ、`taskId`（大文字の I）のはずなのに、`taskid`（小文字の i）って**タイポしてた**んですね！」
+**生徒 👩‍💻**：「なるほど...じゃあ、エラーの詳細を見てみます！`📊 エラーレスポンス`をクリックしてみます」
 
-**ガネーシャ 🐘**：「**正解や！**console.log のおかげでタイポに気づけたな。これがな、**console.log の真の力**や！」
+**ガネーシャ 🐘**：「ええ調子や！▶︎ をクリックして展開してみ」
 
-**生徒 👩‍💻**：「console.log がなかったら、ずっと原因が分からなかったです...」
+#### 🔍 エラーレスポンスを展開してみる
 
-**ガネーシャ 🐘**：「せやろ？エラーメッセージだけ見ても『どこでタイポしてるか』は分からへん。でも console.log で処理の流れを追うと、**どこで何が起きてるか**が一目瞭然や！」
+**`📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, ...}` をクリックすると：**
+
+```
+📊 エラーレスポンス: ▼ {data: {•••}, status: 500, statusText: 'Internal Server Error', ...}
+  status: 500
+  statusText: "Internal Server Error"
+  data: ▼ {message: '...', exception: '...', ...}
+    message: "Call to undefined relationship [creatdBy] on model [App\\Models\\Task]."
+    exception: "BadMethodCallException"
+    file: "/var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/..."
+    line: 1234
+    trace: ▶︎ [...]
+```
+
+**生徒 👩‍💻**：「あ！エラーメッセージが見えました！`Call to undefined relationship [creatdBy]`って...」
+
+**ガネーシャ 🐘**：「おお！読めるか？`creatdBy`っていうリレーションが定義されてへんって言うとるな」
+
+**生徒 👩‍💻**：「あれ？`creatdBy`...これって`createdBy`の間違いじゃないですか？**dとeが逆**になってます！」
+
+**ガネーシャ 🐘**：「**正解や！**Laravel 側でタイポしとったんやな。どこで使われとるか確認してみよう」
+
+**生徒 👩‍💻**：「`app/Services/TaskService.php`の`getTask`メソッドを見てみます...あ！ありました！」
+
+```php
+// app/Services/TaskService.php
+public function getTask(Task $task, User $user): Task
+{
+    $this->checkTaskPermission($task, $user);
+    
+    // ここにタイポがある！
+    $task->load(['creatdBy', 'project']); // ← createdBy のはず
+    
+    return $task;
+}
+```
+
+**生徒 👩‍💻**：「`creatdBy`って書いてます！これを`createdBy`に直せばいいんですね！」
+
+**ガネーシャ 🐘**：「**その通り！**console.log のおかげで、エラーの詳細が分かって、Laravel 側のタイポまで発見できたな！」
 
 #### 📝 タイポを修正しよう
 
-**ガネーシャ 🐘**：「原因が分かったから、タイポを修正しよう」
+**ガネーシャ 🐘**：「ほな、Laravel 側のタイポを修正しよう」
 
-```javascript
+開くファイル：`app/Services/TaskService.php`
+
+```php
 // 修正前
-const response = await axios.get(`/api/tasks/${taskid}`);
+$task->load(['creatdBy', 'project']);
 
 // 修正後
-const response = await axios.get(`/api/tasks/${taskId}`);
+$task->load(['createdBy', 'project']);
 ```
 
-**ガネーシャ 🐘**：「`taskid` を `taskId` に修正して、保存してリロードしてみ」
+**ガネーシャ 🐘**：「保存してリロードしてみ」
 
 **生徒 👩‍💻**：「やりました！」
 
@@ -724,11 +768,11 @@ const response = await axios.get(`/api/tasks/${taskId}`);
 🏁 fetchTask 終了！
 ```
 
-**生徒 👩‍💻**：「わぁ！今度は成功しました！`/api/tasks/1`ってちゃんと ID が入ってます！」
+**生徒 👩‍💻**：「わぁ！今度は成功しました！ステータスコードも 200 になってます！」
 
-**ガネーシャ 🐘**：「せやろ？**console.log があれば、タイポも一発で見つかる**んや。これがデバッグの基本や！」
+**ガネーシャ 🐘**：「せやろ？**console.log があれば、エラーレスポンスの中身を見て、バックエンドのタイポも発見できる**んや。これがデバッグの基本や！」
 
-**生徒 👩‍💻**：「console.log、めっちゃ便利ですね！もうこれなしでは開発できません！」
+**生徒 👩‍💻**：「console.log、めっちゃ便利ですね！エラーの詳細まで全部見えるから、原因がすぐ分かります！」
 
 **ガネーシャ 🐘**：「せやせや！ワシの教え子のスティーブ・ジョブズくんも『シンプルであることは、複雑であることよりも難しい』って言うとったけど、console.log っていうシンプルなツールが、複雑なバグも倒せるんやで」
 
