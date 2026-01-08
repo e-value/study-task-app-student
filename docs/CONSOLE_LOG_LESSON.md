@@ -342,9 +342,6 @@ const fetchTask = async () => {
     try {
         loading.value = true;
         const response = await axios.get(`/api/tasks/${taskId}`);
-
-        console.log("✅ レスポンス:", response);
-
         task.value = response.data.data || response.data;
     } catch (err) {
         console.error("❌ エラー:", err);
@@ -373,26 +370,17 @@ const fetchTask = async () => {
 
 **ガネーシャ 🐘**：「せやろ！これが**ピンポイントでログを出す**コツや。さらにな、`status`と`data`も直接出してみよう」
 
-#### 📝 Step 3：さらに詳細を追加
+#### 📝 Step 3：さらに詳細を追加（エラーの時のみ）
 
-**ガネーシャ 🐘**：「最終形はこんな感じや！**毎回 ▶︎ をクリックするのが面倒やから、最初から全部出しとくんや**」
+**ガネーシャ 🐘**：「エラーの時の最終形はこんな感じや！**毎回 ▶︎ をクリックするのが面倒やから、最初から全部出しとくんや**」
 
 ```javascript
 const fetchTask = async () => {
     console.log("🚀 fetchTask が呼ばれたで！");
-    console.log("📍 タスクID:", taskId);
 
     try {
         loading.value = true;
-
-        console.log("📡 APIリクエストを送信するで：", `/api/tasks/${taskId}`);
-
         const response = await axios.get(`/api/tasks/${taskId}`);
-
-        console.log("✅ APIレスポンス成功！", response);
-        console.log("📦 response.data の中身：", response.data);
-        console.log("📝 取得したタスク：", response.data.data);
-
         task.value = response.data.data || response.data;
     } catch (err) {
         console.error("❌ エラーが発生したで！");
@@ -404,20 +392,32 @@ const fetchTask = async () => {
         toast.error("タスクの読み込みに失敗しました");
     } finally {
         loading.value = false;
-        console.log("🏁 fetchTask 終了！");
     }
 };
 ```
 
-**生徒 👩‍💻**：「なるほど！最初から全部書いておけば、毎回クリックしなくていいんですね！」
+**生徒 👩‍💻**：「保存してブラウザで確認してみます！」
 
-**ガネーシャ 🐘**：「せやせや！**デバッグの基本は『必要な情報を一度に出す』**ことや。これで開発効率がグッと上がるで！」
+**Console に表示される内容：**
+
+```
+🚀 fetchTask が呼ばれたで！
+❌ エラーが発生したで！
+🔍 エラーオブジェクト全体: ▶︎ AxiosError {message: 'Request failed with status code 500', ...}
+📊 エラーレスポンス: ▶︎ {data: {•••}, status: 500, statusText: 'Internal Server Error', ...}
+📋 ステータスコード: 500
+💬 エラーデータ: ▶︎ {message: '...', exception: '...', file: '...', line: 123, trace: [...]}
+```
+
+**生徒 👩‍💻**：「わぁ！今度はエラーの情報が全部一度に見えます！毎回クリックしなくていいから楽ですね！」
+
+**ガネーシャ 🐘**：「せやろ！**エラーの詳細を最初から全部出す**ことで、デバッグが超楽になるんや」
 
 **生徒 👩‍💻**：「絵文字も付けてるんですね！」
 
 **ガネーシャ 🐘**：「せや！絵文字を付けるとな、コンソールがめっちゃ見やすくなるんや。ログが大量にある時でも、絵文字でパッと目的のログが見つかるんやで」
 
-**生徒 👩‍💻**：「分かりました！保存してブラウザで確認してみます！」
+**生徒 👩‍💻**：「分かりました！じゃあ、エラーの詳細を見てみます」
 
 ---
 
@@ -729,7 +729,7 @@ $task->load(['createdBy', 'project']);
 
 **ガネーシャ 🐘**：「そらそうや！今のコードは**エラーの時だけログを出す**ようになっとるからな。成功の時のログも追加せなアカンで」
 
-**生徒 👩‍💻**：「なるほど！成功の時もconsole.logを追加する必要があるんですね！」
+**生徒 👩‍💻**：「なるほど！成功の時も console.log を追加する必要があるんですね！」
 
 ---
 
@@ -914,7 +914,7 @@ const fetchTask = async () => {
 🏁 fetchTask 終了！
 ```
 
-**生徒 👩‍💻**：「わぁ！今度は成功時の情報が全部見えます！タスクIDからレスポンスまで、全部の流れが分かりますね！」
+**生徒 👩‍💻**：「わぁ！今度は成功時の情報が全部見えます！タスク ID からレスポンスまで、全部の流れが分かりますね！」
 
 **ガネーシャ 🐘**：「せやろ！**エラーも成功も、段階的にログを追加**していくことで、**何が起きてるか**が一目瞭然になるんや」
 
