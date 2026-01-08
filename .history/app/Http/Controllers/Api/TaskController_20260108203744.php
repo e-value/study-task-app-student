@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\TaskResource;
 use App\Http\Requests\TaskStoreRequest;    
-use App\Http\Requests\TaskUpdateRequest;
-use App\Services\TaskService;
+use App\Http\Requests\TaskUpdateRequest; 
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Validator;
 
 class TaskController extends ApiController
 {   
@@ -98,14 +98,7 @@ class TaskController extends ApiController
      */
     public function complete(Request $request, Task $task): TaskResource|JsonResponse
     {
-        $result = $this->taskService->complete($task, $request->user()->id);
-    
-        if (!$result['success']) {
-            return response()->json([
-                'message' => $result['message'],
-            ], 409);
-        }
-    
-        return new TaskResource($result['data']);
+        $task = $this->taskService->complete($task, $request->user()->id);
+        return new TaskResource($task);
     }
 }

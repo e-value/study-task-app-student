@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\TaskResource;
 use App\Http\Requests\TaskStoreRequest;    
-use App\Http\Requests\TaskUpdateRequest;
-use App\Services\TaskService;
+use App\Http\Requests\TaskUpdateRequest; 
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Validator;
 
 class TaskController extends ApiController
 {   
@@ -82,15 +82,8 @@ class TaskController extends ApiController
      */
     public function start(Request $request, Task $task): TaskResource|JsonResponse
     {   
-        $result = $this->taskService->start($task, $request->user()->id);
-    
-        if (!$result['success']) {
-            return response()->json([
-                'message' => $result['message'],
-            ], 409);
-        }
-        
-        return new TaskResource($result['data']);
+        $task = $this->taskService->start($task, $request->user()->id);
+        return new TaskResource($task);
     }
 
     /**
@@ -98,14 +91,28 @@ class TaskController extends ApiController
      */
     public function complete(Request $request, Task $task): TaskResource|JsonResponse
     {
-        $result = $this->taskService->complete($task, $request->user()->id);
-    
-        if (!$result['success']) {
+        // 自分が所属しているかチェック
+        $project = $task->project;
+        $isMember = $project->users()
+            ->where('users.id', $request->user()->id)
+            ->exists();
+
+        if (!$isMember) {
             return response()->json([
-                'message' => $result['message'],
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
+        }
+
+        // 状態チェック
+        if ($task->status !== 'doing') {
+            return response()->json([
+                'message' => '作業中のタスクのみ完了できます',
             ], 409);
         }
-    
-        return new TaskResource($result['data']);
+
+        $task->update(['status' => 'done']);
+        $task->load('createdBy');
+
+        return new TaskResource($task);
     }
 }

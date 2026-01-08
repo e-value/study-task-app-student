@@ -56,18 +56,18 @@ class ProjectMemberController extends ApiController
      */
     public function destroy(Request $request, Project $project, $userId): JsonResponse
     {
-        $result = $this->projectMemberService->destroy($project, $userId, $request->user()->id);
+        try {
+            $this->projectMemberService->destroy($project, $userId, $request->user()->id);
 
-        if (!$result['success']) {
-            $statusCode = $result['message'] === 'User is not a member of this project.' ? 404 : 409;
+            return response()->json([
+                'message' => 'メンバーを削除しました',
+            ]);
+        } catch (\Exception $e) {
+            $statusCode = $e->getMessage() === 'User is not a member of this project.' ? 404 : 409;
             
             return response()->json([
-                'message' => $result['message'],
+                'message' => $e->getMessage(),
             ], $statusCode);
         }
-
-        return response()->json([
-            'message' => 'メンバーを削除しました',
-        ]);
     }
 }

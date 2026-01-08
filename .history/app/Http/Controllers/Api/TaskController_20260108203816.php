@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\TaskResource;
 use App\Http\Requests\TaskStoreRequest;    
-use App\Http\Requests\TaskUpdateRequest;
-use App\Services\TaskService;
+use App\Http\Requests\TaskUpdateRequest; 
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Validator;
 
 class TaskController extends ApiController
 {   
@@ -107,5 +107,5 @@ class TaskController extends ApiController
         }
     
         return new TaskResource($result['data']);
-    }
+        }
 }

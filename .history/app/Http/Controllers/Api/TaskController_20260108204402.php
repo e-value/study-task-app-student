@@ -107,5 +107,5 @@ class TaskController extends ApiController
         }
     
         return new TaskResource($result['data']);
-    }
+        }
 }
