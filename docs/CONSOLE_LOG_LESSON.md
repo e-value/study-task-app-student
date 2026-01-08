@@ -149,21 +149,20 @@ const fetchTask = async () => {
         const response = await axios.get(`/api/tasks/${taskId}`);
         task.value = response.data.data || response.data;
     } catch (err) {
-        // 後で詳しく学ぶ handleError
-        handleError(err, "タスクの読み込みに失敗しました");
+        alert("タスクの読み込みに失敗しました");
     } finally {
         loading.value = false;
     }
 };
 ```
 
-**ガネーシャ 🐘**：「このコードにな、console.log を仕込むんや！でもな、まずは**handleError を使わずに**、生のエラーを確認する方法を教えたるわ」
+**ガネーシャ 🐘**：「このコードにな、console.log を仕込むんや！今から生のエラーを確認する方法を教えたるわ」
 
-**生徒 👩‍💻**：「handleError って何ですか？」
+**生徒 👩‍💻**：「どうやってやるんですか？」
 
-**ガネーシャ 🐘**：「それはな、このプロジェクトで用意されとる便利な関数や。でも最初は**生の console.log でエラーを見る練習**が大事なんや。料理でいうたら、インスタント使う前に基本の出汁の取り方を学ぶようなもんやな」
+**ガネーシャ 🐘**：「まぁまぁ、焦るなや。基本の出汁の取り方を学ぶようなもんやな。まずはシンプルにやってみよう」
 
-**追加後のコード（handleError なしバージョン）：**
+**追加後のコード：**
 
 ```javascript
 const fetchTask = async () => {
@@ -1251,21 +1250,9 @@ console.groupEnd();
 
 **ガネーシャ 🐘**：「グループ化すると、関連するログをまとめて折りたたみできるんや。ログが見やすくなるで！」
 
-**生徒 👩‍💻**：「なるほど！さっきの useApiError.js でも使われてましたね！」
+**生徒 👩‍💻**：「なるほど！グループ化すると見やすくなりますね！」
 
-```javascript
-// useApiError.js より
-console.group("🚨 API Error");
-console.error("Error:", err);
-if (err.response) {
-    console.error("Status:", err.response.status);
-    console.error("Data:", err.response.data);
-    console.error("URL:", err.config?.url);
-}
-console.groupEnd();
-```
-
-**ガネーシャ 🐘**：「せや！実はお前のプロジェクトでもすでに使われとるんや。ちゃんと整理されたログは**未来の自分への贈り物**やで」
+**ガネーシャ 🐘**：「せや！ちゃんと整理されたログは**未来の自分への贈り物**やで」
 
 ---
 
@@ -1456,65 +1443,17 @@ console.groupEnd();
 
 ## 🎯 ミッション 3：エラーを徹底的に追跡する
 
-**ガネーシャ 🐘**：「お前のプロジェクトには既に `useApiError.js` っちゅう優秀なエラーハンドリングがあるんやけど、これをもっと活用してみるで」
+**ガネーシャ 🐘**：「さて、次はエラーの時にもっと詳しい情報を出すようにしてみよう」
 
-**生徒 👩‍💻**：「useApiError.js ですか？」
+**生徒 👩‍💻**：「エラーの時もconsole.logで確認できるんですか？」
 
-**ガネーシャ 🐘**：「せや。このファイル、見てみ」
-
-開くファイル：`resources/js/composables/useApiError.js`
-
-```javascript
-// 39-52行目
-if (import.meta.env.APP_DEBUG) {
-    console.group("🚨 API Error");
-    console.error("Error:", err);
-    if (err.response) {
-        console.error("Status:", err.response.status);
-        console.error("Data:", err.response.data);
-        console.error("URL:", err.config?.url);
-    } else {
-        console.error("Network Error:", err.message);
-    }
-    console.groupEnd();
-}
-```
-
-**生徒 👩‍💻**：「あ、`import.meta.env.APP_DEBUG` が `true` の時だけログを出すんですね！」
-
-**ガネーシャ 🐘**：「せや！これが**環境に応じた出し分け**や。開発中はログを出して、本番環境では出さへんようにする。これはセキュリティにも繋がるんや」
-
----
-
-### 📝 .env ファイルで APP_DEBUG を切り替える
-
-**ガネーシャ 🐘**：「お前のプロジェクトの `.env` ファイルを見てみ」
-
-開くファイル：`.env`（プロジェクトルートにある）
-
-```bash
-# 開発中はこれを true に
-VITE_APP_DEBUG=true
-
-# 本番環境ではこれを false に
-# VITE_APP_DEBUG=false
-```
-
-**生徒 👩‍💻**：「あ、`VITE_APP_DEBUG` って書いてあります！」
-
-**ガネーシャ 🐘**：「せや！Vite（ビルドツール）を使っとるから `VITE_` プレフィックスが必要なんや。これを `true` にするとログが出て、`false` にするとログが出なくなる」
-
-| 環境             | APP_DEBUG |  ログ出力   | 用途                     |
-| :--------------- | :-------: | :---------: | :----------------------- |
-| 開発環境         |  `true`   |   ✅ 出す   | デバッグ作業             |
-| ステージング環境 |  `false`  | ❌ 出さない | 本番に近い環境でのテスト |
-| 本番環境         |  `false`  | ❌ 出さない | セキュリティ対策         |
+**ガネーシャ 🐘**：「せやで！さっきのfetchTask関数のcatchブロックにな、console.errorを追加するんや」
 
 ---
 
 ### 📝 実装：より詳細なエラーログ
 
-**ガネーシャ 🐘**：「せっかくやから、エラーの時にもっと詳しい情報を出すようにしてみよう」
+**ガネーシャ 🐘**：「エラーの時にもっと詳しい情報を出すコードを追加や！」
 
 ```javascript
 // エラーをキャッチした時
@@ -1574,13 +1513,13 @@ catch (err) {
   console.error("📍 エラー発生箇所:", err.stack);
   console.groupEnd();
 
-  handleError(err, "処理に失敗しました");
+  alert("タスクの読み込みに失敗しました");
 }
 ```
 
 **生徒 👩‍💻**：「うわぁ！これならエラーの原因がすぐ分かりますね！」
 
-**ガネーシャ 🐘**：「せやろ！エラーハンドリングは**未来の自分を助ける投資**や。ワシの教え子のベンジャミン・フランクリンくんも『時間こそ金なり』って言うとったけど、デバッグ時間を短縮することは**時間を生み出すこと**なんやで」
+**ガネーシャ 🐘**：「せやろ！console.logとconsole.errorを使いこなせば、**未来の自分を助ける**ことになるんや。ワシの教え子のベンジャミン・フランクリンくんも『時間こそ金なり』って言うとったけど、デバッグ時間を短縮することは**時間を生み出すこと**なんやで」
 
 ---
 
@@ -1996,14 +1935,9 @@ console.timeEnd("⏱️ データ取得"); // ⏱️ データ取得: 245.123ms
 if (import.meta.env.DEV) {
     console.log("🔧 開発環境でのみ表示されるログ");
 }
-
-// または
-if (import.meta.env.VITE_APP_DEBUG) {
-    console.log("🔧 デバッグモードでのみ表示されるログ");
-}
 ```
 
-**理由**：セキュリティとパフォーマンスのため。
+**理由**：セキュリティとパフォーマンスのため。本番環境では不要なログを出さないようにしましょう。
 
 ---
 
@@ -2210,7 +2144,6 @@ try {
 -   [ ] `console.log()` の記述場所は正しいか？
 -   [ ] ブラウザをリロードしたか？
 -   [ ] JavaScript のエラーで処理が止まっていないか？
--   [ ] `.env` の `VITE_APP_DEBUG` が `true` か？
 
 ### ✅ API 通信が失敗する時
 

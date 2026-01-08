@@ -14,6 +14,7 @@ class ApiResponse
      * @param mixed $data
      * @param int $status
      * @param mixed $errors
+     * @param string|null $requestId
      * @return JsonResponse
      *
      * @example レスポンス例（成功時）
@@ -32,10 +33,11 @@ class ApiResponse
      *     "message": "バリデーションエラー",
      *     "errors": {
      *         "email": ["メールアドレスは必須です"]
-     *     }
+     *     },
+     *     "request_id": "req_67890abcdef12345"
      * }
      */
-    private function respond(bool $success, string $message, $data, int $status, $errors = null): JsonResponse
+    private function respond(bool $success, string $message, $data, int $status, $errors = null, ?string $requestId = null): JsonResponse
     {
         $response = [
             'success' => $success,
@@ -48,6 +50,11 @@ class ApiResponse
 
         if ($errors !== null) {
             $response['errors'] = $errors;
+        }
+
+        // リクエストIDがある場合は追加（エラー時など）
+        if ($requestId !== null) {
+            $response['request_id'] = $requestId;
         }
 
         return response()->json($response, $status);
@@ -101,6 +108,7 @@ class ApiResponse
      * 不正リクエストエラー
      *
      * @param string $message
+     * @param string|null $requestId
      * @return JsonResponse
      *
      * @example 使用例
@@ -109,18 +117,20 @@ class ApiResponse
      * @example レスポンス例
      * {
      *     "success": false,
-     *     "message": "リクエストが不正です"
+     *     "message": "リクエストが不正です",
+     *     "request_id": "req_67890abcdef12345"
      * }
      */
-    public function badRequest(string $message = 'リクエストが不正です'): JsonResponse
+    public function badRequest(string $message = 'リクエストが不正です', ?string $requestId = null): JsonResponse
     {
-        return $this->respond(false, $message, null, 400);
+        return $this->respond(false, $message, null, 400, null, $requestId);
     }
 
     /**
      * 認証エラー
      *
      * @param string $message
+     * @param string|null $requestId
      * @return JsonResponse
      *
      * @example 使用例
@@ -129,18 +139,20 @@ class ApiResponse
      * @example レスポンス例
      * {
      *     "success": false,
-     *     "message": "認証が必要です"
+     *     "message": "認証が必要です",
+     *     "request_id": "req_67890abcdef12345"
      * }
      */
-    public function unauthorized(string $message = '認証が必要です'): JsonResponse
+    public function unauthorized(string $message = '認証が必要です', ?string $requestId = null): JsonResponse
     {
-        return $this->respond(false, $message, null, 401);
+        return $this->respond(false, $message, null, 401, null, $requestId);
     }
 
     /**
      * 権限エラー
      *
      * @param string $message
+     * @param string|null $requestId
      * @return JsonResponse
      *
      * @example 使用例
@@ -149,18 +161,20 @@ class ApiResponse
      * @example レスポンス例
      * {
      *     "success": false,
-     *     "message": "権限がありません"
+     *     "message": "権限がありません",
+     *     "request_id": "req_67890abcdef12345"
      * }
      */
-    public function forbidden(string $message = '権限がありません'): JsonResponse
+    public function forbidden(string $message = '権限がありません', ?string $requestId = null): JsonResponse
     {
-        return $this->respond(false, $message, null, 403);
+        return $this->respond(false, $message, null, 403, null, $requestId);
     }
 
     /**
      * 未検出エラー
      *
      * @param string $message
+     * @param string|null $requestId
      * @return JsonResponse
      *
      * @example 使用例
@@ -169,12 +183,13 @@ class ApiResponse
      * @example レスポンス例
      * {
      *     "success": false,
-     *     "message": "ユーザーが見つかりません"
+     *     "message": "ユーザーが見つかりません",
+     *     "request_id": "req_67890abcdef12345"
      * }
      */
-    public function notFound(string $message = 'リソースが見つかりません'): JsonResponse
+    public function notFound(string $message = '指定されたデータが見つかりません', ?string $requestId = null): JsonResponse
     {
-        return $this->respond(false, $message, null, 404);
+        return $this->respond(false, $message, null, 404, null, $requestId);
     }
 
     /**
@@ -182,6 +197,7 @@ class ApiResponse
      *
      * @param string $message
      * @param mixed $errors
+     * @param string|null $requestId
      * @return JsonResponse
      *
      * @example 使用例
@@ -194,18 +210,20 @@ class ApiResponse
      *     "errors": {
      *         "email": ["メールアドレスは必須です"],
      *         "name": ["名前は255文字以内で入力してください"]
-     *     }
+     *     },
+     *     "request_id": "req_67890abcdef12345"
      * }
      */
-    public function validationError(string $message = 'バリデーションエラー', $errors = null): JsonResponse
+    public function validationError(string $message = 'バリデーションエラー', $errors = null, ?string $requestId = null): JsonResponse
     {
-        return $this->respond(false, $message, null, 422, $errors);
+        return $this->respond(false, $message, null, 422, $errors, $requestId);
     }
 
     /**
      * サーバーエラー
      *
      * @param string $message
+     * @param string|null $requestId
      * @return JsonResponse
      *
      * @example 使用例
@@ -214,11 +232,12 @@ class ApiResponse
      * @example レスポンス例
      * {
      *     "success": false,
-     *     "message": "サーバーエラーが発生しました"
+     *     "message": "サーバーエラーが発生しました",
+     *     "request_id": "req_67890abcdef12345"
      * }
      */
-    public function serverError(string $message = 'サーバーエラー'): JsonResponse
+    public function serverError(string $message = 'サーバーエラー', ?string $requestId = null): JsonResponse
     {
-        return $this->respond(false, $message, null, 500);
+        return $this->respond(false, $message, null, 500, null, $requestId);
     }
 }

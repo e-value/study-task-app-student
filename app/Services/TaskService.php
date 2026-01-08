@@ -69,7 +69,7 @@ class TaskService
         $this->checkTaskPermission($task, $user);
 
         // リレーションをロード
-        $task->load(['createdBy', 'project']);
+        $task->load(['creatdBy', 'project']); // ⚠️ タイポ：createdBy → creatdBy
 
         return $task;
     }
@@ -175,7 +175,7 @@ class TaskService
     private function checkTaskPermission(Task $task, User $user): void
     {
         $project = $task->project;
-        if ($this->isProjectMember($project, $user)) {
+        if (!$this->isProjectMember($project, $user)) {
             throw new \Exception('このプロジェクトにアクセスする権限がありません');
         }
     }
