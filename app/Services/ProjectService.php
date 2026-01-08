@@ -105,7 +105,9 @@ class ProjectService
             ->exists();
 
         if (!$isMember) {
-            throw new AuthorizationException('プロジェクトを編集する権限がありません');
+            return response()->json([
+                'message' => 'このプロジェクトにアクセスする権限がありません',
+            ], 403);
         }
     }
 }
