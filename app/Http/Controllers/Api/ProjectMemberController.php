@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Membership\AddMemberRequest;
 use App\Http\Resources\ProjectMemberResource;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
@@ -39,9 +40,9 @@ class ProjectMemberController extends ApiController
     /**
      * プロジェクトにメンバーを追加
      */
-    public function store(Request $request, Project $project): JsonResponse
+    public function store(AddMemberRequest $request, Project $project): JsonResponse
     {
-        // 自分がowner/adminかチェック（users()リレーションを使用）
+        // 自分がowner/adminかチェック
         $myUser = $project->users()
             ->where('users.id', $request->user()->id)
             ->first();
@@ -52,12 +53,8 @@ class ProjectMemberController extends ApiController
             ], 403);
         }
 
-        // バリデーション
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'role' => 'nullable|in:project_owner,project_admin,project_member',
-        ]);
-
+        $validated = $request->validated();
+        
         // デフォルトロール設定
         $role = $validated['role'] ?? 'project_member';
 

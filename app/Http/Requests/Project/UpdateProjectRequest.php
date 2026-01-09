@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Project;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProjectRequest extends FormRequest
+class UpdateProjectRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     * 
+     * 認可チェックはUseCaseで行うため、ここでは認証のみ
      */
     public function authorize(): bool
     {
-        // ログインユーザーであればプロジェクトを作成できる
-        return $this->user() !== null;
+        return true;
     }
 
     /**
@@ -23,8 +24,8 @@ class ProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'is_archived' => 'boolean',
+            'name' => 'sometimes|required|string|max:255',
+            'is_archived' => 'sometimes|boolean',
         ];
     }
 }

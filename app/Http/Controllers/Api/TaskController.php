@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Task\StoreTaskRequest;
+use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Validator;
 
 class TaskController extends ApiController
 {
@@ -39,7 +40,7 @@ class TaskController extends ApiController
     /**
      * タスク作成
      */
-    public function store(Request $request, Project $project): JsonResponse
+    public function store(StoreTaskRequest $request, Project $project): JsonResponse
     {
         // 自分が所属しているかチェック
         $isMember = $project->users()
@@ -50,18 +51,6 @@ class TaskController extends ApiController
             return response()->json([
                 'message' => 'このプロジェクトにアクセスする権限がありません',
             ], 403);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
         }
 
         $task = Task::create([
@@ -105,7 +94,7 @@ class TaskController extends ApiController
     /**
      * タスク更新
      */
-    public function update(Request $request, Task $task): TaskResource|JsonResponse
+    public function update(UpdateTaskRequest $request, Task $task): TaskResource|JsonResponse
     {
         // 自分が所属しているかチェック
         $project = $task->project;
@@ -117,19 +106,6 @@ class TaskController extends ApiController
             return response()->json([
                 'message' => 'このプロジェクトにアクセスする権限がありません',
             ], 403);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'sometimes|in:todo,doing,done',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
         }
 
         $task->update($request->only(['title', 'description', 'status']));

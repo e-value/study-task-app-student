@@ -28,13 +28,14 @@ const form = ref({
 });
 
 const fetchTask = async () => {
+  console.log("🚀 fetchTask が呼ばれたで！");
+
   try {
     loading.value = true;
     const response = await axios.get(`/api/tasks/${taskId}`);
     task.value = response.data.data || response.data;
   } catch (err) {
     handleError(err, "タスクの読み込みに失敗しました");
-    toast.error(error.value);
   } finally {
     loading.value = false;
   }

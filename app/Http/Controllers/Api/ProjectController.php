@@ -2,20 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Project\StoreProjectRequest;
+use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Validator;
-use App\Services\ProjectService;
-use App\Http\Requests\ProjectRequest;
 
 class ProjectController extends ApiController
 {
-    public function __construct(
-        private ProjectService $projectService
-    ) {}
 
     /**
      * 自分が所属しているプロジェクト一覧を返す
@@ -34,12 +30,20 @@ class ProjectController extends ApiController
     /**
      * プロジェクト新規作成
      */
-    public function store(ProjectRequest $request): JsonResponse
+    public function store(StoreProjectRequest $request): JsonResponse
     {
-        $project = $this->projectService->createProject(
-            $request->validated(),
-            $request->user()
-        );
+        // プロジェクト作成
+        $project = Project::create([
+            'name' => $request->name,
+            'is_archived' => $request->is_archived ?? false,
+        ]);
+
+        // 作成者をオーナーとして追加
+        $project->users()->attach($request->user()->id, [
+            'role' => 'project_owner',
+        ]);
+
+        $project->load(['users', 'tasks']);
 
         return (new ProjectResource($project))
             ->additional(['message' => 'プロジェクトを作成しました'])
@@ -71,9 +75,9 @@ class ProjectController extends ApiController
     /**
      * プロジェクト更新
      */
-    public function update(Request $request, Project $project): ProjectResource|JsonResponse
+    public function update(UpdateProjectRequest $request, Project $project): ProjectResource|JsonResponse
     {
-        // 自分がオーナーまたは管理者かチェック（users()リレーションを使用）
+        // 自分がオーナーまたは管理者かチェック
         $myUser = $project->users()
             ->where('users.id', $request->user()->id)
             ->first();
@@ -82,18 +86,6 @@ class ProjectController extends ApiController
             return response()->json([
                 'message' => 'プロジェクトを編集する権限がありません',
             ], 403);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255',
-            'is_archived' => 'sometimes|boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors' => $validator->errors(),
-            ], 422);
         }
 
         $project->update($request->only(['name', 'is_archived']));
