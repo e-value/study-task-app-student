@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Membership\AddMemberRequest;
 use App\Http\Resources\ProjectMemberResource;
 use App\Models\Project;
@@ -9,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class ProjectMemberController extends ApiController
+class ProjectMemberController extends Controller
 {
     /**
      * プロジェクトのメンバー一覧を取得
@@ -54,7 +55,7 @@ class ProjectMemberController extends ApiController
         }
 
         $validated = $request->validated();
-        
+
         // デフォルトロール設定
         $role = $validated['role'] ?? 'project_member';
 
