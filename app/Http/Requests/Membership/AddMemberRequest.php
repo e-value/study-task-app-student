@@ -1,32 +1,19 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Membership;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProjectMemberRequest extends FormRequest
+class AddMemberRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     * 
+     * 認可チェックはUseCaseで行うため、ここでは認証のみ
      */
     public function authorize(): bool
     {
-        // プロジェクトのオーナーまたは管理者かチェック
-        $project = $this->route('project');
-
-        if (!$project) {
-            return false;
-        }
-
-        $myUser = $project->users()
-            ->where('users.id', $this->user()->id)
-            ->first();
-
-        if (!$myUser) {
-            return false;
-        }
-
-        return in_array($myUser->pivot->role, ['project_owner', 'project_admin']);
+        return true;
     }
 
     /**

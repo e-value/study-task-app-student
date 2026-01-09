@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\ProjectRequest;
+use App\Http\Requests\Project\StoreProjectRequest;
+use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
-use App\Services\ProjectService;
+use App\UseCases\Project\CreateProjectUseCase;
+use App\UseCases\Project\GetProjectUseCase;
+use App\UseCases\Project\UpdateProjectUseCase;
+use App\UseCases\Project\DeleteProjectUseCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -13,7 +17,10 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class ProjectController extends ApiController
 {
     public function __construct(
-        private ProjectService $projectService
+        private CreateProjectUseCase $createProjectUseCase,
+        private GetProjectUseCase $getProjectUseCase,
+        private UpdateProjectUseCase $updateProjectUseCase,
+        private DeleteProjectUseCase $deleteProjectUseCase,
     ) {}
 
     /**
@@ -33,9 +40,9 @@ class ProjectController extends ApiController
     /**
      * プロジェクト新規作成
      */
-    public function store(ProjectRequest $request): JsonResponse
+    public function store(StoreProjectRequest $request): JsonResponse
     {
-        $project = $this->projectService->createProject(
+        $project = $this->createProjectUseCase->execute(
             $request->validated(),
             $request->user()
         );
@@ -51,16 +58,16 @@ class ProjectController extends ApiController
      */
     public function show(Request $request, Project $project): ProjectResource
     {
-        $project = $this->projectService->getProject($project, $request->user());
+        $project = $this->getProjectUseCase->execute($project, $request->user());
         return new ProjectResource($project);
     }
 
     /**
      * プロジェクト更新
      */
-    public function update(ProjectRequest $request, Project $project): ProjectResource
+    public function update(UpdateProjectRequest $request, Project $project): ProjectResource
     {
-        $project = $this->projectService->updateProject(
+        $project = $this->updateProjectUseCase->execute(
             $project,
             $request->validated(),
             $request->user()
@@ -75,7 +82,7 @@ class ProjectController extends ApiController
      */
     public function destroy(Request $request, Project $project): JsonResponse
     {
-        $this->projectService->deleteProject($project, $request->user());
+        $this->deleteProjectUseCase->execute($project, $request->user());
 
         return $this->response()->success(null, 'プロジェクトを削除しました');
     }

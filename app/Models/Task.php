@@ -33,4 +33,28 @@ class Task extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /**
+     * タスクが未着手（todo）か判定
+     */
+    public function isTodo(): bool
+    {
+        return $this->status === 'todo';
+    }
+
+    /**
+     * タスクが作業中（doing）か判定
+     */
+    public function isDoing(): bool
+    {
+        return $this->status === 'doing';
+    }
+
+    /**
+     * タスクが完了（done）か判定
+     */
+    public function isDone(): bool
+    {
+        return $this->status === 'done';
+    }
 }

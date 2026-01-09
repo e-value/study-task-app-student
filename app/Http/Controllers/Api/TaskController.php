@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\TaskRequest;
+use App\Http\Requests\Task\StoreTaskRequest;
+use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Models\Task;
-use App\Services\TaskService;
+use App\UseCases\Task\CreateTaskUseCase;
+use App\UseCases\Task\GetTasksUseCase;
+use App\UseCases\Task\GetTaskUseCase;
+use App\UseCases\Task\UpdateTaskUseCase;
+use App\UseCases\Task\DeleteTaskUseCase;
+use App\UseCases\Task\StartTaskUseCase;
+use App\UseCases\Task\CompleteTaskUseCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -14,8 +21,15 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class TaskController extends ApiController
 {
     public function __construct(
-        private TaskService $taskService
+        private GetTasksUseCase $getTasksUseCase,
+        private CreateTaskUseCase $createTaskUseCase,
+        private GetTaskUseCase $getTaskUseCase,
+        private UpdateTaskUseCase $updateTaskUseCase,
+        private DeleteTaskUseCase $deleteTaskUseCase,
+        private StartTaskUseCase $startTaskUseCase,
+        private CompleteTaskUseCase $completeTaskUseCase,
     ) {}
+
     /**
      * プロジェクトのタスク一覧を取得
      *
@@ -25,7 +39,7 @@ class TaskController extends ApiController
      */
     public function index(Request $request, Project $project): AnonymousResourceCollection
     {
-        $tasks = $this->taskService->getTasks($project, $request->user());
+        $tasks = $this->getTasksUseCase->execute($project, $request->user());
 
         return TaskResource::collection($tasks);
     }
@@ -33,9 +47,9 @@ class TaskController extends ApiController
     /**
      * タスク作成
      */
-    public function store(TaskRequest $request, Project $project): JsonResponse
+    public function store(StoreTaskRequest $request, Project $project): JsonResponse
     {
-        $task = $this->taskService->createTask(
+        $task = $this->createTaskUseCase->execute(
             $request->validated(),
             $project,
             $request->user()
@@ -52,16 +66,16 @@ class TaskController extends ApiController
      */
     public function show(Request $request, Task $task): TaskResource
     {
-        $task = $this->taskService->getTask($task, $request->user());
+        $task = $this->getTaskUseCase->execute($task, $request->user());
         return new TaskResource($task);
     }
 
     /**
      * タスク更新
      */
-    public function update(TaskRequest $request, Task $task): TaskResource
+    public function update(UpdateTaskRequest $request, Task $task): TaskResource
     {
-        $task = $this->taskService->updateTask(
+        $task = $this->updateTaskUseCase->execute(
             $task,
             $request->validated(),
             $request->user()
@@ -76,7 +90,7 @@ class TaskController extends ApiController
      */
     public function destroy(Request $request, Task $task): JsonResponse
     {
-        $this->taskService->deleteTask($task, $request->user());
+        $this->deleteTaskUseCase->execute($task, $request->user());
 
         return $this->response()->success(null, 'タスクを削除しました');
     }
@@ -86,7 +100,7 @@ class TaskController extends ApiController
      */
     public function start(Request $request, Task $task): TaskResource
     {
-        $task = $this->taskService->startTask($task, $request->user());
+        $task = $this->startTaskUseCase->execute($task, $request->user());
         return new TaskResource($task);
     }
 
@@ -95,7 +109,7 @@ class TaskController extends ApiController
      */
     public function complete(Request $request, Task $task): TaskResource
     {
-        $task = $this->taskService->completeTask($task, $request->user());
+        $task = $this->completeTaskUseCase->execute($task, $request->user());
         return new TaskResource($task);
     }
 }
