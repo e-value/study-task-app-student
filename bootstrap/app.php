@@ -26,13 +26,17 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // Sentry統合（研修用に必要に応じてコメントアウト）
+        // Sentry統合
         // Integration::handles($exceptions);
 
-        // API例外ハンドラーを登録
-        $apiHandler = new ApiExceptionHandler();
+        // 研修用に必要に応じて以下のコメントアウトの切り替え（コメントアウト時はLaravelのデフォルトハンドラーが使用される）
 
-        $exceptions->render(function (\Throwable $e, Request $request) use ($apiHandler) {
-            return $apiHandler->handle($e, $request);
-        });
+
+
+        // // API例外ハンドラーを登録
+        // $apiHandler = new ApiExceptionHandler();
+
+        // $exceptions->render(function (\Throwable $e, Request $request) use ($apiHandler) {
+        //     return $apiHandler->handle($e, $request);
+        // });
     })->create();
