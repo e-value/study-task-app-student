@@ -158,6 +158,24 @@ TaskController::start()     → StartTaskUseCase
 TaskController::complete()  → CompleteTaskUseCase
 ```
 
+**📌 命名のポイント：ファイル名は業務シナリオ名にする**
+
+UseCase のファイル名は、「技術的な処理名」ではなく「業務シナリオ名」にすることが重要です。
+
+```
+❌ 悪い例（技術的な処理名）
+- IndexTaskUseCase
+- StoreTaskUseCase
+
+✅ 良い例（業務シナリオ名）
+- GetTasksUseCase          （タスク一覧を取得する）
+- CreateTaskUseCase        （タスクを作成する）
+- StartTaskUseCase         （タスクを開始する）
+- CompleteTaskUseCase      （タスクを完了する）
+```
+
+**👉 「ユーザーが何をするのか」を表す名前にしてください。**
+
 **UseCase の作成場所：**
 
 ```bash
@@ -169,6 +187,14 @@ mkdir -p app/UseCases/Membership
 # UseCaseファイルを作成（例）
 touch app/UseCases/Task/CreateTaskUseCase.php
 ```
+
+**📝 参考：既に作成済みの例**
+
+プロジェクト一覧取得の UseCase は既に例として作成されています。
+
+-   `app/UseCases/Project/GetProjectsUseCase.php`
+
+このファイルを参考にしながら、他の UseCase も作成してください。
 
 #### 2-2. Controller の処理をそのまま UseCase に移す
 
