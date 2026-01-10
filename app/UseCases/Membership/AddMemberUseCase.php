@@ -4,6 +4,7 @@ namespace App\UseCases\Membership;
 
 use App\Models\Project;
 use App\Models\User;
+use App\Services\Project\ProjectRules;
 use App\Exceptions\ConflictException;
 
 /**
@@ -11,6 +12,9 @@ use App\Exceptions\ConflictException;
  */
 class AddMemberUseCase
 {
+    public function __construct(
+        private ProjectRules $projectRules,
+    ) {}
 
     /**
      * プロジェクトメンバー追加の流れを組み立てる
@@ -26,12 +30,12 @@ class AddMemberUseCase
         $role = $data['role'] ?? 'project_member';
 
         // ========================================
-        // 1. ビジネスルール検証（Domain Service）
+        // 1. ビジネスルール検証
         // ========================================
-        // 既にメンバーかチェック
-        $this->ensureNotMember($project, $userId);
+        // 既にメンバーかチェック（システム全体ルール - Projectドメイン）
+        $this->projectRules->ensureNotMember($project, $userId);
 
-        // 自分自身を追加しようとしていないかチェック
+        // 自分自身を追加しようとしていないかチェック（UseCase固有ルール）
         $this->ensureNotSelf($userId, $currentUser->id);
 
         // ========================================
@@ -52,34 +56,20 @@ class AddMemberUseCase
     /**
      * 自分自身を追加しようとしていないか検証
      * 
-     * @param int $userId 追加しようとするユーザーID
+     * 【なぜprivateメソッドに置くか】
+     * - AddMemberUseCaseでしか使わない
+     * - 他のUseCaseで使う予定がない（RemoveMemberは別の制約があるため）
+     * - ロジックが単純
+     * 
+     * @param int $targetUserId 対象ユーザーID
      * @param int $currentUserId 現在のユーザーID
      * @return void
      * @throws ConflictException
      */
-    private function ensureNotSelf(int $userId, int $currentUserId): void
+    private function ensureNotSelf(int $targetUserId, int $currentUserId): void
     {
-        if ($userId == $currentUserId) {
-            throw new ConflictException('あなたは既にこのプロジェクトのメンバーです');
-        }
-    }
-
-    /**
-     * 既にメンバーか検証（メンバーなら例外）
-     * 
-     * @param Project $project プロジェクト
-     * @param int $userId ユーザーID
-     * @return void
-     * @throws ConflictException
-     */
-    private function ensureNotMember(Project $project, int $userId): void
-    {
-        $exists = $project->users()
-            ->where('users.id', $userId)
-            ->exists();
-
-        if ($exists) {
-            throw new ConflictException('既にメンバーです');
+        if ($targetUserId === $currentUserId) {
+            throw new ConflictException('自分自身を追加することはできません');
         }
     }
 }

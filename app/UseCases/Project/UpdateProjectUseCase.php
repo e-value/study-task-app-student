@@ -4,7 +4,7 @@ namespace App\UseCases\Project;
 
 use App\Models\Project;
 use App\Models\User;
-use App\Services\Domain\Project\ProjectRuleService;
+use App\Services\Project\ProjectRules;
 
 /**
  * プロジェクト更新UseCase
@@ -12,7 +12,7 @@ use App\Services\Domain\Project\ProjectRuleService;
 class UpdateProjectUseCase
 {
     public function __construct(
-        private ProjectRuleService $projectRule,
+        private ProjectRules $projectRules,
     ) {}
 
     /**
@@ -25,8 +25,8 @@ class UpdateProjectUseCase
      */
     public function execute(Project $project, array $data, User $user): Project
     {
-        // オーナーまたは管理者かチェック
-        $this->projectRule->ensureOwnerOrAdmin($project, $user);
+        // オーナーまたは管理者かチェック（システム全体ルール）
+        $this->projectRules->ensureOwnerOrAdmin($project, $user);
 
         // プロジェクト更新
         $project->update($data);

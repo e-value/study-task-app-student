@@ -4,7 +4,7 @@ namespace App\UseCases\Project;
 
 use App\Models\Project;
 use App\Models\User;
-use App\Services\Domain\Project\ProjectRuleService;
+use App\Services\Project\ProjectRules;
 
 /**
  * プロジェクト削除UseCase
@@ -12,7 +12,7 @@ use App\Services\Domain\Project\ProjectRuleService;
 class DeleteProjectUseCase
 {
     public function __construct(
-        private ProjectRuleService $projectRule,
+        private ProjectRules $projectRules,
     ) {}
 
     /**
@@ -24,8 +24,8 @@ class DeleteProjectUseCase
      */
     public function execute(Project $project, User $user): void
     {
-        // 権限チェック（オーナーのみ）
-        $this->projectRule->ensureOwner($project, $user);
+        // 権限チェック（オーナーのみ）（システム全体ルール）
+        $this->projectRules->ensureOwner($project, $user);
 
         // プロジェクト削除
         $project->delete();

@@ -4,7 +4,7 @@ namespace App\UseCases\Project;
 
 use App\Models\Project;
 use App\Models\User;
-use App\Services\Domain\Project\ProjectRuleService;
+use App\Services\Project\ProjectRules;
 
 /**
  * プロジェクト詳細取得UseCase
@@ -12,7 +12,7 @@ use App\Services\Domain\Project\ProjectRuleService;
 class GetProjectUseCase
 {
     public function __construct(
-        private ProjectRuleService $projectRule,
+        private ProjectRules $projectRules,
     ) {}
 
     /**
@@ -24,8 +24,8 @@ class GetProjectUseCase
      */
     public function execute(Project $project, User $user): Project
     {
-        // メンバーかチェック
-        $this->projectRule->ensureMember($project, $user);
+        // メンバーかチェック（システム全体ルール）
+        $this->projectRules->ensureMember($project, $user);
 
         // リレーションをロード
         $project->load(['users', 'tasks.createdBy']);

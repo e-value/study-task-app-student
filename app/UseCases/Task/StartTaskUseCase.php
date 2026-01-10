@@ -4,7 +4,7 @@ namespace App\UseCases\Task;
 
 use App\Models\Task;
 use App\Models\User;
-use App\Services\Domain\Project\ProjectRuleService;
+use App\Services\Project\ProjectRules;
 use App\Exceptions\ConflictException;
 
 /**
@@ -13,7 +13,7 @@ use App\Exceptions\ConflictException;
 class StartTaskUseCase
 {
     public function __construct(
-        private ProjectRuleService $projectRule,
+        private ProjectRules $projectRules,
     ) {}
 
     /**
@@ -28,8 +28,8 @@ class StartTaskUseCase
         // ========================================
         // 1. ビジネスルール検証
         // ========================================
-        // 権限チェック（Domain Service - 複数UseCaseで共通）
-        $this->projectRule->ensureMember($task->project, $user);
+        // 権限チェック（システム全体ルール - 複数UseCaseで共通）
+        $this->projectRules->ensureMember($task->project, $user);
 
         // 状態チェック（privateメソッド - このUseCaseだけで使う）
         $this->ensureCanStart($task);

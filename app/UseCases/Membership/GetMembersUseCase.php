@@ -4,7 +4,7 @@ namespace App\UseCases\Membership;
 
 use App\Models\Project;
 use App\Models\User;
-use App\Services\Domain\Project\ProjectRuleService;
+use App\Services\Project\ProjectRules;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 class GetMembersUseCase
 {
     public function __construct(
-        private ProjectRuleService $projectRule,
+        private ProjectRules $projectRules,
     ) {}
 
     /**
@@ -25,8 +25,8 @@ class GetMembersUseCase
      */
     public function execute(Project $project, User $user): Collection
     {
-        // 権限チェック
-        $this->projectRule->ensureMember($project, $user);
+        // 権限チェック（システム全体ルール）
+        $this->projectRules->ensureMember($project, $user);
 
         // メンバー一覧取得
         return $project->users()

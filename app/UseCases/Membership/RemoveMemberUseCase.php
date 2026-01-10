@@ -4,7 +4,7 @@ namespace App\UseCases\Membership;
 
 use App\Models\Project;
 use App\Models\User;
-use App\Services\Domain\Project\ProjectRuleService;
+use App\Services\Project\ProjectRules;
 use App\Exceptions\ConflictException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class RemoveMemberUseCase
 {
     public function __construct(
-        private ProjectRuleService $projectRule,
+        private ProjectRules $projectRules,
     ) {}
 
     /**
@@ -28,21 +28,18 @@ class RemoveMemberUseCase
     public function execute(Project $project, int $userId, User $currentUser): void
     {
         // ========================================
-        // 1. ビジネスルール検証（Domain Service）
+        // 1. ビジネスルール検証
         // ========================================
-        // 権限チェック（メンバーか）
-        $this->projectRule->ensureMember($project, $currentUser);
-
-        // 権限チェック（オーナーまたは管理者か）
-        $this->projectRule->ensureOwnerOrAdmin($project, $currentUser);
+        // 権限チェック（システム全体ルール - オーナーまたは管理者か）
+        $this->projectRules->ensureOwnerOrAdmin($project, $currentUser);
 
         // 削除対象のユーザーを取得
         $targetUser = $this->ensureMemberExists($project, $userId);
 
-        // Owner維持チェック
+        // Owner維持チェック（UseCase固有ルール）
         $this->ensureOwnerMaintenance($project, $targetUser);
 
-        // 未完了タスクチェック
+        // 未完了タスクチェック（UseCase固有ルール）
         $this->ensureNoIncompleteTasks($project, $userId);
 
         // ========================================
@@ -55,7 +52,10 @@ class RemoveMemberUseCase
     /**
      * 削除対象のユーザーに未完了タスクがないか検証
      * 
-     * 未完了タスクがある場合は例外
+     * 【なぜprivateメソッドに置くか】
+     * - RemoveMemberUseCaseでしか使わない
+     * - Taskドメインを参照するが、Task側のルールではない
+     * - メンバー削除という文脈でのみ必要な制約
      * 
      * @param Project $project プロジェクト
      * @param int $userId ユーザーID
@@ -77,7 +77,9 @@ class RemoveMemberUseCase
     /**
      * オーナー削除後に0人にならないか検証
      * 
-     * 最後のオーナーを削除しようとする場合は例外
+     * 【なぜprivateメソッドに置くか】
+     * - RemoveMemberUseCaseでしか使わない
+     * - メンバー削除という文脈でのみ必要な制約
      * 
      * @param Project $project プロジェクト
      * @param User $targetUser 削除対象のユーザー
@@ -99,8 +101,6 @@ class RemoveMemberUseCase
 
     /**
      * 削除対象のユーザーがメンバーか検証
-     * 
-     * メンバーでない場合は例外
      * 
      * @param Project $project プロジェクト
      * @param int $userId ユーザーID

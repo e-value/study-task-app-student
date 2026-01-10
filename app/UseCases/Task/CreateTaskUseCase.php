@@ -5,7 +5,7 @@ namespace App\UseCases\Task;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
-use App\Services\Domain\Project\ProjectRuleService;
+use App\Services\Project\ProjectRules;
 
 /**
  * タスク作成UseCase
@@ -13,12 +13,12 @@ use App\Services\Domain\Project\ProjectRuleService;
  * 【UseCaseの責務】
  * - 「誰を」「どの順番で」呼ぶか決める司令塔
  * - 自分ではビジネスルールを判断しない
- * - Domain Serviceに判断を任せる
+ * - Rulesに判断を任せる
  */
 class CreateTaskUseCase
 {
     public function __construct(
-        private ProjectRuleService $projectRule,
+        private ProjectRules $projectRules,
     ) {}
 
     /**
@@ -32,10 +32,10 @@ class CreateTaskUseCase
     public function execute(array $data, Project $project, User $user): Task
     {
         // ========================================
-        // 1. ビジネスルール検証（Domain Service）
+        // 1. ビジネスルール検証（システム全体ルール）
         //    → UseCaseは「呼ぶだけ」で判断しない
         // ========================================
-        $this->projectRule->ensureMember($project, $user);
+        $this->projectRules->ensureMember($project, $user);
 
         // ========================================
         // 2. データ作成（Eloquent直接）

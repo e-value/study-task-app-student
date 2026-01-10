@@ -4,8 +4,8 @@ namespace App\UseCases\Task;
 
 use App\Models\Task;
 use App\Models\User;
-use App\Services\Domain\Project\ProjectRuleService;
-use App\UseCases\Task\Shared\Rules\EnsureTaskNotDone;
+use App\Services\Project\ProjectRules;
+use App\UseCases\Task\Rules\TaskRules;
 
 /**
  * タスク更新UseCase
@@ -13,8 +13,8 @@ use App\UseCases\Task\Shared\Rules\EnsureTaskNotDone;
 class UpdateTaskUseCase
 {
     public function __construct(
-        private ProjectRuleService $projectRule,
-        private EnsureTaskNotDone $ensureTaskNotDone,
+        private ProjectRules $projectRules,
+        private TaskRules $taskRules,
     ) {}
 
     /**
@@ -27,11 +27,11 @@ class UpdateTaskUseCase
      */
     public function execute(Task $task, array $data, User $user): Task
     {
-        // 権限チェック
-        $this->projectRule->ensureMember($task->project, $user);
+        // 権限チェック（システム全体ルール）
+        $this->projectRules->ensureMember($task->project, $user);
 
-        // タスクが完了していないか検証
-        ($this->ensureTaskNotDone)($task);
+        // タスクが完了していないか検証（ドメイン内ルール）
+        $this->taskRules->ensureNotDone($task);
 
         // タスク更新
         $task->update($data);

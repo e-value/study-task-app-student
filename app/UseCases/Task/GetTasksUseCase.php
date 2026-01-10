@@ -4,7 +4,7 @@ namespace App\UseCases\Task;
 
 use App\Models\Project;
 use App\Models\User;
-use App\Services\Domain\Project\ProjectRuleService;
+use App\Services\Project\ProjectRules;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 class GetTasksUseCase
 {
     public function __construct(
-        private ProjectRuleService $projectRule,
+        private ProjectRules $projectRules,
     ) {}
 
     /**
@@ -25,8 +25,8 @@ class GetTasksUseCase
      */
     public function execute(Project $project, User $user): Collection
     {
-        // ビジネスルール検証
-        $this->projectRule->ensureMember($project, $user);
+        // ビジネスルール検証（システム全体ルール）
+        $this->projectRules->ensureMember($project, $user);
 
         // タスク一覧取得
         return $project->tasks()
