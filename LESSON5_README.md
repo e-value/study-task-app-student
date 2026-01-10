@@ -18,7 +18,7 @@
 実装を始める前に、以下の参考資料を確認してください：
 
 👉 **リファクタリングの参考資料（必読）**  
-[https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5](https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5)
+<a href="https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5" target="_blank">https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5</a>
 
 この資料では、以下の内容を解説しています：
 
@@ -41,7 +41,6 @@ Lesson2 では、以下のような処理を **すべて Controller に直接記
 -   認証・認可チェック
 -   バリデーション
 -   ビジネスロジック
--   エラーハンドリング
 -   データベース操作
 
 Lesson5 では、これらを整理するために、
@@ -217,11 +216,11 @@ UseCase に移動した後、**同じようなコードが複数の UseCase に�
 ```php
 class CreateTaskUseCase
 {
-    public function execute(...) 
+    public function execute(...)
     {
         // メンバーチェック
         $this->ensureProjectMember($project, $user);
-        
+
         // タスク作成
         // ...
     }
@@ -282,13 +281,8 @@ Week 4: 参考資料を読んで、配置場所が適切か見直す
 
 -   リファクタリングは段階的に行うものです
 -   まずは 1 つの Controller から始めてください
--   **最初は Controller → UseCase に移すだけでOK**
+-   **最初は Controller → UseCase に移すだけで OK**
 -   共通化は後で考えます
-
-### テストを活用する
-
--   リファクタリング前後で動作が変わっていないことを確認してください
--   Postman や API テストツールを使って動作確認しましょう
 
 ### 参考資料を読みながら進める
 
@@ -302,7 +296,7 @@ Week 4: 参考資料を読んで、配置場所が適切か見直す
 
 **今回は参考実装を用意していません。**
 
-参考資料（[https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5](https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5)）を読み、自分で考えて実装してください。
+参考資料（<a href="https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5" target="_blank">https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5</a>）を読み、自分で考えて実装してください。
 
 **考えるべきポイント：**
 
@@ -368,4 +362,4 @@ Lesson5 が完了したら、Lesson4 と同様に振り返りを行い、リフ�
 
 ## 📚 参考リンク
 
--   **必読：** [リファクタリングの参考資料](https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5)
+-   **必読：** <a href="https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5" target="_blank">リファクタリングの参考資料</a>
