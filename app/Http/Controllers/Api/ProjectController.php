@@ -8,11 +8,13 @@ use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use App\UseCases\Project\CreateProjectUseCase;
 use App\UseCases\Project\GetProjectUseCase;
+use App\UseCases\Project\GetProjectsUseCase;
 use App\UseCases\Project\UpdateProjectUseCase;
 use App\UseCases\Project\DeleteProjectUseCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+
 
 class ProjectController extends ApiController
 {
@@ -21,6 +23,7 @@ class ProjectController extends ApiController
         private GetProjectUseCase $getProjectUseCase,
         private UpdateProjectUseCase $updateProjectUseCase,
         private DeleteProjectUseCase $deleteProjectUseCase,
+        private GetProjectsUseCase $getProjectsUseCase,
     ) {}
 
     /**
@@ -28,11 +31,7 @@ class ProjectController extends ApiController
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $projects = $request->user()
-            ->projects()
-            ->with('users')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $projects = $this->getProjectsUseCase->execute($request->user());
 
         return ProjectResource::collection($projects);
     }
