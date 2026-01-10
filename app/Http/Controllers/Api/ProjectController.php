@@ -10,19 +10,20 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
+use App\UseCases\Project\GetProjectsUseCase;
+
 class ProjectController extends ApiController
 {
+    public function __construct(
+        private GetProjectsUseCase $getProjectsUseCase,
+    ) {}
 
     /**
      * 自分が所属しているプロジェクト一覧を返す
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $projects = $request->user()
-            ->projects()
-            ->with('users')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $projects = $this->getProjectsUseCase->execute($request->user());
 
         return ProjectResource::collection($projects);
     }
