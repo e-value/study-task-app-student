@@ -49,7 +49,6 @@ Lesson5 では、これらを整理するために、
 -   **FormRequest は既に実装済み** - バリデーションは FormRequest に分離されています
 -   **認可チェックを整理する** - 重複した権限チェックのコードを共通化します
 -   **ビジネスロジックを Service や UseCase に分離する** - Controller をスリムに保ちます
--   **エラーハンドリングを統一する** - 一貫したエラーレスポンスを返します
 
 ---
 
@@ -74,14 +73,6 @@ Lesson5 では、これらを整理するために、
 -   複雑なビジネスロジック
 -   直接的なデータベース操作（複雑な場合）
 -   重複したコードの記述
-
-### 3. 参考記事（推奨）
-
--   ▼ Laravel の Controller をスリムに保つ方法
-    [https://laracasts.com/discuss/channels/laravel/keeping-controllers-thin](https://laracasts.com/discuss/channels/laravel/keeping-controllers-thin)
-
--   ▼ リファクタリングの基本原則
-    [https://refactoring.guru/refactoring](https://refactoring.guru/refactoring)
 
 ---
 
@@ -126,11 +117,6 @@ Lesson5 では、Lesson2 で作成したコードをリファクタリングし�
 -   Service / UseCase：ビジネスロジック
 -   Model：データアクセス
 
-#### 4. **エラーハンドリングの統一**
-
--   一貫したエラーレスポンス形式にする
--   適切な HTTP ステータスコードを返す（403, 404, 409, 422 など）
-
 ---
 
 ## 📝 リファクタリングの進め方
@@ -149,98 +135,118 @@ Lesson5 では、Lesson2 で作成したコードをリファクタリングし�
 -   Controller が長すぎないか？
 -   処理の意図がすぐに理解できるか？
 
-### Step 2: 重複コードを特定する
+### Step 2: まずは UseCase に移動する
 
-特に以下のコードが重複している箇所を探してください：
+**重要：最初から完璧を目指さない**
 
-```php
-// 自分が所属しているかチェック（よく出てくる）
-$isMember = $project->users()
-    ->where('users.id', $request->user()->id)
-    ->exists();
+リファクタリングの第一歩は、**Controller の処理を UseCase に移動すること**です。
 
-if (!$isMember) {
-    return response()->json([
-        'message' => 'このプロジェクトにアクセスする権限がありません',
-    ], 403);
-}
+#### 2-1. UseCase を作成する
+
+Controller の各メソッドに対応する UseCase を作成します。
+
+```
+1つのControllerメソッド = 1つのUseCaseファイル
+
+例：
+TaskController::store()     → CreateTaskUseCase
+TaskController::index()     → GetTasksUseCase
+TaskController::show()      → GetTaskUseCase
+TaskController::update()    → UpdateTaskUseCase
+TaskController::destroy()   → DeleteTaskUseCase
+TaskController::start()     → StartTaskUseCase
+TaskController::complete()  → CompleteTaskUseCase
 ```
 
-このような重複したコードを、どのように共通化できるか考えてください。
+**UseCase の作成場所：**
 
-### Step 3: 共通化の手法を検討する
+```bash
+# ディレクトリ作成
+mkdir -p app/UseCases/Task
+mkdir -p app/UseCases/Project
+mkdir -p app/UseCases/Membership
 
-重複したコードを共通化する方法として、以下の手法が考えられます：
-
-#### 手法 A：private メソッドに切り出す
-
-Controller 内で private メソッドを作成し、重複コードをまとめる
-
-```php
-private function checkProjectMember(Request $request, Project $project): void
-{
-    $isMember = $project->users()
-        ->where('users.id', $request->user()->id)
-        ->exists();
-
-    if (!$isMember) {
-        abort(403, 'このプロジェクトにアクセスする権限がありません');
-    }
-}
+# UseCaseファイルを作成（例）
+touch app/UseCases/Task/CreateTaskUseCase.php
 ```
 
-#### 手法 B：Trait を使用する
+#### 2-2. Controller の処理をそのまま UseCase に移す
 
-複数の Controller で使用する場合、Trait にまとめる
+**まずは深く考えずに、Controller の処理をそのまま UseCase に移動してください。**
+
+-   認可チェックも
+-   ビジネスロジックも
+-   データベース操作も
+
+**すべてそのまま UseCase の `execute()` メソッドに移します。**
+
+### Step 3: 共通ルールを発見して切り出す
+
+UseCase に移動した後、**同じようなコードが複数の UseCase に出てきたら**、それを切り出します。
+
+#### 3-1. まずは private メソッドに切り出す
+
+同じ UseCase 内で繰り返し使うコードは、private メソッドに切り出します。
 
 ```php
-// app/Http/Controllers/Api/Concerns/ChecksProjectMembership.php
-trait ChecksProjectMembership
+class CreateTaskUseCase
 {
-    protected function ensureProjectMember(Request $request, Project $project): void
+    public function execute(...) 
     {
+        // メンバーチェック
+        $this->ensureProjectMember($project, $user);
+        
+        // タスク作成
         // ...
     }
-}
-```
 
-#### 手法 C：Service クラスに切り出す
-
-認可チェックを専用の Service クラスに委譲する
-
-```php
-// app/Services/ProjectAuthorizationService.php
-class ProjectAuthorizationService
-{
-    public function ensureMember(User $user, Project $project): void
+    // 👇 まずはここに書く
+    private function ensureProjectMember(Project $project, User $user): void
     {
-        // ...
+        // チェック処理
     }
 }
 ```
 
-#### 手法 D：Policy を使用する（Laravel の標準機能）
+#### 3-2. 複数の UseCase で使うようになったらルールクラスに移動
 
-Laravel の Policy を使って認可ロジックを管理する
+**「あれ？このチェック、他の UseCase でも使ってるな」**
 
-```php
-// app/Policies/ProjectPolicy.php
-class ProjectPolicy
-{
-    public function view(User $user, Project $project): bool
-    {
-        // ...
-    }
-}
+と気づいたら、参考資料を読んで配置場所を考えてください。
+
+**参考資料の配置基準：**
+
+```
+┌─────────────────────────────────────────────────┐
+│ Q: このルールどこに置く？                        │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│ 1箇所だけで使う                                  │
+│   → UseCase内のprivateメソッド                  │
+│                                                 │
+│ 同じドメイン内の複数UseCaseで使う                │
+│   → UseCases/{Domain}/Rules/                   │
+│   例: UseCases/Task/Rules/TaskRules.php         │
+│                                                 │
+│ 複数ドメインで使う                               │
+│   → Services/{Domain}/                         │
+│   例: Services/Project/ProjectRules.php         │
+│                                                 │
+└─────────────────────────────────────────────────┘
 ```
 
-**どの手法を選ぶべきか？**
+**👉 参考資料をよく読んで、「なぜその場所に配置するのか」を理解してください。**
 
--   シンプルな場合：private メソッドや Trait
--   複雑な認可ロジック：Policy
--   ビジネスロジックと一緒に管理：Service クラス
+#### 3-3. 段階的に進める
 
-**参考資料を確認しながら、自分で最適な手法を選んでください。**
+```
+Week 1: Controller → UseCase に移動（そのまま移す）
+Week 2: UseCase内で重複したコードをprivateメソッドに切り出す
+Week 3: 他のUseCaseでも使うルールをRulesクラスに移動
+Week 4: 参考資料を読んで、配置場所が適切か見直す
+```
+
+**焦らず、段階的に進めてください。**
 
 ---
 
@@ -250,17 +256,19 @@ class ProjectPolicy
 
 -   リファクタリングは段階的に行うものです
 -   まずは 1 つの Controller から始めてください
--   動作を確認しながら、少しずつ改善していきましょう
+-   **最初は Controller → UseCase に移すだけでOK**
+-   共通化は後で考えます
 
 ### テストを活用する
 
 -   リファクタリング前後で動作が変わっていないことを確認してください
 -   Postman や API テストツールを使って動作確認しましょう
 
-### 既存の FormRequest を活用する
+### 参考資料を読みながら進める
 
--   バリデーションは既に FormRequest に切り出されています
--   FormRequest を変更する必要はありません（変更しても OK）
+-   UseCase に移した後、共通コードが出てきたら参考資料を読んでください
+-   **「このルールはどこに配置すべきか？」** を参考資料で確認しながら進めます
+-   配置場所の判断基準は参考資料に詳しく書かれています
 
 ---
 
@@ -277,34 +285,6 @@ class ProjectPolicy
 -   どこに配置するか？
 
 これらを自分で判断することが、設計力を鍛えるための重要な訓練です。
-
----
-
-## 🧪 動作確認
-
-リファクタリング後、以下を確認してください：
-
-### 1. API の動作確認（Postman など）
-
-以下のエンドポイントが正しく動作することを確認：
-
--   プロジェクト一覧取得
--   プロジェクト作成
--   プロジェクト詳細取得
--   プロジェクト更新
--   プロジェクト削除
--   タスク一覧取得
--   タスク作成・更新・削除
--   タスク開始・完了
-
-### 2. エラーケースの確認
-
-以下のエラーケースが正しく動作することを確認：
-
--   権限がない場合（403）
--   存在しないリソースへのアクセス（404）
--   バリデーションエラー（422）
--   ステータス遷移エラー（409）
 
 ---
 
@@ -363,7 +343,3 @@ Lesson5 が完了したら、Lesson4 と同様に振り返りを行い、リフ�
 ## 📚 参考リンク
 
 -   **必読：** [リファクタリングの参考資料](https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5)
--   [Laravel Controllers - 公式ドキュメント](https://laravel.com/docs/11.x/controllers)
--   [Laravel Authorization - 公式ドキュメント](https://laravel.com/docs/11.x/authorization)
--   [Laravel Policies - 公式ドキュメント](https://laravel.com/docs/11.x/authorization#creating-policies)
--   [Refactoring Guru](https://refactoring.guru/refactoring)
