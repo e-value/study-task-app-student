@@ -67,6 +67,10 @@ class ApiResponse
      * @param string $message
      * @return JsonResponse
      *
+     * @description
+     * このメソッドは Resource でないデータを返す場合に使用します。
+     * フロントエンドから response.data.data でアクセスできる構造になります。
+     *
      * @example 使用例
      * return $this->response->success($user, 'ユーザーを取得しました');
      *
@@ -76,6 +80,10 @@ class ApiResponse
      *     "message": "ユーザーを取得しました",
      *     "data": {"id": 1, "name": "田中太郎", "email": "tanaka@example.com"}
      * }
+     *
+     * @note フロントエンドのアクセス方法
+     * const user = response.data.data;  // { id: 1, name: "田中太郎", ... }
+     * const success = response.data.success;  // true
      */
     public function success($data = null, string $message = '成功'): JsonResponse
     {
@@ -239,5 +247,112 @@ class ApiResponse
     public function serverError(string $message = 'サーバーエラー', ?string $requestId = null): JsonResponse
     {
         return $this->respond(false, $message, null, 500, null, $requestId);
+    }
+
+    /**
+     * Resourceを使った成功レスポンス（Resource構造を維持しつつApiResponse要素を追加）
+     *
+     * @param \Illuminate\Http\Resources\Json\JsonResource $resource
+     * @param string $message
+     * @param int $status
+     * @return JsonResponse
+     *
+     * @description
+     * このメソッドは Resource の構造を維持しながら、success と message を追加します。
+     * フロントエンドから response.data.data でアクセスできる構造になります。
+     *
+     * @example 使用例
+     * return $this->response->successWithResource(new UserResource($user), 'ユーザーを取得しました');
+     *
+     * @example レスポンス例
+     * {
+     *     "data": {
+     *         "id": 1,
+     *         "name": "田中太郎",
+     *         "email": "tanaka@example.com"
+     *     },
+     *     "success": true,
+     *     "message": "ユーザーを取得しました"
+     * }
+     *
+     * @note フロントエンドのアクセス方法
+     * const user = response.data.data;  // { id: 1, name: "田中太郎", ... }
+     * const success = response.data.success;  // true
+     * const message = response.data.message;  // "ユーザーを取得しました"
+     */
+    public function successWithResource($resource, string $message = '成功', int $status = 200): JsonResponse
+    {
+        return $resource
+            ->additional([
+                'success' => true,
+                'message' => $message,
+            ])
+            ->response()
+            ->setStatusCode($status);
+    }
+
+    /**
+     * Resourceを使った作成成功レスポンス
+     *
+     * @param \Illuminate\Http\Resources\Json\JsonResource $resource
+     * @param string $message
+     * @return JsonResponse
+     *
+     * @example 使用例
+     * return $this->response->createdWithResource(new ProjectResource($project), 'プロジェクトを作成しました');
+     *
+     * @example レスポンス例
+     * {
+     *     "data": {
+     *         "id": 1,
+     *         "name": "新プロジェクト",
+     *         "is_archived": false,
+     *         "created_at": "2026-01-10T12:00:00.000000Z",
+     *         "updated_at": "2026-01-10T12:00:00.000000Z"
+     *     },
+     *     "success": true,
+     *     "message": "プロジェクトを作成しました"
+     * }
+     */
+    public function createdWithResource($resource, string $message = '作成しました'): JsonResponse
+    {
+        return $this->successWithResource($resource, $message, 201);
+    }
+
+    /**
+     * Resourceコレクションを使った成功レスポンス
+     *
+     * @param \Illuminate\Http\Resources\Json\AnonymousResourceCollection $collection
+     * @param string $message
+     * @return JsonResponse
+     *
+     * @example 使用例
+     * return $this->response->successWithCollection(
+     *     ProjectResource::collection($projects),
+     *     'プロジェクト一覧を取得しました'
+     * );
+     *
+     * @example レスポンス例
+     * {
+     *     "data": [
+     *         {"id": 1, "name": "プロジェクトA"},
+     *         {"id": 2, "name": "プロジェクトB"}
+     *     ],
+     *     "success": true,
+     *     "message": "プロジェクト一覧を取得しました"
+     * }
+     *
+     * @note フロントエンドのアクセス方法
+     * const projects = response.data.data;  // [{id: 1, ...}, {id: 2, ...}]
+     */
+    public function successWithCollection($collection, string $message = '取得しました'): JsonResponse
+    {
+        return $collection
+            ->additional([
+                'success' => true,
+                'message' => $message,
+            ])
+            ->response()
+            ->setStatusCode(200);
     }
 }

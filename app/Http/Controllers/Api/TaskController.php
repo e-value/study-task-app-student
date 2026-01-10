@@ -55,10 +55,10 @@ class TaskController extends ApiController
             $request->user()
         );
 
-        return (new TaskResource($task))
-            ->additional(['message' => 'タスクを作成しました'])
-            ->response()
-            ->setStatusCode(201);
+        return $this->response()->createdWithResource(
+            new TaskResource($task),
+            'タスクを作成しました'
+        );
     }
 
     /**
@@ -73,7 +73,7 @@ class TaskController extends ApiController
     /**
      * タスク更新
      */
-    public function update(UpdateTaskRequest $request, Task $task): TaskResource
+    public function update(UpdateTaskRequest $request, Task $task): JsonResponse
     {
         $task = $this->updateTaskUseCase->execute(
             $task,
@@ -81,8 +81,10 @@ class TaskController extends ApiController
             $request->user()
         );
 
-        return (new TaskResource($task))
-            ->additional(['message' => 'タスクを更新しました']);
+        return $this->response()->successWithResource(
+            new TaskResource($task),
+            'タスクを更新しました'
+        );
     }
 
     /**
@@ -98,18 +100,24 @@ class TaskController extends ApiController
     /**
      * タスクを開始（todo → doing）
      */
-    public function start(Request $request, Task $task): TaskResource
+    public function start(Request $request, Task $task): JsonResponse
     {
         $task = $this->startTaskUseCase->execute($task, $request->user());
-        return new TaskResource($task);
+        return $this->response()->successWithResource(
+            new TaskResource($task),
+            'タスクを開始しました'
+        );
     }
 
     /**
      * タスクを完了（doing → done）
      */
-    public function complete(Request $request, Task $task): TaskResource
+    public function complete(Request $request, Task $task): JsonResponse
     {
         $task = $this->completeTaskUseCase->execute($task, $request->user());
-        return new TaskResource($task);
+        return $this->response()->successWithResource(
+            new TaskResource($task),
+            'タスクを完了しました'
+        );
     }
 }

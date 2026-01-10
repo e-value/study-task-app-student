@@ -40,9 +40,10 @@ class ProjectMemberController extends ApiController
             $request->user()
         );
 
-        return $this->response()->created([
-            'membership' => new ProjectMemberResource($user),
-        ], 'メンバーを追加しました');
+        return $this->response()->createdWithResource(
+            new ProjectMemberResource($user),
+            'メンバーを追加しました'
+        );
     }
 
     /**

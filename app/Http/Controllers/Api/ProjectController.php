@@ -46,10 +46,10 @@ class ProjectController extends ApiController
             $request->user()
         );
 
-        return (new ProjectResource($project))
-            ->additional(['message' => 'プロジェクトを作成しました'])
-            ->response()
-            ->setStatusCode(201);
+        return $this->response()->createdWithResource(
+            new ProjectResource($project),
+            'プロジェクトを作成しました'
+        );
     }
 
     /**
@@ -64,7 +64,7 @@ class ProjectController extends ApiController
     /**
      * プロジェクト更新
      */
-    public function update(UpdateProjectRequest $request, Project $project): ProjectResource
+    public function update(UpdateProjectRequest $request, Project $project): JsonResponse
     {
         $project = $this->updateProjectUseCase->execute(
             $project,
@@ -72,8 +72,10 @@ class ProjectController extends ApiController
             $request->user()
         );
 
-        return (new ProjectResource($project))
-            ->additional(['message' => 'プロジェクトを更新しました']);
+        return $this->response()->successWithResource(
+            new ProjectResource($project),
+            'プロジェクトを更新しました'
+        );
     }
 
     /**
