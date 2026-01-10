@@ -18,7 +18,7 @@
 実装を始める前に、以下の参考資料を確認してください：
 
 👉 **リファクタリングの参考資料（必読）**  
-<a href="https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5" target="_blank">https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5</a>
+<a href="https://chatgpt.com/canvas/shared/6961fa4f54bc8191b85791c8f212beec" target="_blank">https://chatgpt.com/canvas/shared/6961fa4f54bc8191b85791c8f212beec</a>
 
 この資料では、以下の内容を解説しています：
 
@@ -296,7 +296,7 @@ Week 4: 参考資料を読んで、配置場所が適切か見直す
 
 **今回は参考実装を用意していません。**
 
-参考資料（<a href="https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5" target="_blank">https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5</a>）を読み、自分で考えて実装してください。
+参考資料（<a href="https://chatgpt.com/canvas/shared/6961fa4f54bc8191b85791c8f212beec" target="_blank">https://chatgpt.com/canvas/shared/6961fa4f54bc8191b85791c8f212beec</a>）を読み、自分で考えて実装してください。
 
 **考えるべきポイント：**
 
@@ -362,4 +362,4 @@ Lesson5 が完了したら、Lesson4 と同様に振り返りを行い、リフ�
 
 ## 📚 参考リンク
 
--   **必読：** <a href="https://claude.ai/public/artifacts/2e64c71d-5897-4dcc-836b-4cfaf10741a5" target="_blank">リファクタリングの参考資料</a>
+-   **必読：** <a href="https://chatgpt.com/canvas/shared/6961fa4f54bc8191b85791c8f212beec" target="_blank">リファクタリングの参考資料</a>
